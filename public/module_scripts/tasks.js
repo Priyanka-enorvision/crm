@@ -1,6 +1,5 @@
 $(document).ready(function () {
 
-
 	/* Delete data */
 	$("#delete_record").submit(function (e) {
 		/*Form Submit*/
@@ -15,14 +14,18 @@ $(document).ready(function () {
 				if (JSON.error != '') {
 					toastr.error(JSON.error);
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
-					location.reload();
+					Ladda.stopAll();
 				} else {
 					$('.delete-modal').modal('toggle');
 					toastr.success(JSON.result);
+					window.location.href = main_url + 'tasks-list';
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
-					location.reload();
 
+					Ladda.stopAll();
 				}
+			},
+			error: function (xhr, error, thrown) {
+				console.log("AJAX Error: ", xhr.responseText);
 			}
 		});
 	});
@@ -61,5 +64,5 @@ $(document).ready(function () {
 });
 $(document).on("click", ".delete", function () {
 	$('input[name=_token]').val($(this).data('record-id'));
-	$('#delete_record').attr('action', main_url + 'tasks/delete_tasks');
+	$('#delete_record').attr('action', main_url + 'delete-tasks');
 });

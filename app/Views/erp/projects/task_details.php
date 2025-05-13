@@ -1,4 +1,5 @@
 <?php
+
 use CodeIgniter\I18n\Time;
 use App\Models\SystemModel;
 use App\Models\UsersModel;
@@ -58,7 +59,7 @@ curl_close($curl);
 $locale = service('request')->getLocale();
 $request = \Config\Services::request();
 
-$segment_id = $request->uri->getSegment(3);
+$segment_id = $request->getUri()->getSegment(3);
 $task_id = udecode($segment_id);
 
 $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
@@ -101,7 +102,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
       <?php if (in_array('task5', staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
         <?php $attributes = array('name' => 'update_task_progress', 'id' => 'update_task_progress', 'autocomplete' => 'off'); ?>
         <?php $hidden = array('token' => $segment_id); ?>
-        <?php echo form_open('erp/tasks/update_task_progress', $attributes, $hidden); ?>
+        <?php echo form_open('erp/update-task-progress', $attributes, $hidden); ?>
       <?php } ?>
       <div class="card-body">
         <div class="row justify-content-md-center">
@@ -257,7 +258,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                           </td>
                         </tr>
                       <?php endif; ?>
-                      <?php $gi++;
+                    <?php $gi++;
                     } ?>
                   </tbody>
                 </table>
@@ -280,7 +281,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
             role="tabpanel" aria-labelledby="pills-edit-tab">
             <?php $attributes = array('name' => 'update_task', 'id' => 'update_task', 'autocomplete' => 'off'); ?>
             <?php $hidden = array('token' => $segment_id); ?>
-            <?php echo form_open('erp/tasks/update_task', $attributes, $hidden); ?>
+            <?php echo form_open('erp/update-task', $attributes, $hidden); ?>
             <div class="card-body">
               <div class="row">
                 <div class="col-md-4">
@@ -351,7 +352,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                       <option value=""></option>
                       <?php foreach ($applyExpertData as $staff) { ?>
                         <option value="<?= $staff['expertId'] ?>" <?php if (in_array($staff['expertId'], $expert_to)): ?>
-                            selected="selected" <?php endif; ?>>
+                          selected="selected" <?php endif; ?>>
                           <?= $staff['expertFullName'] ?>
                         </option>
                       <?php } ?>
@@ -368,7 +369,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                       <option value=""></option>
                       <?php foreach ($staff_info as $staff) { ?>
                         <option value="<?= $staff['user_id'] ?>" <?php if (in_array($staff['user_id'], $assigned_to)): ?>
-                            selected="selected" <?php endif; ?>>
+                          selected="selected" <?php endif; ?>>
                           <?= $staff['first_name'] . ' ' . $staff['last_name'] ?>
                         </option>
                       <?php } ?>
@@ -440,7 +441,8 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                       <div class="mt-2"><a href="#!" data-field="<?= $_discussion['task_discussion_id']; ?>"
                           class="delete_discussion m-r-10 text-secondary"><i class="fas fa-trash-alt text-danger mr-2"></i>
                           <?= lang('Main.xin_delete'); ?>
-                        </a></div>
+                        </a>
+                      </div>
                     </div>
                   </li>
                   <hr class="discussion_option_id_<?= $_discussion['task_discussion_id']; ?>">
@@ -448,7 +450,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
               </ul>
               <?php $attributes = array('name' => 'add_discussion', 'id' => 'add_discussion', 'autocomplete' => 'off'); ?>
               <?php $hidden = array('token' => $segment_id); ?>
-              <?= form_open('erp/tasks/add_discussion', $attributes, $hidden); ?>
+              <?= form_open('erp/add-discussion', $attributes, $hidden); ?>
               <div class="input-group mb-3">
                 <!-- <textarea class="form-control editor" name="description"><?= lang('Projects.xin_enter_discussion_msg'); ?>...</textarea> -->
                 <!-- <input type="text" class="form-control editor"  name="description" placeholder="<?= lang('Projects.xin_enter_discussion_msg'); ?>..."> -->
@@ -498,7 +500,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
               </ul>
               <?php $attributes = array('name' => 'add_note', 'id' => 'add_note', 'autocomplete' => 'off'); ?>
               <?php $hidden = array('token' => $segment_id); ?>
-              <?= form_open('erp/tasks/add_note', $attributes, $hidden); ?>
+              <?= form_open('erp/add-note', $attributes, $hidden); ?>
               <div class="input-group mb-3">
                 <input type="text" name="description" class="form-control"
                   placeholder="<?= lang('Projects.xin_post_a_note'); ?>...">
@@ -555,7 +557,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
               </div>
               <?php $attributes = array('name' => 'add_attachment', 'id' => 'add_attachment', 'autocomplete' => 'off'); ?>
               <?php $hidden = array('token' => $segment_id); ?>
-              <?= form_open('erp/tasks/add_attachment', $attributes, $hidden); ?>
+              <?= form_open('erp/add-attachment', $attributes, $hidden); ?>
               <div class="bg-white">
                 <div class="row mt-4">
                   <div class="col-md-6">

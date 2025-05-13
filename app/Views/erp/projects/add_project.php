@@ -171,9 +171,9 @@ if ($user_info['user_type'] == 'staff') {
 <div class="row m-b-1 animated fadeInRight">
     <div class="col-md-12">
         <?php if (in_array('project2', staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
-            <div id="add_form" class="add-form <?= $get_animate; ?>" data-parent="#accordion" style="">
+            <div id="add_form" class="add-form " data-parent="#accordion" style="">
                 <?php $attributes = array('name' => 'add_project', 'id' => 'xin-form', 'autocomplete' => 'off'); ?>
-                <?php $hidden = array('user_id' => 0); ?>
+                <?php $hidden = array('user_id' => '0'); ?>
                 <?php echo form_open('erp/projects/add_project', $attributes, $hidden); ?>
                 <div class="card mb-2">
                     <div id="accordion">
@@ -484,7 +484,7 @@ if ($user_info['user_type'] == 'staff') {
 
             if (company_id) {
                 $.ajax({
-                    url: '<?= base_url('erp/projects/get_employe'); ?>',
+                    url: '<?= base_url('erp/get-employelist'); ?>',
                     type: 'POST',
                     data: {
                         company_id: company_id

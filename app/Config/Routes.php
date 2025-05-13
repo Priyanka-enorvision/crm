@@ -91,6 +91,7 @@ $routes->get('erp/projects-list/', 'Projects::show_projects', ['namespace' => 'A
 $routes->get('erp/create-project/', 'Projects::create_project', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/edit-project/(:segment)', 'Projects::edit_project', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/project-detail/(:segment)', 'Projects::project_details', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/get-employelist', 'Projects::get_employe', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 // project invoice
 $routes->get('erp/project-invoice/(:any)', 'projects::project_invoice/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -115,9 +116,22 @@ $routes->get('erp/project-details/(:segment)', 'Projects::client_project_details
 $routes->get('erp/tasks-list/', 'Tasks::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/tasks-data-Lists', 'Tasks::tasks_data_lists', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/add-tasks', 'Tasks::add_tasks', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/delete-tasks', 'Tasks::delete_tasks', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/task-detail/(:segment)', 'Tasks::task_details', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-task-progress', 'Tasks::update_task_progress', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-task', 'Tasks::update_task', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-discussion', 'Tasks::add_discussion', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/delete-task-discussion', 'Tasks::delete_task_discussion', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-note', 'Tasks::add_note', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/delete-task-note', 'Tasks::delete_task_note', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-attachment', 'tasks::add_attachment', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/delete-task-file', 'Tasks::delete_task_file', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
 
 $routes->get('erp/tasks-grid/', 'Tasks::tasks_grid', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->get('erp/task-detail/(:segment)', 'Tasks::task_details', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-grid-task', 'Tasks::add_gridTask', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/delete-gridTask', 'Tasks/delete_gridtask', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
 $routes->get('erp/tasks-summary/', 'Tasks::tasks_summary', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/tasks-calendar/', 'Tasks::tasks_calendar', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/tasks-scrum-board/', 'Tasks::tasks_scrum_board', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);

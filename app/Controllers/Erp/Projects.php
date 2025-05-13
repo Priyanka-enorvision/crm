@@ -89,7 +89,7 @@ class Projects extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -2500,7 +2500,6 @@ class Projects extends BaseController
 	public function get_employe()
 	{
 		$company_id = $this->request->getPost('company_id');
-
 		if (!$company_id) {
 			return $this->response->setJSON([]);
 		}
