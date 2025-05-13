@@ -51,7 +51,7 @@ class Employees extends BaseController
 		$data['breadcrumbs'] = lang('Dashboard.dashboard_employees');
 		$data['files'] = $files;
 		$data['subview'] = view('erp/employees/staff_list', $data);
-		return view('erp/layout/layout_main', $data); //page load
+		return view('erp/layout/layout_main', $data);
 	}
 	public function staff_grid()
 	{
@@ -1426,12 +1426,12 @@ class Employees extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||edit record|||
@@ -1786,11 +1786,11 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			exit;
+			
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||update record|||
@@ -1885,11 +1885,11 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			exit;
+			
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||update record|||
@@ -1953,7 +1953,7 @@ class Employees extends BaseController
 				// Collect all errors
 				$Return['error'] = $validation->getErrors();
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 			$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
 			$UsersModel = new UsersModel();
@@ -1974,11 +1974,11 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			exit;
+			
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||update record|||
@@ -2145,11 +2145,11 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			exit;
+			
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||update record|||
@@ -2256,11 +2256,11 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			exit;
+			
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||update record|||
@@ -2322,11 +2322,11 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			exit;
+			
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// update record
@@ -2492,11 +2492,11 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			exit;
+			
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 
@@ -2545,7 +2545,7 @@ class Employees extends BaseController
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		if ($this->request->getPost('_method') == 'DELETE') {
-			/* Define return | here result is used to return user data and error for error message */
+			
 			$Return = ['result' => '', 'error' => '', 'csrf_hash' => ''];
 
 			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
@@ -2581,7 +2581,7 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// delete record
@@ -2605,7 +2605,7 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// delete record
@@ -2629,7 +2629,7 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// delete record
@@ -2653,7 +2653,7 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// delete record

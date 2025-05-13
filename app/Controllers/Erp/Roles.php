@@ -22,7 +22,7 @@ class Roles extends BaseController
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -36,8 +36,6 @@ class Roles extends BaseController
 		$data['subview'] = view('erp/staff_roles/staff_role_list', $data);
 		return view('erp/layout/layout_main', $data); //page load
 	}
-
-
 
 	public function add_role()
 	{
@@ -74,7 +72,7 @@ class Roles extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -101,40 +99,32 @@ class Roles extends BaseController
 				$Return['csrf_hash'] = csrf_hash();
 				if ($result == TRUE) {
 
-					// toastr()->success(lang('Users.xin_strole_success_added'));
-					// $session->setFlashdata('success',lang('Users.xin_strole_success_added'));
-					// return redirect()->to(site_url('erp/set-roles'));
 
 					$Return['result'] = lang('Users.xin_strole_success_added');
 				} else {
-					// toastr()->error(lang('Main.xin_error_msg'));
-					// $session->setFlashdata('error',lang('Main.xin_error_msg'));
-					// return redirect()->to(site_url('erp/set-roles'));
+					
 
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
-				exit;
+				return $this->response->setJSON($Return);
 			}
 		} else {
 
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	public function update_role()
 	{
 
 		$validation =  \Config\Services::validation();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		if ($this->request->getPost()) {
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$Return['csrf_hash'] = csrf_hash();
-			// set rules
-			// set rules
+			
 			$rules = [
 				'role_name' => [
 					'rules'  => 'required',
@@ -158,7 +148,7 @@ class Roles extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -176,28 +166,22 @@ class Roles extends BaseController
 				$Return['csrf_hash'] = csrf_hash();
 				if ($result == TRUE) {
 					$Return['result'] = lang('Users.xin_strole_success_updated');
-					// toastr()->success(lang('Users.xin_strole_success_updated'));
-					// $session->setFlashdata('error',lang('Users.xin_strole_success_updated'));
-					// return redirect()->to(site_url('erp/set-roles'));
+					
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
-					// toastr()->error(lang('Main.xin_error_msg'));
-					// $session->setFlashdata('error',lang('Main.xin_error_msg'));
-					// return redirect()->to(site_url('erp/set-roles'));
+					
 				}
-				$this->output($Return);
-				exit;
+				return $this->response->setJSON($Return);
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// read record
 	public function read_role()
 	{
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$id = $request->getGet('field_id');
 		$data = [
@@ -206,7 +190,7 @@ class Roles extends BaseController
 		if ($session->has('sup_username')) {
 			return view('erp/staff_roles/dialog_role', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
 	// record list
@@ -237,22 +221,9 @@ class Roles extends BaseController
 				$role_access = lang('Users.xin_role_cmenu');
 			}
 			$created_at = set_date_format($r['created_at']);
-			/*$subs_role = substr($r['role_name'], 0, 1);	
-			$role_title= '<div class="media align-items-center">
-				<span class="bg-avatar d-block ui-w-30 '.$avatar_array[$i].'">'.$subs_role.'</span>
-				<div class="media-body flex-basis-auto pl-3">
-				  <div>'.$r['role_name'].'</div>
-				</div>
-			  </div>';*/
+			
 
-			$role_name = $r['role_name'];
-
-			// $role_name = '
-			// 	'.$r['role_name'].'
-			// 	<div class="overlay-edit">
-			// 		'.$combhr.'
-			// 	</div>
-			// ';				 			  				
+			$role_name = $r['role_name'];			 			  				
 			$data[] = array(
 				$role_name,
 				$role_access,
@@ -262,7 +233,7 @@ class Roles extends BaseController
 			$i++;
 		}
 		$output = array(
-			//"draw" => $draw,
+			
 			"data" => $data
 		);
 		echo json_encode($output);
@@ -273,9 +244,8 @@ class Roles extends BaseController
 	{
 
 		if ($this->request->getPost('type') == 'delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-			$session = \Config\Services::session($config);
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
 			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
@@ -294,7 +264,7 @@ class Roles extends BaseController
 			} else {
 				$Return['error'] = lang('Membership.xin_error_msg');
 			}
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 		}
 	}
 }

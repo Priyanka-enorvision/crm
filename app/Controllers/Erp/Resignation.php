@@ -3,12 +3,8 @@
 namespace App\Controllers\Erp;
 
 use App\Controllers\BaseController;
-use CodeIgniter\HTTP\RequestInterface;
-use CodeIgniter\HTTP\ResponseInterface;
-use CodeIgniter\HTTP\Files\UploadedFile;
 
-use App\Models\OffModel;
-use App\Models\MainModel;
+
 use App\Models\RolesModel;
 use App\Models\UsersModel;
 use App\Models\SystemModel;
@@ -31,7 +27,7 @@ class Resignation extends BaseController
 		$user_id = $user_info['user_id'];
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -94,7 +90,7 @@ class Resignation extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -124,7 +120,7 @@ class Resignation extends BaseController
 
 				if ($existing_resignation) {
 					$Return['error'] = "Same date don't apply a resignation";
-					$this->output($Return);
+					return $this->response->setJSON($Return);
 				} else {
 					$data = [
 						'company_id'  => $company_id,
@@ -146,14 +142,12 @@ class Resignation extends BaseController
 						$Return['error'] = lang('Main.xin_error_msg');
 					}
 
-					$this->output($Return);
-					exit;
+					return $this->response->setJSON($Return);
 				}
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 
@@ -198,7 +192,7 @@ class Resignation extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -221,106 +215,151 @@ class Resignation extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
-				exit;
+				return $this->response->setJSON($Return);
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// record list
 	public function resignation_list()
 	{
-
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
+		
+		// Check session
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
+
+		// Load models
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
 		$SystemModel = new SystemModel();
 		$ResignationsModel = new ResignationsModel();
 		$ConstantsModel = new ConstantsModel();
-		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 
-		if ($user_info['user_type'] == 'staff') {
-			$get_data = $ResignationsModel->where('company_id', $user_info['company_id'])->where('employee_id', $user_info['user_id'])->orderBy('resignation_id', 'ASC')->findAll();
-		} else {
-			$get_data = $ResignationsModel->where('company_id', $usession['sup_user_id'])->orderBy('resignation_id', 'ASC')->findAll();
+		// Get user info with null check
+		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+		if (!$user_info) {
+			return $this->response->setJSON(['data' => []]);
 		}
-		$data = array();
+
+		// Get resignation data based on user type
+		if ($user_info['user_type'] == 'staff') {
+			$get_data = $ResignationsModel->where('company_id', $user_info['company_id'])
+										->where('employee_id', $user_info['user_id'])
+										->orderBy('resignation_id', 'ASC')
+										->findAll();
+		} else {
+			$get_data = $ResignationsModel->where('company_id', $usession['sup_user_id'])
+										->orderBy('resignation_id', 'ASC')
+										->findAll();
+		}
+
+		$data = [];
 
 		foreach ($get_data as $r) {
+			// Skip invalid records
+			if (!$r) {
+				continue;
+			}
 
-			if (in_array('resignation3', staff_role_resource()) || $user_info['user_type'] == 'company') { //edit
-				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_edit') . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="' . uencode($r['resignation_id']) . '"><i class="feather icon-edit"></i></button></span>';
+			// Initialize variables with null checks
+			$resignation_id = $r['resignation_id'] ?? null;
+			$employee_id = $r['employee_id'] ?? null;
+			$company_id = $r['company_id'] ?? null;
+			
+			// Skip if required fields are missing
+			if (!$resignation_id || !$employee_id || !$company_id) {
+				continue;
+			}
+
+			// Edit button
+			if (in_array('resignation3', staff_role_resource()) || $user_info['user_type'] == 'company') {
+				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_edit') . '">
+						<button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" 
+						data-toggle="modal" data-target=".view-modal-data" 
+						data-field_id="' . uencode($resignation_id) . '">
+						<i class="feather icon-edit"></i></button></span>';
 			} else {
 				$edit = '';
 			}
-			if (in_array('resignation4', staff_role_resource()) || $user_info['user_type'] == 'company') { //edit
-				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . uencode($r['resignation_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
+
+			// Delete button
+			if (in_array('resignation4', staff_role_resource()) || $user_info['user_type'] == 'company') {
+				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '">
+						<button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" 
+						data-toggle="modal" data-target=".delete-modal" 
+						data-record-id="' . uencode($resignation_id) . '">
+						<i class="feather icon-trash-2"></i></button></span>';
 			} else {
 				$delete = '';
 			}
 
-			$notice_date = set_date_format($r['notice_date']);
-			$resignation_date = set_date_format($r['resignation_date']);
-			//
-			if ($r['status'] == 0) {
-				$app_status = '<span class="badge badge-light-warning">' . lang('Main.xin_pending') . '</span>';
-			} else if ($r['status'] == 1) {
-				$app_status = '<span class="badge badge-light-success">' . lang('Main.xin_accepted') . '</span>';
-			} else if ($r['status'] == 2) {
-				$app_status = '<span class="badge badge-light-danger">' . lang('Main.xin_rejected') . '</span>';
+			// Format dates
+			$notice_date = isset($r['notice_date']) ? set_date_format($r['notice_date']) : '';
+			$resignation_date = isset($r['resignation_date']) ? set_date_format($r['resignation_date']) : '';
+
+			// Status badge
+			$app_status = '<span class="badge badge-light-secondary">' . lang('Main.xin_unknown_status') . '</span>';
+			if (isset($r['status'])) {
+				switch ($r['status']) {
+					case 0:
+						$app_status = '<span class="badge badge-light-warning">' . lang('Main.xin_pending') . '</span>';
+						break;
+					case 1:
+						$app_status = '<span class="badge badge-light-success">' . lang('Main.xin_accepted') . '</span>';
+						break;
+					case 2:
+						$app_status = '<span class="badge badge-light-danger">' . lang('Main.xin_rejected') . '</span>';
+						break;
+				}
 			}
-			// employee
-			$iuser = $UsersModel->where('user_id', $r['employee_id'])->first();
-			$employee_name = $iuser['first_name'] . ' ' . $iuser['last_name'];
-			$ruserinfo = $employee_name . '<br><small class="text-muted"><i>' . $iuser['email'] . '<i></i></i></small>';
+
+			// Get employee info with null checks
+			$iuser = $UsersModel->where('user_id', $employee_id)->first();
+			if (!$iuser) {
+				continue;
+			}
+
+			$employee_name = ($iuser['first_name'] ?? '') . ' ' . ($iuser['last_name'] ?? '');
+			$profile_photo = $iuser['profile_photo'] ?? 'default.png';
+
 			$uname = '<div class="d-inline-block align-middle">
-				<img src="' . base_url() . '/public/uploads/users/thumb/' . $iuser['profile_photo'] . '" alt="user image" class="img-radius align-top m-r-15" style="width:40px;">
+				<img src="' . base_url() . '/public/uploads/users/thumb/' . $profile_photo . '" alt="user image" class="img-radius align-top m-r-15" style="width:40px;">
 				<div class="d-inline-block">
 					<h6 class="m-b-0">' . $employee_name . '</h6>
-					<p class="m-b-0">' . $iuser['email'] . '</p>
+					<p class="m-b-0">' . ($iuser['email'] ?? '') . '</p>
 				</div>
 			</div>';
 
 			$combhr = $edit . $delete;
-			if (in_array('resignation3', staff_role_resource()) || in_array('resignation4', staff_role_resource()) || $user_info['user_type'] == 'company') {
-				$iemployee_name = $uname;
-				// $iemployee_name = '
-				// '.$uname.'
-				// <div class="overlay-edit">
-				// 	'.$combhr.'
-				// </div>';	 			  				
-			} else {
-				$iemployee_name = $uname;
-			}
-			$data[] = array(
+			$iemployee_name = $uname; // Simplified since both conditions used same value
+
+			$data[] = [
 				$iemployee_name,
 				$notice_date,
 				$resignation_date,
 				$app_status,
 				$combhr
-			);
+			];
 		}
-		$output = array(
-			//"draw" => $draw,
+
+		$output = [
 			"data" => $data
-		);
-		echo json_encode($output);
-		exit();
+		];
+
+		return $this->response->setJSON($output);
 	}
 	// read record
 	public function read_resignation()
 	{
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$id = $request->getGet('field_id');
 		$data = [
@@ -329,7 +368,7 @@ class Resignation extends BaseController
 		if ($session->has('sup_username')) {
 			return view('erp/resignation/dialog_resignation', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
 	// delete record
@@ -339,7 +378,7 @@ class Resignation extends BaseController
 		if ($this->request->getPost('type') == 'delete_record') {
 			/* Define return | here result is used to return user data and error for error message */
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-			$session = \Config\Services::session($config);
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
 			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
@@ -351,7 +390,7 @@ class Resignation extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 		}
 	}
 }

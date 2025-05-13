@@ -33,7 +33,7 @@ $get_animate = '';
         </div>
 
 
-        <?= form_open('erp/resignation/add_resignation', ['name' => 'add_resignation', 'id' => 'xin-form', 'autocomplete' => 'off']); ?>
+        <?= form_open('erp/add-resignation', ['name' => 'add_resignation', 'id' => 'xin-form', 'autocomplete' => 'off']); ?>
         <input type="hidden" name="user_id" value="1">
         <div class="card-body">
           <div class="row">

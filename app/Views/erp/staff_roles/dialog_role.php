@@ -43,7 +43,7 @@ if ($request->getGet('data') === 'role' && $request->getGet('field_id')) {
 	</div>
 	<?php $attributes = array('name' => 'edit_role', 'id' => 'edit_role', 'autocomplete' => 'off', 'class' => '"m-b-1'); ?>
 	<?php $hidden = array('_method' => 'EDIT', 'token' => $field_id); ?>
-	<?= form_open('erp/roles/update_role', $attributes, $hidden); ?>
+	<?= form_open('erp/update-role', $attributes, $hidden); ?>
 	<div class="modal-body">
 		<div class="row">
 			<div class="col-md-6">
@@ -146,7 +146,7 @@ if ($request->getGet('data') === 'role' && $request->getGet('field_id')) {
 							var xin_table = $('#xin_table').dataTable({
 								"bDestroy": true,
 								"ajax": {
-									url: "<?= site_url("erp/roles/staff_roles_list") ?>",
+									url: "<?= site_url("erp/staff-roles-list") ?>",
 									type: 'GET'
 								},
 								"language": {

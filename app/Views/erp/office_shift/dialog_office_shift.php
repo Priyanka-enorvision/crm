@@ -28,7 +28,7 @@ $result = $ShiftModel->where('office_shift_id', $ifield_id)->first();
 </div>
 <?php $attributes = array('name' => 'edit_office_shift', 'id' => 'edit_office_shift', 'autocomplete' => 'off', 'class'=>'m-b-1');?>
 <?php $hidden = array('_method' => 'EDIT', 'token' => $field_id);?>
-<?php echo form_open('erp/officeshifts/update_office_shift', $attributes, $hidden);?>
+<?php echo form_open('erp/update-office-shift', $attributes, $hidden);?>
 <div class="modal-body">
   <div class="row">
     <div class="col-md-6">
@@ -254,7 +254,7 @@ $result = $ShiftModel->where('office_shift_id', $ifield_id)->first();
 						var xin_table = $('#xin_table').dataTable({
 							"bDestroy": true,
 							"ajax": {
-								url : "<?php echo site_url("erp/Officeshifts/office_shifts_list") ?>",
+								url : "<?php echo site_url("erp/office-shifts-list") ?>",
 								type : 'GET'
 							},
 							"language": {

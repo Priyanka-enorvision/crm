@@ -2,7 +2,7 @@ $(document).ready(function() {
 	var xin_table = $('#xin_table').dataTable({
 		 "bDestroy": true,
 		 "ajax": {
-			 url : main_url+"roles/staff_roles_list",
+			 url : main_url+"staff-roles-list",
 			 type : 'GET'
 		 },
 		 "language": {
@@ -57,7 +57,7 @@ $(document).ready(function() {
 		 var field_id = button.data('field_id');
 		 var modal = $(this);
 	 $.ajax({
-		 url : main_url+"roles/read_role",
+		 url : main_url+"read-role",
 		 type: "GET",
 		 data: 'jd=1&data=role&field_id='+field_id,
 		 success: function (response) {
@@ -105,7 +105,7 @@ $(document).ready(function() {
  });
  $( document ).on( "click", ".delete", function() {
 	 $('input[name=_token]').val($(this).data('record-id'));
-	 $('#delete_record').attr('action',main_url+'roles/delete_role/'+$(this).data('record-id'));
+	 $('#delete_record').attr('action',main_url+'delete-role/'+$(this).data('record-id'));
  });
  $(document).ready(function(){
 	 $("#role_access").change(function(){

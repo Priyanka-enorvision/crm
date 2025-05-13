@@ -43,7 +43,7 @@ $result = $OffModel->where('exit_id', $exit_id)->first();
 </div>
 <?php $attributes = array('name' => 'edit_exit', 'id' => 'edit_exit', 'autocomplete' => 'off', 'class'=>'m-b-1');?>
 <?php $hidden = array('_method' => 'EDIT', 'token' => $field_id);?>
-<?php echo form_open('erp/leaving/update_exit', $attributes, $hidden);?>
+<?php echo form_open('erp/update-exit', $attributes, $hidden);?>
 <div class="modal-body">
   <div class="row">
     <div class="col-md-6">
@@ -155,7 +155,7 @@ $(document).ready(function(){
 					var xin_table = $('#xin_table').dataTable({
 					"bDestroy": true,
 					"ajax": {
-						url : "<?php echo site_url("erp/leaving/employee_off_list") ?>",
+						url : "<?php echo site_url("erp/employee-off-list") ?>",
 						type : 'GET'
 					},
 					"language": {
