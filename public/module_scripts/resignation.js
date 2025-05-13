@@ -2,7 +2,7 @@ $(document).ready(function() {
    var xin_table = $('#xin_table').dataTable({
         "bDestroy": true,
 		"ajax": {
-            url : main_url+"resignation/resignation_list",
+            url : main_url+"resignation-datalist",
             type : 'GET'
         },
 		"language": {
@@ -57,7 +57,7 @@ $(document).ready(function() {
 		var field_id = button.data('field_id');
 		var modal = $(this);
 	$.ajax({
-		url : main_url+"resignation/read_resignation",
+		url : main_url+"read-resignation",
 		type: "GET",
 		data: 'jd=1&data=resignation&field_id='+field_id,
 		success: function (response) {
@@ -125,5 +125,5 @@ $(document).ready(function() {
 });
 $( document ).on( "click", ".delete", function() {
 	$('input[name=_token]').val($(this).data('record-id'));
-	$('#delete_record').attr('action',main_url+'resignation/delete_resignation');
+	$('#delete_record').attr('action',main_url+'delete-resignation');
 });

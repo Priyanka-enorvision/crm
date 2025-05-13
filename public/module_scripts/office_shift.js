@@ -2,7 +2,7 @@ $(document).ready(function() {
 var xin_table = $('#xin_table').dataTable({
 	"bDestroy": true,
 	"ajax": {
-		url : main_url+"officeshifts/office_shifts_list",
+		url : main_url+"office-shifts-list",
 		type : 'GET'
 	},
 	"language": {
@@ -62,7 +62,7 @@ $('.edit-modal-data').on('show.bs.modal', function (event) {
 	var field_id = button.data('field_id');
 	var modal = $(this);
 $.ajax({
-	url : main_url+"officeshifts/read_shift",
+	url : main_url+"read-shift",
 	type: "GET",
 	data: 'jd=1&is_ajax=1&mode=modal&data=shift&field_id='+field_id,
 	success: function (response) {
@@ -114,5 +114,5 @@ $("#xin-form").submit(function(e){
 });
 $( document ).on( "click", ".delete", function() {
 	$('input[name=_token]').val($(this).data('record-id'));
-	$('#delete_record').attr('action',main_url+'officeshifts/delete_office_shift');
+	$('#delete_record').attr('action',main_url+'delete-office-shift');
 });

@@ -30,7 +30,7 @@ class Officeshifts extends BaseController
 		$user_id = $user_info['user_id'];
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -57,7 +57,7 @@ class Officeshifts extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
@@ -151,11 +151,7 @@ class Officeshifts extends BaseController
 			$combhr = $edit . $delete;
 			if (in_array('shift3', staff_role_resource()) || in_array('shift4', staff_role_resource()) || $user_info['user_type'] == 'company') {
 				$ishift_name = $r['shift_name'];
-				// $ishift_name = '
-				// '.$r['shift_name'].'
-				// <div class="overlay-edit">
-				// 	'.$combhr.'
-				// </div>';
+				
 
 			} else {
 				$ishift_name = $r['shift_name'];
@@ -208,7 +204,7 @@ class Officeshifts extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -259,8 +255,7 @@ class Officeshifts extends BaseController
 
 				if ($existingShift) {
 					$Return['error'] = 'Shift with the same name already exists.';
-					$this->output($Return);
-					exit;
+					return $this->response->setJSON($Return);
 				}
 				$result = $ShiftModel->insert($data);
 				$Return['csrf_hash'] = csrf_hash();
@@ -269,13 +264,11 @@ class Officeshifts extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
-				exit;
+				return $this->response->setJSON($Return);
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// |||edit record|||
@@ -305,7 +298,7 @@ class Officeshifts extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -351,22 +344,20 @@ class Officeshifts extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
-				exit;
+				return $this->response->setJSON($Return);
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// read record
 	public function read_shift()
 	{
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$id = $request->getGet('field_id');
 		$data = [
@@ -375,7 +366,7 @@ class Officeshifts extends BaseController
 		if ($session->has('sup_username')) {
 			return view('erp/office_shift/dialog_office_shift', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
 	// delete record
@@ -385,7 +376,7 @@ class Officeshifts extends BaseController
 		if ($this->request->getPost('type') == 'delete_record') {
 			/* Define return | here result is used to return user data and error for error message */
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-			$session = \Config\Services::session($config);
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
 			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
@@ -397,7 +388,7 @@ class Officeshifts extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 		}
 	}
 }

@@ -198,7 +198,6 @@ $routes->group('erp', ['filter' => 'checklogin', 'namespace' => 'App\Controllers
 });
 
 
-
 //client management
 //custom lead config
 $routes->get('erp/customization-lead', 'Lead_config::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
@@ -313,9 +312,12 @@ $routes->match(['get', 'post'], 'erp/settings/update_template/', 'Settings::upda
 //1: Staff Roles
 
 $routes->get('erp/set-roles/', 'Roles::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin', 'filter' => 'companyauth']);
-$routes->match(['get', 'post'], 'erp/roles/add_role/', 'Roles::add_role', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin', 'filter' => 'companyauth']);
-$routes->match(['get', 'post'], 'erp/roles/update_role/', 'Roles::update_role', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin', 'filter' => 'companyauth']);
-$routes->match(['get', 'post'], 'erp/roles/delete_role/', 'Roles::delete_role', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin', 'filter' => 'companyauth']);
+$routes->get('erp/staff-roles-list', 'Roles::staff_roles_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin', 'filter' => 'companyauth']);
+$routes->post('erp/add-role', 'Roles::add_role', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin', 'filter' => 'companyauth']);
+$routes->get('erp/read-role', 'Roles::read_role', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin', 'filter' => 'companyauth']);
+$routes->post('erp/update-role', 'Roles::update_role', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin', 'filter' => 'companyauth']);
+$routes->delete('erp/delete-role/(:any)', 'Roles::delete_role/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin', 'filter' => 'companyauth']);
+
 //2: Assets
 $routes->get('erp/assets-list/', 'Assets::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin', 'filter' => 'companyauth']);
 $routes->get('erp/assets-Datalist', 'assets::assets_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin', 'filter' => 'companyauth']);
@@ -356,6 +358,11 @@ $routes->get('erp/read-arrangement-type', 'types::read_arrangement_type', ['name
 
 
 $routes->get('erp/exit-type/', 'Types::exit_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/exit-type-list', 'Types::exit_type_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-exit-type', 'Types::add_exit_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/read-exit-type', 'Types::read_exit_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-constants-type', 'Types::update_constants_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/delete-type/(:any)', 'Types::delete_type/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // Income 
 $routes->get('erp/income-type/', 'Types::income_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/income-type-list', 'types::income_type_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -436,8 +443,18 @@ $routes->get('erp/travel-calendar/', 'Travel::travel_calendar', ['namespace' => 
 $routes->get('erp/view-travel-info/(:segment)', 'Travel::travel_details', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // complaints
 $routes->get('erp/complaints-list/', 'Complaints::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/complaints-datalist/', 'Complaints::complaints_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-complaint', 'Complaints::add_complaint', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/read-complaints/', 'Complaints::read_complaints', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-complaint', 'Complaints::update_complaint', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/delete-complaint', 'Complaints::delete_complaint', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // resignation
 $routes->get('erp/resignation-list/', 'Resignation::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/resignation-datalist/', 'Resignation::resignation_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-resignation/', 'Resignation::add_resignation', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/read-resignation/', 'Resignation::read_resignation', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-resignation/', 'Resignation::update_resignation', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/delete-resignation', 'Resignation::delete_resignation', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // transfer
 $routes->get('erp/transfers-list/', 'Transfers::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/transfers-dataList', 'transfers::transfers_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -449,6 +466,12 @@ $routes->get('erp/read-transfer', 'transfers::read_transfer', ['namespace' => 'A
 $routes->post('erp/update-transfer', 'transfers::update_transfer', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // employee exit
 $routes->get('erp/employee-exit/', 'Leaving::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/employee-off-list', 'Leaving::employee_off_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-exit', 'Leaving::add_exit', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/read-employee-exit', 'Leaving::read_employee_exit', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-exit', 'Leaving::update_exit', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/read-employee-exit', 'Leaving::read_employee_exit', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/delete-employee-exit', 'Leaving::delete_employee_exit', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // documents || upload files, official and expired documents
 $routes->get('erp/upload-files/', 'Documents::upload_files', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/add-document', 'documents::add_document', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -523,6 +546,11 @@ $routes->post('erp/update-holiday', 'holidays::update_holiday', ['namespace' => 
 $routes->get('erp/holidays-calendar/', 'Holidays::holidays_calendar', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // officeshifts
 $routes->get('erp/office-shifts/', 'Officeshifts::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/office-shifts-list', 'Officeshifts::office_shifts_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-office-shift', 'Officeshifts::add_office_shift', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/read-shift', 'Officeshifts::read_shift', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-office-shift', 'Officeshifts::update_office_shift', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/delete-office-shift', 'Officeshifts::delete_office_shift', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 //mom 
 $routes->get('erp/moms-list/', 'Moms::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);

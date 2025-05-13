@@ -34,7 +34,7 @@ $get_animate = '';
     <div class="col-md-12">
       <div id="add_form" class="collapse add-form <?php echo $get_animate; ?>" data-parent="#accordion" style="">
 
-        <?= form_open('erp/leaving/add_exit', ['name' => 'add_exit', 'id' => 'xin-form', 'autocomplete' => 'off']); ?>
+        <?= form_open('erp/add-exit', ['name' => 'add_exit', 'id' => 'xin-form', 'autocomplete' => 'off']); ?>
         <input type="hidden" name="user_id" value="1">
 
         <div class="row">

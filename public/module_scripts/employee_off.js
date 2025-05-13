@@ -2,7 +2,7 @@ $(document).ready(function() {
    var xin_table = $('#xin_table').dataTable({
         "bDestroy": true,
 		"ajax": {
-            url : main_url+"leaving/employee_off_list",
+            url : main_url+"employee-off-list",
             type : 'GET'
         },
 		"language": {
@@ -57,7 +57,7 @@ $(document).ready(function() {
 		var field_id = button.data('field_id');
 		var modal = $(this);
 	$.ajax({
-		url : main_url+"leaving/read_employee_exit",
+		url : main_url+"read-employee-exit",
 		type: "GET",
 		data: 'jd=1&data=employee_exit&field_id='+field_id,
 		success: function (response) {
@@ -72,7 +72,7 @@ $(document).ready(function() {
 		var field_id = button.data('field_id');
 		var modal = $(this);
 	$.ajax({
-		url :  main_url+"leaving/read_employee_exit",
+		url :  main_url+"read-employee-exit",
 		type: "GET",
 		data: 'jd=1&type=view_employee_exit&field_id='+field_id,
 		success: function (response) {
@@ -125,5 +125,5 @@ $(document).ready(function() {
 });
 $( document ).on( "click", ".delete", function() {
 	$('input[name=_token]').val($(this).data('record-id'));
-	$('#delete_record').attr('action',main_url+'leaving/delete_employee_exit');
+	$('#delete_record').attr('action',main_url+'delete-employee-exit');
 });

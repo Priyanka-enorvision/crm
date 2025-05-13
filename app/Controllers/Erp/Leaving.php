@@ -3,12 +3,9 @@
 namespace App\Controllers\Erp;
 
 use App\Controllers\BaseController;
-use CodeIgniter\HTTP\RequestInterface;
-use CodeIgniter\HTTP\ResponseInterface;
-use CodeIgniter\HTTP\Files\UploadedFile;
+
 
 use App\Models\OffModel;
-use App\Models\MainModel;
 use App\Models\RolesModel;
 use App\Models\UsersModel;
 use App\Models\SystemModel;
@@ -30,7 +27,7 @@ class Leaving extends BaseController
 		$user_id = $user_info['user_id'];
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -105,7 +102,7 @@ class Leaving extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -144,13 +141,11 @@ class Leaving extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
-				exit;
+				return $this->response->setJSON($Return);
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// |||edit record|||
@@ -202,7 +197,7 @@ class Leaving extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -229,13 +224,11 @@ class Leaving extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
-				exit;
+				return $this->response->setJSON($Return);
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// record list
@@ -245,7 +238,7 @@ class Leaving extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
@@ -290,7 +283,7 @@ class Leaving extends BaseController
 			$iuser = $UsersModel->where('user_id', $r['employee_id'])->first();
 			$employee_name = $iuser['first_name'] . ' ' . $iuser['last_name'];
 			$uname = '<div class="d-inline-block align-middle">
-				<img src="' . base_url() . '/public/uploads/users/thumb/' . $iuser['profile_photo'] . '" alt="user image" class="img-radius align-top m-r-15" style="width:40px;">
+				<img src="' . base_url() . 'uploads/users/thumb/' . $iuser['profile_photo'] . '" alt="user image" class="img-radius align-top m-r-15" style="width:40px;">
 				<div class="d-inline-block">
 					<h6 class="m-b-0">' . $employee_name . '</h6>
 					<p class="m-b-0">' . $iuser['email'] . '</p>
@@ -322,10 +315,10 @@ class Leaving extends BaseController
 	// read record
 	public function read_employee_exit()
 	{
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$id = $request->getGet('field_id');
 		$data = [
@@ -334,7 +327,7 @@ class Leaving extends BaseController
 		if ($session->has('sup_username')) {
 			return view('erp/exit/dialog_exit', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
 	// delete record
@@ -342,9 +335,8 @@ class Leaving extends BaseController
 	{
 
 		if ($this->request->getPost('type') == 'delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-			$session = \Config\Services::session($config);
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
 			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
@@ -356,7 +348,7 @@ class Leaving extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 		}
 	}
 }

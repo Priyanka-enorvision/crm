@@ -53,7 +53,7 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
               </span> </div>
             <div class="card-body">
 
-              <?= form_open('erp/types/add_exit_type', ['name' => 'add_exit_type', 'id' => 'xin-form', 'autocomplete' => 'off']); ?>
+              <?= form_open('erp/add-exit-type', ['name' => 'add_exit_type', 'id' => 'xin-form', 'autocomplete' => 'off']); ?>
               <input type="hidden" name="user_id" value="0">
               <div class="form-group">
                 <label for="name">

@@ -21,7 +21,7 @@ $get_animate = '';
       <div class="card-body">
         <div class="row m-b-1">
           <div class="col-md-12">
-            <?= form_open('erp/roles/add_role', ['name' => 'add_role', 'id' => 'add_role', 'autocomplete' => 'off', 'class' => 'form-horizontal']); ?>
+            <?= form_open('erp/add-role', ['name' => 'add_role', 'id' => 'add_role', 'autocomplete' => 'off', 'class' => 'form-horizontal']); ?>
             <input type="hidden" name="_user" value="0">
 
             <div class="form-body">

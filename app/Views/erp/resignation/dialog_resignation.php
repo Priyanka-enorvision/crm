@@ -33,7 +33,7 @@ $result = $ResignationsModel->where('resignation_id', $resignation_id)->first();
 </div>
 <?php $attributes = array('name' => 'edit_resign', 'id' => 'edit_resign', 'autocomplete' => 'off', 'class'=>'m-b-1');?>
 <?php $hidden = array('_method' => 'EDIT', 'token' => $field_id);?>
-<?php echo form_open('erp/resignation/update_resignation', $attributes, $hidden);?>
+<?php echo form_open('erp/update-resignation', $attributes, $hidden);?>
 <div class="modal-body">
   <div class="row">
     <div class="col-md-6">
@@ -136,7 +136,7 @@ $result = $ResignationsModel->where('resignation_id', $resignation_id)->first();
 						var xin_table = $('#xin_table').dataTable({
 						"bDestroy": true,
 						"ajax": {
-							url : "<?php echo site_url("erp/resignation/resignation_list") ?>",
+							url : "<?php echo site_url("erp/resignation-datalist") ?>",
 							type : 'GET'
 						},
 						"language": {

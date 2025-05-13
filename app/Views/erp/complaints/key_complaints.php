@@ -29,7 +29,7 @@ $get_animate = '';
   <div id="add_form" class="collapse add-form" data-parent="#accordion" style="">
 
 
-    <?= form_open('erp/complaints/add_complaint', ['name' => 'add_complaint', 'id' => 'xin-form', 'autocomplete' => 'off']); ?>
+    <?= form_open('erp/add-complaint', ['name' => 'add_complaint', 'id' => 'xin-form', 'autocomplete' => 'off']); ?>
     <input type="hidden" name="user_id" value="1">
 
     <div class="row">

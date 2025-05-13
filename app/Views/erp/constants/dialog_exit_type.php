@@ -29,7 +29,7 @@ $result = $ConstantsModel->where('constants_id', $category_id)->where('type','ex
 </div>
 <?php $attributes = array('name' => 'update_constants_type', 'id' => 'update_constants_type', 'autocomplete' => 'off', 'class'=>'m-b-1');?>
 <?php $hidden = array('_method' => 'EDIT', 'token' => $field_id);?>
-<?= form_open('erp/types/update_constants_type', $attributes, $hidden);?>
+<?= form_open('erp/update-constants-type', $attributes, $hidden);?>
 <div class="modal-body">
   <div class="row">
     <div class="col-md-12">
@@ -76,7 +76,7 @@ $(document).ready(function(){
 					var xin_table = $('#xin_table').dataTable({
 						"bDestroy": true,
 						"ajax": {
-							url : "<?= site_url("erp/types/exit_type_list") ?>",
+							url : "<?= site_url("erp/exit-type-list") ?>",
 							type : 'GET'
 						},
 						"fnDrawCallback": function(settings){

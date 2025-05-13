@@ -94,7 +94,7 @@ class Complaints extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -121,8 +121,7 @@ class Complaints extends BaseController
 					->first();
 				if ($existing_complaint) {
 					$Return['error'] = "This staff complaint already exists";
-					$this->output($Return);
-					exit;
+					return $this->response->setJSON($Return);
 				}
 
 				$data = [
@@ -144,13 +143,11 @@ class Complaints extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
-				exit;
+				return $this->response->setJSON($Return);
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 
@@ -206,7 +203,7 @@ class Complaints extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -230,13 +227,11 @@ class Complaints extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
-				exit;
+				return $this->response->setJSON($Return);
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// record list
@@ -333,7 +328,7 @@ class Complaints extends BaseController
 	// read record
 	public function read_complaints()
 	{
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		if (!$session->has('sup_username')) {
 			return redirect()->to(site_url('erp/login'));
@@ -353,9 +348,9 @@ class Complaints extends BaseController
 	{
 
 		if ($this->request->getPost('type') == 'delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
+			
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-			$session = \Config\Services::session($config);
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
 			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
@@ -367,7 +362,7 @@ class Complaints extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 		}
 	}
 }
