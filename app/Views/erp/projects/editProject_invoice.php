@@ -25,7 +25,7 @@ $locale = service('request')->getLocale();
 
 $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 $user_id = $user_info['user_id'];
-$segment_id = $request->uri->getSegment(3);
+$segment_id = $request->getUri()->getSegment(3);
 
 $curl = curl_init();
 $url = "http://103.104.73.221:3000/api/V1/global/lead?userId=$user_id";
@@ -56,15 +56,13 @@ if ($user_info['user_type'] == 'staff') {
     $clients = $UsersModel->where('company_id', $user_info['company_id'])->where('user_type', 'customer')->findAll();
     $tax_types = $ConstantsModel->where('company_id', $user_info['company_id'])->where('type', 'tax_type')->findAll();
     // $invoice_items = $InvoiceitemsModel->where('invoice_id', $invoice['invoice_id'])->findAll();
-    $invoice_items = $InvoiceitemsModel->where('project_id',$invoice['project_id'] )->where('invoice_id', $invoice['invoice_id'])->findAll();
-
+    $invoice_items = $InvoiceitemsModel->where('project_id', $invoice['project_id'])->where('invoice_id', $invoice['invoice_id'])->findAll();
 } else {
     $projects = $ProjectsModel->where('company_id', $usession['sup_user_id'])->orderBy('project_id', 'ASC')->findAll();
     $clients = $UsersModel->where('company_id', $user_info['company_id'])->where('user_type', 'customer')->findAll();
     $tax_types = $ConstantsModel->where('company_id', $usession['sup_user_id'])->where('type', 'tax_type')->findAll();
     // $invoice_items = $InvoiceitemsModel->where('invoice_id', $invoice['invoice_id'])->findAll();
-    $invoice_items = $InvoiceitemsModel->where('project_id',$invoice['project_id'] )->where('invoice_id', $invoice['invoice_id'])->findAll();
-
+    $invoice_items = $InvoiceitemsModel->where('project_id', $invoice['project_id'])->where('invoice_id', $invoice['invoice_id'])->findAll();
 }
 $xin_system = erp_company_settings();
 ?>
@@ -109,7 +107,7 @@ $xin_system = erp_company_settings();
                     <div class="col-md-12">
                         <?php $attributes = array('name' => 'update_invoice', 'id' => '', 'autocomplete' => 'off', 'class' => 'form'); ?>
                         <?php $hidden = array('token' => $segment_id); ?>
-                        <?php echo form_open('erp/invoices/update_invoice', $attributes, $hidden); ?>
+                        <?php echo form_open('erp/update-invoice', $attributes, $hidden); ?>
                         <?php $inv_info = generate_random_employeeid(); ?>
                         <div class="bg-white">
                             <div class="box-block">

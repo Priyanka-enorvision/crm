@@ -14,7 +14,6 @@ class Milestones extends BaseController
     public function __construct()
     {
         helper('Language');
-      
     }
 
 
@@ -48,7 +47,17 @@ class Milestones extends BaseController
         $session = \Config\Services::session();
         $usession = $session->get('sup_username');
 
+        // Check if session exists
+        if (!$usession || !isset($usession['sup_user_id'])) {
+            return redirect()->to('/')->with('error', 'Please login first.');
+        }
+
         $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+
+        // Check if user exists
+        if (!$user_info) {
+            return redirect()->to('/')->with('error', 'User not found.');
+        }
 
         $validation->setRules([
             'name' => 'required|min_length[3]',
@@ -58,38 +67,59 @@ class Milestones extends BaseController
             'project_id' => 'required',
         ]);
 
-        if ($this->request->getMethod() === 'post' && $validation->withRequest($this->request)->run()) {
+        if ($this->request->getMethod()) {
+            if ($validation->withRequest($this->request)->run()) {
+                $milestone_name = $this->request->getPost('name');
 
-            $milestone_name = $this->request->getPost('name');
+                // Check if milestone already exists
+                $existing_data = $Model->where([
+                    'name' => $milestone_name,
+                    'company_id' => $user_info['company_id'],
+                    'project_id' => $this->request->getPost('project_id')
+                ])->first();
 
-            $existing_data = $Model->where(['name' => $milestone_name, 'company_id' => $user_info['company_id']])->first();
+                if ($existing_data) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->with('error', 'Milestone name already exists for this project. Please enter a different name.');
+                }
 
-            if ($existing_data) {
-                $session->setFlashdata('error', 'Milestone name already exists. Please enter different name.');
-                return redirect()->back()->withInput();
-            }
-            // Prepare data for insertion
-            $data = [
-                'company_id' => $user_info['company_id'],
-                'project_id' => $this->request->getPost('project_id'),
-                'name' => $this->request->getPost('name'),
-                'due_date' => $this->request->getPost('due_date'),
-                'description' => $this->request->getPost('description'),
-                'status' => 1, // Default status
-                'orders' => $this->request->getPost('milestone_order'),
-                'created_at' => date('Y-m-d H:i:s'),
-            ];
+                // Prepare data for insertion
+                $data = [
+                    'company_id' => $user_info['company_id'],
+                    'project_id' => $this->request->getPost('project_id'),
+                    'name' => $milestone_name,
+                    'due_date' => $this->request->getPost('due_date'),
+                    'description' => $this->request->getPost('description'),
+                    'status' => 1, // Default status
+                    'orders' => $this->request->getPost('milestone_order'),
+                    'created_at' => date('Y-m-d H:i:s'),
+                ];
 
-            if ($Model->insert($data)) {
-                $session->setFlashdata('message', 'Milestone successfully added.');
+                try {
+                    if ($Model->insert($data)) {
+                        return redirect()->back()
+                            ->with('message', 'Milestone successfully added.');
+                    } else {
+                        return redirect()->back()
+                            ->withInput()
+                            ->with('error', 'Failed to add milestone.');
+                    }
+                } catch (\Exception $e) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->with('error', 'Database error: ' . $e->getMessage());
+                }
             } else {
-                $session->setFlashdata('error', 'Failed to add milestone.');
+                return redirect()->back()
+                    ->withInput()
+                    ->with('errors', $validation->getErrors());
             }
-        } else {
-            $session->setFlashdata('error', implode(", ", $validation->getErrors()));
         }
 
-        return redirect()->back()->withInput();
+        return redirect()->back()
+            ->withInput()
+            ->with('error', 'Invalid request method.');
     }
     public function delete($id)
     {
@@ -151,9 +181,8 @@ class Milestones extends BaseController
     }
 
 
-    public function update($enc_id)
+    public function update($milestones_id)
     {
-        $milestones_id = base64_decode($enc_id);
         $session = session();
         $model = new \App\Models\MilestonesModel();
         $validation = \Config\Services::validation();

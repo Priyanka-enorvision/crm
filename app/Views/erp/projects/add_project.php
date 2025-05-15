@@ -174,7 +174,7 @@ if ($user_info['user_type'] == 'staff') {
             <div id="add_form" class="add-form " data-parent="#accordion" style="">
                 <?php $attributes = array('name' => 'add_project', 'id' => 'xin-form', 'autocomplete' => 'off'); ?>
                 <?php $hidden = array('user_id' => '0'); ?>
-                <?php echo form_open('erp/projects/add_project', $attributes, $hidden); ?>
+                <?php echo form_open('erp/add-project', $attributes, $hidden); ?>
                 <div class="card mb-2">
                     <div id="accordion">
                         <div class="card-header">
@@ -478,14 +478,13 @@ if ($user_info['user_type'] == 'staff') {
 <script>
     $(document).ready(function() {
         $('[data-plugin="select_hrm"]').select2();
-
         $('#company_id').change(function() {
             var company_id = $(this).val();
 
             if (company_id) {
                 $.ajax({
                     url: '<?= base_url('erp/get-employelist'); ?>',
-                    type: 'POST',
+                    type: 'GET',
                     data: {
                         company_id: company_id
                     },

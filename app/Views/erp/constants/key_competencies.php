@@ -1,4 +1,5 @@
 <?php
+
 use App\Models\SystemModel;
 use App\Models\RolesModel;
 use App\Models\UsersModel;
@@ -33,8 +34,8 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 								</span> </div>
 							<div class="card-body">
 								<?php $attributes = array('name' => 'add_competencies', 'id' => 'xin-form', 'autocomplete' => 'off'); ?>
-								<?php $hidden = array('user_id' => 0); ?>
-								<?= form_open('erp/types/add_competencies', $attributes, $hidden); ?>
+								<?php $hidden = array('user_id' => '0'); ?>
+								<?= form_open('erp/add-competencies', $attributes, $hidden); ?>
 								<div class="form-group">
 									<label for="name">
 										<?= lang('Dashboard.xin_category'); ?>

@@ -1,4 +1,5 @@
 <?php
+
 use App\Models\SystemModel;
 use App\Models\UsersModel;
 use App\Models\LanguageModel;
@@ -35,7 +36,7 @@ if ($user_info['user_type'] == 'company') {
 <?php if (in_array('tracking2', staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
   <div class="row m-b-1 animated fadeInRight">
     <div class="col-md-12">
-      <div id="add_form" class="collapse add-form <?php echo $get_animate; ?>" data-parent="#accordion" style="">
+      <div id="add_form" class="collapse add-form " data-parent="#accordion" style="">
         <div class="card">
           <div id="accordion">
             <div class="card-header">
@@ -50,8 +51,8 @@ if ($user_info['user_type'] == 'company') {
             </div>
 
             <?php $attributes = array('name' => 'add_tracking', 'id' => 'xin-form', 'autocomplete' => 'off'); ?>
-            <?php $hidden = array('_user' => 1); ?>
-            <?php echo form_open('erp/trackgoals/add_tracking', $attributes, $hidden); ?>
+            <?php $hidden = array('_user' => '1'); ?>
+            <?php echo form_open('erp/add-tracking', $attributes, $hidden); ?>
             <div class="card-body">
               <div class="row">
                 <div class="col-md-4">

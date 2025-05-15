@@ -74,7 +74,15 @@ class Filters extends BaseConfig
 				'get-designation/',
 				'erp/update-profile-photo',
 				'erp/insert-investment',
-				'erp/update-status/'
+				'erp/update-status/',
+				'erp/milestones-save',
+				'erp/milestones-update/',
+				'erp/add-projectTask',
+				'erp/update-projectTask',
+				'erp/timelogs-save',
+				'erp/timelogs-delete',
+				'erp/timelogs-update/',
+				'delete-project-file',
 			]],
 		],
 		'after'  => [

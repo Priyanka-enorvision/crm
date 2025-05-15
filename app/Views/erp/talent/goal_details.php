@@ -1,4 +1,5 @@
 <?php
+
 use App\Models\SystemModel;
 use App\Models\UsersModel;
 use App\Models\LanguageModel;
@@ -26,64 +27,72 @@ $usession = $session->get('sup_username');
 $router = service('router');
 $request = \Config\Services::request();
 $xin_system = $SystemModel->where('setting_id', 1)->first();
-$user = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+$user = $UsersModel->where('user_id', $usession['sup_user_id'] ?? 0)->first();
 $locale = service('request')->getLocale();
 
-$segment_id = $request->uri->getSegment(3);
+$segment_id = $request->getUri()->getSegment(3);
 $ifield_id = udecode($segment_id);
 
-$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+$user_info = $UsersModel->where('user_id', $usession['sup_user_id'] ?? 0)->first();
 if ($user_info['user_type'] == 'staff') {
-  $company_id = $user_info['company_id'];
-  $user_id = $user_info['user_id'];
+  $company_id = $user_info['company_id'] ?? 0;
+  $user_id = $user_info['user_id'] ?? 0;
 
   $staff_info = $UsersModel->where('company_id', $company_id)->where('user_type', 'staff')->where('is_active', 1)->findAll();
-  $training = assigned_staff_training($usession['sup_user_id']);
+  $training = assigned_staff_training($usession['sup_user_id'] ?? 0);
 
-  $projects = $ProjectsModel->where('company_id', $user_info['company_id'])->groupStart()
+  $projects = $ProjectsModel->where('company_id', $user_info['company_id'] ?? 0)->groupStart()
     ->where('added_by', $user_id)
     ->orWhere('FIND_IN_SET(' . $user_id . ', assigned_to) > 0')
     ->groupEnd()->findAll();
-  $projectstatus = $ProjectsModel->where('company_id', $user_info['company_id'])->where('status', '2')->findAll(); //complete project status=2
+
+  $projectstatus = $ProjectsModel->where('company_id', $user_info['company_id'] ?? 0)->where('status', '2')->findAll();
   $completed_projects = count($projectstatus);
   $total_projects = count($projects);
-  $progress_percentage = ($total_projects > 0) ? ($completed_projects / $total_projects) * 100 : 0;
+  $progress_percentage = ($total_projects > 0) ? round(($completed_projects / $total_projects) * 100, 2) : 0;
 
-
-  $tasks = $TasksModel->where('company_id', $user_info['company_id'])->groupStart()
+  $tasks = $TasksModel->where('company_id', $user_info['company_id'] ?? 0)->groupStart()
     ->where('created_by', $user_id)
     ->orWhere('FIND_IN_SET(' . $user_id . ', assigned_to) > 0')
     ->groupEnd()->orderBy('task_id', 'ASC')->findAll();
-  $awards = $AwardsModel->where('employee_id', $user_info['user_id'])->orderBy('award_id', 'ASC')->findAll();
-  $travel = $TravelModel->where('employee_id', $user_info['user_id'])->orderBy('travel_id', 'ASC')->findAll();
-  $all_tracking_types = $ConstantsModel->where('company_id', $user_info['company_id'])->where('type', 'goal_type')->orderBy('constants_id', 'ASC')->findAll();
-  $track_data = $TrackgoalsModel->where('company_id', $user_info['company_id'])->where('tracking_id', $ifield_id)->first();
-  $type_data = $ConstantsModel->where('company_id', $user_info['company_id'])->where('constants_id', $track_data['tracking_type_id'])->where('type', 'goal_type')->first();
 
+  $awards = $AwardsModel->where('employee_id', $user_info['user_id'] ?? 0)->orderBy('award_id', 'ASC')->findAll();
+  $travel = $TravelModel->where('employee_id', $user_info['user_id'] ?? 0)->orderBy('travel_id', 'ASC')->findAll();
+  $all_tracking_types = $ConstantsModel->where('company_id', $user_info['company_id'] ?? 0)->where('type', 'goal_type')->orderBy('constants_id', 'ASC')->findAll();
+  $track_data = $TrackgoalsModel->where('company_id', $user_info['company_id'] ?? 0)->where('tracking_id', $ifield_id)->first() ?? [];
+  $type_data = $ConstantsModel->where('company_id', $user_info['company_id'] ?? 0)
+    ->where('constants_id', $track_data['tracking_type_id'] ?? 0)
+    ->where('type', 'goal_type')
+    ->first() ?? [];
 } else {
-  $staff_info = $UsersModel->where('company_id', $usession['sup_user_id'])->where('user_type', 'staff')->where('is_active', 1)->findAll();
-  $tasks = $TasksModel->where('company_id', $usession['sup_user_id'])->orderBy('task_id', 'ASC')->findAll();
-  $projects = $ProjectsModel->where('company_id', $usession['sup_user_id'])->findAll();
-  $projectstatus = $ProjectsModel->where('company_id', $usession['sup_user_id'])->where('status', '2')->findAll(); //complete project status=2
+  $staff_info = $UsersModel->where('company_id', $usession['sup_user_id'] ?? 0)->where('user_type', 'staff')->where('is_active', 1)->findAll();
+  $tasks = $TasksModel->where('company_id', $usession['sup_user_id'] ?? 0)->orderBy('task_id', 'ASC')->findAll();
+  $projects = $ProjectsModel->where('company_id', $usession['sup_user_id'] ?? 0)->findAll();
+  $projectstatus = $ProjectsModel->where('company_id', $usession['sup_user_id'] ?? 0)->where('status', '2')->findAll();
   $completed_projects = count($projectstatus);
-
   $total_projects = count($projects);
-  $progress_percentage = ($total_projects > 0) ? ($completed_projects / $total_projects) * 100 : 0;
+  $progress_percentage = ($total_projects > 0) ? round(($completed_projects / $total_projects) * 100, 2) : 0;
 
+  $awards = $AwardsModel->where('company_id', $usession['sup_user_id'] ?? 0)->orderBy('award_id', 'ASC')->findAll();
+  $travel = $TravelModel->where('company_id', $usession['sup_user_id'] ?? 0)->orderBy('travel_id', 'ASC')->findAll();
+  $training = $TrainingModel->where('company_id', $usession['sup_user_id'] ?? 0)->orderBy('training_id', 'ASC')->findAll();
+  $all_tracking_types = $ConstantsModel->where('company_id', $usession['sup_user_id'] ?? 0)->where('type', 'goal_type')->orderBy('constants_id', 'ASC')->findAll();
+  $track_data = $TrackgoalsModel->where('company_id', $usession['sup_user_id'] ?? 0)->where('tracking_id', $ifield_id)->first() ?? [];
 
-  $awards = $AwardsModel->where('company_id', $usession['sup_user_id'])->orderBy('award_id', 'ASC')->findAll();
-  $travel = $TravelModel->where('company_id', $usession['sup_user_id'])->orderBy('travel_id', 'ASC')->findAll();
-  $training = $TrainingModel->where('company_id', $usession['sup_user_id'])->orderBy('training_id', 'ASC')->findAll();
-  $all_tracking_types = $ConstantsModel->where('company_id', $usession['sup_user_id'])->where('type', 'goal_type')->orderBy('constants_id', 'ASC')->findAll();
-  $track_data = $TrackgoalsModel->where('company_id', $usession['sup_user_id'])->where('tracking_id', $ifield_id)->first();
-  $type_data = $ConstantsModel->where('company_id', $usession['sup_user_id'])->where('constants_id', $track_data['tracking_type_id'])->where('type', 'goal_type')->first();
+  if (!empty($track_data)) {
+    $type_data = $ConstantsModel->where('company_id', $usession['sup_user_id'] ?? 0)
+      ->where('constants_id', $track_data['tracking_type_id'] ?? 0)
+      ->where('type', 'goal_type')
+      ->first() ?? [];
+    $goal_work = isset($track_data['goal_work']) ? unserialize($track_data['goal_work']) : [];
+  } else {
+    $type_data = [];
+    $goal_work = [];
+  }
 }
-$goal_work = unserialize($track_data['goal_work']);
 
-//$added_by = $UsersModel->where('user_id',$track_data['added_by'])->first();
+$get_type = '';
 ?>
-
-
 
 <div class="row">
   <!-- [ trackgoal-detail-right ] start -->
@@ -91,144 +100,145 @@ $goal_work = unserialize($track_data['goal_work']);
     <div class="bg-light card mb-2">
       <div class="card-body">
         <ul class="nav nav-pills" id="pills-tab" role="tablist">
-
-          <?php if (in_array('tracking6', staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
-            <li class="nav-item"> <a class="nav-link active" id="pills-overview-tab" data-toggle="pill"
-                href="#pills-overview" role="tab" aria-controls="pills-overview" aria-selected="true">
+          <?php if (in_array('tracking6', staff_role_resource()) || ($user_info['user_type'] ?? '') == 'company') : ?>
+            <li class="nav-item">
+              <a class="nav-link active" id="pills-overview-tab" data-toggle="pill" href="#pills-overview" role="tab" aria-controls="pills-overview" aria-selected="true">
                 <?= lang('Main.xin_overview'); ?>
-              </a> </li>
-          <?php } ?>
-          <?php if (in_array('tracking3', staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
-            <li class="nav-item"> <a class="nav-link" id="pills-edit-tab" data-toggle="pill" href="#pills-edit" role="tab"
-                aria-controls="pills-edit" aria-selected="false">
+              </a>
+            </li>
+          <?php endif; ?>
+          <?php if (in_array('tracking3', staff_role_resource()) || ($user_info['user_type'] ?? '') == 'company') : ?>
+            <li class="nav-item">
+              <a class="nav-link" id="pills-edit-tab" data-toggle="pill" href="#pills-edit" role="tab" aria-controls="pills-edit" aria-selected="false">
                 <?= lang('Main.xin_edit'); ?>
-              </a> </li>
-          <?php } ?>
-
-          <li class="nav-item"> <a class="nav-link" id="pills-work-tab" data-toggle="pill" href="#pills-work" role="tab"
-              aria-controls="pills-work" aria-selected="false">
+              </a>
+            </li>
+          <?php endif; ?>
+          <li class="nav-item">
+            <a class="nav-link" id="pills-work-tab" data-toggle="pill" href="#pills-work" role="tab" aria-controls="pills-work" aria-selected="false">
               <?= lang('Main.xin_add_work'); ?>
-            </a> </li>
+            </a>
+          </li>
         </ul>
       </div>
     </div>
     <div class="card">
       <div class="card-header">
-        <h5><i class="feather icon-lock mr-1"></i><?php echo lang('Performance.xin_goal_details'); ?> :
-          <?= $project_data['title']; ?>
+        <h5><i class="feather icon-lock mr-1"></i><?= lang('Performance.xin_goal_details'); ?>:
+          <?= htmlspecialchars($track_data['title'] ?? ''); ?>
         </h5>
       </div>
       <div class="tab-content" id="pills-tabContent">
-        <div class="tab-pane fade <?php if ($get_type == ''): ?>show active<?php endif; ?>" id="pills-overview"
-          role="tabpanel" aria-labelledby="pills-overview-tab">
+        <div class="tab-pane fade <?= ($get_type == '') ? 'show active' : ''; ?>" id="pills-overview" role="tabpanel" aria-labelledby="pills-overview-tab">
           <div class="card-body">
             <div class="table-responsive">
               <table class="table table-borderless">
                 <tbody class="text-muted">
                   <tr>
-                    <td><i class="fas fa-adjust m-r-5"></i> <?php echo lang('Dashboard.xin_hr_goal_tracking_type'); ?>:
-                    </td>
-                    <td><span>
-                        <?= $type_data['category_name']; ?>
-                      </span></td>
+                    <td><i class="fas fa-adjust m-r-5"></i> <?= lang('Dashboard.xin_hr_goal_tracking_type'); ?>:</td>
+                    <td><span><?= htmlspecialchars($type_data['category_name'] ?? ''); ?></span></td>
                   </tr>
                   <tr>
-                    <td><i class="far fa-calendar-alt m-r-5"></i> <?php echo lang('Main.xin_subject'); ?>:</td>
-                    <td><?= $track_data['subject']; ?></td>
+                    <td><i class="far fa-calendar-alt m-r-5"></i> <?= lang('Main.xin_subject'); ?>:</td>
+                    <td><?= htmlspecialchars($track_data['subject'] ?? ''); ?></td>
                   </tr>
                   <tr>
-                    <td><i class="far fa-credit-card m-r-5"></i>
-                      <?= lang('Performance.xin_target'); ?>
-                      :</td>
-                    <td><?= $track_data['target_achiement']; ?></td>
+                    <td><i class="far fa-credit-card m-r-5"></i><?= lang('Performance.xin_target'); ?>:</td>
+                    <td><?= htmlspecialchars($track_data['target_achiement'] ?? ''); ?></td>
                   </tr>
                   <tr>
-                    <td><i class="fas fa-chart-line m-r-5"></i> <?php echo lang('Projects.dashboard_xin_progress'); ?>:
-                    </td>
+                    <td><i class="fas fa-chart-line m-r-5"></i> <?= lang('Projects.dashboard_xin_progress'); ?>:</td>
                     <td>
-                      <div class="btn-group"> <?php echo lang('Projects.xin_completed'); ?>
-                        <?= $progress_percentage; ?>
-                        %
+                      <div class="btn-group"><?= lang('Projects.xin_completed'); ?>
+                        <?= $progress_percentage; ?>%
                       </div>
                     </td>
                   </tr>
                   <tr>
-                    <td><i class="fas fa-sync-alt m-r-5"></i> <?php echo lang('Projects.xin_start_date'); ?>:</td>
-                    <td><?= $track_data['start_date']; ?></td>
+                    <td><i class="fas fa-sync-alt m-r-5"></i> <?= lang('Projects.xin_start_date'); ?>:</td>
+                    <td><?= htmlspecialchars($track_data['start_date'] ?? ''); ?></td>
                   </tr>
                   <tr>
-                    <td><i class="fas fa-sync-alt m-r-5"></i> <?php echo lang('Projects.xin_end_date'); ?>:</td>
-                    <td><?= $track_data['end_date']; ?></td>
+                    <td><i class="fas fa-sync-alt m-r-5"></i> <?= lang('Projects.xin_end_date'); ?>:</td>
+                    <td><?= htmlspecialchars($track_data['end_date'] ?? ''); ?></td>
                   </tr>
                   <tr>
-                    <?php if ($track_data['for'] == 'all') { ?>
-                      <td><i class="fas fa-users m-r-5"></i> <?php echo "For"; ?>:</td>
-                      <td><?= $track_data['for']; ?></td>
-                    <?php } else { ?>
-                      <td><i class="fas fa-user m-r-5"></i> <?php echo "For"; ?>:</td>
-                      <td><?= $track_data['for']; ?></td>
-                    <?php } ?>
+                    <?php if (!empty($track_data)) : ?>
+                      <?php if (($track_data['for'] ?? '') == 'all') : ?>
+                        <td><i class="fas fa-users m-r-5"></i> <?= "For"; ?>:</td>
+                        <td><?= htmlspecialchars($track_data['for'] ?? ''); ?></td>
+                      <?php else : ?>
+                        <td><i class="fas fa-user m-r-5"></i> <?= "For"; ?>:</td>
+                        <td><?= htmlspecialchars($track_data['for'] ?? ''); ?></td>
+                      <?php endif; ?>
+                    <?php endif; ?>
                   </tr>
                 </tbody>
               </table>
             </div>
             <div class="m-b-20 m-t-20">
-              <h6><?php echo lang('Main.xin_related_work') . $track_data['tracking_type_id']; ?></h6>
+              <h6><?= lang('Main.xin_related_work') . (!empty($track_data['tracking_type_id']) ? htmlspecialchars($track_data['tracking_type_id']) : ''); ?></h6>
               <hr>
               <div class="table-responsive">
                 <table class="table table-borderless">
                   <tbody class="text-muted">
                     <tr>
-                      <td><i class="fas fa-layer-group m-r-5"></i> <?php echo lang('Projects.xin_project'); ?>:</td>
+                      <td><i class="fas fa-layer-group m-r-5"></i> <?= lang('Projects.xin_project'); ?>:</td>
                       <td>
-                        <?php foreach ($projects as $iprojects) { ?>
-                          <?php if ($goal_work['project'] == $iprojects['project_id']): ?>
-                            <?= $iprojects['title'] ?>
+                        <?php foreach ($projects as $iprojects) : ?>
+                          <?php if (($goal_work['project'] ?? '') == $iprojects['project_id']) : ?>
+                            <?= htmlspecialchars($iprojects['title']); ?>
                           <?php endif; ?>
-                        <?php } ?>
+                        <?php endforeach; ?>
                       </td>
                     </tr>
                     <tr>
-                      <td><i class="fas fa-edit m-r-5"></i> <?php echo lang('Projects.xin_task'); ?>:</td>
+                      <td><i class="fas fa-edit m-r-5"></i> <?= lang('Projects.xin_task'); ?>:</td>
                       <td>
-                        <?php foreach ($tasks as $_task) { ?>
-                          <?php if ($goal_work['task'] == $_task['task_id']): ?>
-                            <?= $_task['task_name'] ?>
+                        <?php foreach ($tasks as $_task) : ?>
+                          <?php if (($goal_work['task'] ?? '') == $_task['task_id']) : ?>
+                            <?= htmlspecialchars($_task['task_name']); ?>
                           <?php endif; ?>
-                        <?php } ?>
+                        <?php endforeach; ?>
                       </td>
                     </tr>
                     <tr>
-                      <td><i class="fas fa-award m-r-5"></i> <?php echo lang('Dashboard.left_award'); ?>:</td>
+                      <td><i class="fas fa-award m-r-5"></i> <?= lang('Dashboard.left_award'); ?>:</td>
                       <td>
-                        <?php foreach ($awards as $_award) { ?>
-                          <?php $award_cat = $ConstantsModel->where('constants_id', $_award['award_type_id'])->where('type', 'award_type')->first(); ?>
-                          <?php if ($goal_work['award'] == $award_cat['constants_id']): ?>
-                            <?= $award_cat['category_name'] ?>
+                        <?php foreach ($awards as $_award) : ?>
+                          <?php $award_cat = $ConstantsModel->where('constants_id', $_award['award_type_id'] ?? 0)
+                            ->where('type', 'award_type')
+                            ->first() ?? []; ?>
+                          <?php if (($goal_work['award'] ?? '') == ($award_cat['constants_id'] ?? '')) : ?>
+                            <?= htmlspecialchars($award_cat['category_name'] ?? ''); ?>
                           <?php endif; ?>
-                        <?php } ?>
+                        <?php endforeach; ?>
                       </td>
                     </tr>
                     <tr>
-                      <td><i class="fas fa-star-of-life m-r-5"></i> <?php echo lang('Dashboard.left_training'); ?>:</td>
+                      <td><i class="fas fa-star-of-life m-r-5"></i> <?= lang('Dashboard.left_training'); ?>:</td>
                       <td>
-                        <?php foreach ($training as $_training) { ?>
-                          <?php $training_cat = $ConstantsModel->where('constants_id', $_training['training_type_id'])->where('type', 'training_type')->first(); ?>
-                          <?php if ($goal_work['training'] == $training_cat['constants_id']): ?>
-                            <?= $training_cat['category_name'] ?>
+                        <?php foreach ($training as $_training) : ?>
+                          <?php $training_cat = $ConstantsModel->where('constants_id', $_training['training_type_id'] ?? 0)
+                            ->where('type', 'training_type')
+                            ->first() ?? []; ?>
+                          <?php if (($goal_work['training'] ?? '') == ($training_cat['constants_id'] ?? '')) : ?>
+                            <?= htmlspecialchars($training_cat['category_name'] ?? ''); ?>
                           <?php endif; ?>
-                        <?php } ?>
+                        <?php endforeach; ?>
                       </td>
                     </tr>
                     <tr>
-                      <td><i class="fas fa-globe m-r-5"></i> <?php echo lang('Dashboard.left_travel'); ?>:</td>
+                      <td><i class="fas fa-globe m-r-5"></i> <?= lang('Dashboard.left_travel'); ?>:</td>
                       <td>
-                        <?php foreach ($travel as $_travel) { ?>
-                          <?php $travel_type = $ConstantsModel->where('constants_id', $_travel['arrangement_type'])->where('type', 'travel_type')->first(); ?>
-                          <?php if ($goal_work['travel'] == $travel_type['constants_id']): ?>
-                            <?= $travel_type['category_name'] ?>
+                        <?php foreach ($travel as $_travel) : ?>
+                          <?php $travel_type = $ConstantsModel->where('constants_id', $_travel['arrangement_type'] ?? 0)
+                            ->where('type', 'travel_type')
+                            ->first() ?? []; ?>
+                          <?php if (($goal_work['travel'] ?? '') == ($travel_type['constants_id'] ?? '')) : ?>
+                            <?= htmlspecialchars($travel_type['category_name'] ?? ''); ?>
                           <?php endif; ?>
-                        <?php } ?>
+                        <?php endforeach; ?>
                       </td>
                     </tr>
                   </tbody>
@@ -236,16 +246,18 @@ $goal_work = unserialize($track_data['goal_work']);
               </div>
             </div>
             <div class="m-b-20 m-t-20">
-              <h6><?php echo lang('Main.xin_description'); ?></h6>
+              <h6><?= lang('Main.xin_description'); ?></h6>
               <hr>
-              <?= html_entity_decode($track_data['description']); ?>
+              <?= !empty($track_data['description']) ? html_entity_decode($track_data['description']) : ''; ?>
             </div>
           </div>
         </div>
+
+        <!-- Edit Tab Content -->
         <div class="tab-pane fade <?php if ($get_type == 'edit'): ?>show active<?php endif; ?>" id="pills-edit"
           role="tabpanel" aria-labelledby="pills-overview-tab">
           <?php $attributes = array('name' => 'update_goal_tracking', 'id' => 'update_goal_tracking', 'autocomplete' => 'off', 'class' => 'form-hrm'); ?>
-          <?php $hidden = array('token' => $segment_id); ?>
+          <?php $hidden = array('token' => isset($segment_id) ? $segment_id : ''); ?>
           <?php echo form_open('erp/trackgoals/update_goal_tracking', $attributes, $hidden); ?>
           <div class="card-body">
             <div class="row">
@@ -256,11 +268,11 @@ $goal_work = unserialize($track_data['goal_work']);
                   <select class="form-control" name="tracking_type" data-plugin="select_hrm"
                     data-placeholder="<?php echo lang('Dashboard.xin_hr_goal_tracking_type'); ?>">
                     <option value=""></option>
-                    <?php foreach ($all_tracking_types as $tracking_type) { ?>
-                      <option value="<?= $tracking_type['constants_id']; ?>" <?php if ($track_data['tracking_type_id'] == $tracking_type['constants_id']): ?> selected="selected" <?php endif; ?>>
-                        <?= $tracking_type['category_name']; ?>
+                    <?php foreach (isset($all_tracking_types) ? $all_tracking_types : array() as $tracking_type) : ?>
+                      <option value="<?= $tracking_type['constants_id']; ?>" <?= ((isset($track_data['tracking_type_id']) && $track_data['tracking_type_id'] == $tracking_type['constants_id']) ? 'selected="selected"' : ''); ?>>
+                        <?= htmlspecialchars($tracking_type['category_name']); ?>
                       </option>
-                    <?php } ?>
+                    <?php endforeach; ?>
                   </select>
                 </div>
               </div>
@@ -269,7 +281,7 @@ $goal_work = unserialize($track_data['goal_work']);
                   <label for="xin_subject"><?php echo lang('Main.xin_subject'); ?> <span
                       class="text-danger">*</span></label>
                   <input class="form-control" placeholder="<?php echo lang('Main.xin_subject'); ?>" name="subject"
-                    type="text" value="<?= $track_data['subject']; ?>">
+                    type="text" value="<?= isset($track_data['subject']) ? htmlspecialchars($track_data['subject']) : ''; ?>">
                 </div>
               </div>
               <div class="col-md-6">
@@ -280,25 +292,15 @@ $goal_work = unserialize($track_data['goal_work']);
                     <div class="input-group-prepend"><span class="input-group-text"><i
                           class="fas fa-vector-square"></i></span></div>
                     <input class="form-control" placeholder="<?php echo lang('Performance.xin_hr_target_achiement'); ?>"
-                      name="target_achiement" type="text" value="<?= $track_data['target_achiement']; ?>">
+                      name="target_achiement" type="text" value="<?= isset($track_data['target_achiement']) ? htmlspecialchars($track_data['target_achiement']) : ''; ?>">
                   </div>
                 </div>
               </div>
 
-              <!-- <div class="col-md-6">
-                <div class="form-group"> <input type="hidden" id="progres_val" name="progres_val"
-                    value="<?= $track_data['goal_progress']; ?>">
-                    <label for="progress">
-                      <?= lang('Projects.dashboard_xin_progress'); ?> 
-                    </label> 
-                    <input type="text" id="range_grid" readonly> 
-                </div>
-              </div> -->
-
               <div class="col-md-6">
                 <div class="form-group">
-                  <input type="hidden" id="completed_projects" value="<?= count($projectstatus); ?>">
-                  <input type="hidden" id="total_projects" value="<?= count($projects); ?>">
+                  <input type="hidden" id="completed_projects" value="<?= isset($projectstatus) ? count($projectstatus) : 0; ?>">
+                  <input type="hidden" id="total_projects" value="<?= isset($projects) ? count($projects) : 0; ?>">
                   <input type="hidden" id="progres_val" name="progres_val"
                     value="0">
                   <label for="progress">
@@ -319,20 +321,20 @@ $goal_work = unserialize($track_data['goal_work']);
                   <select class="form-control" id="for_id" name="for" data-plugin="select_hrm" data-placeholder="For"
                     onchange="toggleEmployeeField()">
                     <option value="">-- Select --</option>
-                    <option value="self" <?= $track_data['for'] === 'self' ? 'selected="selected"' : '' ?>>Self</option>
-                    <option value="all" <?= $track_data['for'] === 'all' ? 'selected="selected"' : '' ?>>Employee</option>
+                    <option value="self" <?= (isset($track_data['for']) && $track_data['for'] === 'self' ? 'selected="selected"' : '') ?>>Self</option>
+                    <option value="all" <?= (isset($track_data['for']) && $track_data['for'] === 'all' ? 'selected="selected"' : '') ?>>Employee</option>
                   </select>
                 </div>
               </div>
-              <?php $employee_id = explode(',', $track_data['employee_id']); ?>
+              <?php $employee_id = isset($track_data['employee_id']) ? explode(',', $track_data['employee_id']) : array(); ?>
               <div class="col-md-4" id="employee_ajax"
-                style="display: <?= $track_data['for'] === 'all' ? 'block' : 'none' ?>;">
+                style="display: <?= (isset($track_data['for']) && $track_data['for'] === 'all') ? 'block' : 'none'; ?>;">
                 <div class="form-group">
                   <label for="employee_id">Employee List <span class="text-danger">*</span></label>
                   <select class="form-control" id="employee_id" name="employee_id[]" multiple="multiple"
                     data-plugin="select_hrm" data-placeholder="Employee List">
                     <option value=""></option>
-                    <?php foreach ($staff_info as $staff): ?>
+                    <?php foreach (isset($staff_info) ? $staff_info : array() as $staff): ?>
                       <option value="<?= htmlspecialchars($staff['user_id']) ?>" <?= in_array($staff['user_id'], $employee_id) ? 'selected="selected"' : '' ?>>
                         <?= htmlspecialchars($staff['first_name'] . ' ' . $staff['last_name']) ?>
                       </option>
@@ -347,16 +349,11 @@ $goal_work = unserialize($track_data['goal_work']);
                   </label>
                   <select class="star-rating " name="goal_rating" autocomplete="off">
                     <option value=""></option>
-                    <option value="1" <?php if ($track_data['goal_rating'] == 1): ?> selected="selected" <?php endif; ?>>1
-                    </option>
-                    <option value="2" <?php if ($track_data['goal_rating'] == 2): ?> selected="selected" <?php endif; ?>>2
-                    </option>
-                    <option value="3" <?php if ($track_data['goal_rating'] == 3): ?> selected="selected" <?php endif; ?>>3
-                    </option>
-                    <option value="4" <?php if ($track_data['goal_rating'] == 4): ?> selected="selected" <?php endif; ?>>4
-                    </option>
-                    <option value="5" <?php if ($track_data['goal_rating'] == 5): ?> selected="selected" <?php endif; ?>>5
-                    </option>
+                    <option value="1" <?= (isset($track_data['goal_rating']) && $track_data['goal_rating'] == 1) ? 'selected="selected"' : '' ?>>1</option>
+                    <option value="2" <?= (isset($track_data['goal_rating']) && $track_data['goal_rating'] == 2) ? 'selected="selected"' : '' ?>>2</option>
+                    <option value="3" <?= (isset($track_data['goal_rating']) && $track_data['goal_rating'] == 3) ? 'selected="selected"' : '' ?>>3</option>
+                    <option value="4" <?= (isset($track_data['goal_rating']) && $track_data['goal_rating'] == 4) ? 'selected="selected"' : '' ?>>4</option>
+                    <option value="5" <?= (isset($track_data['goal_rating']) && $track_data['goal_rating'] == 5) ? 'selected="selected"' : '' ?>>5</option>
                   </select>
                 </div>
               </div>
@@ -367,13 +364,13 @@ $goal_work = unserialize($track_data['goal_work']);
                   </label>
                   <select name="status" class="form-control" data-plugin="select_hrm"
                     data-placeholder="<?= lang('Main.dashboard_xin_status'); ?>...">
-                    <option value="0" <?php if ($track_data['goal_status'] == '0'): ?> selected <?php endif; ?>>
+                    <option value="0" <?= (isset($track_data['goal_status']) && $track_data['goal_status'] == '0' ? 'selected' : '') ?>>
                       <?= lang('Projects.xin_not_started'); ?>
                     </option>
-                    <option value="1" <?php if ($track_data['goal_status'] == '1'): ?> selected <?php endif; ?>>
+                    <option value="1" <?= (isset($track_data['goal_status']) && $track_data['goal_status'] == '1' ? 'selected' : '') ?>>
                       <?= lang('Projects.xin_in_progress'); ?>
                     </option>
-                    <option value="2" <?php if ($track_data['goal_status'] == '2'): ?> selected <?php endif; ?>>
+                    <option value="2" <?= (isset($track_data['goal_status']) && $track_data['goal_status'] == '2' ? 'selected' : '') ?>>
                       <?= lang('Projects.xin_completed'); ?>
                     </option>
                   </select>
@@ -385,7 +382,7 @@ $goal_work = unserialize($track_data['goal_work']);
                       class="text-danger">*</span></label>
                   <div class="input-group">
                     <input class="form-control date" placeholder="<?php echo lang('Projects.xin_start_date'); ?>"
-                      name="start_date" type="text" value="<?= $track_data['start_date']; ?>">
+                      name="start_date" type="text" value="<?= isset($track_data['start_date']) ? $track_data['start_date'] : ''; ?>">
                     <div class="input-group-append"><span class="input-group-text"><i
                           class="fas fa-calendar-alt"></i></span></div>
                   </div>
@@ -397,7 +394,7 @@ $goal_work = unserialize($track_data['goal_work']);
                       class="text-danger">*</span></label>
                   <div class="input-group">
                     <input class="form-control date" placeholder="<?php echo lang('Projects.xin_end_date'); ?>"
-                      name="end_date" type="text" value="<?= $track_data['end_date']; ?>">
+                      name="end_date" type="text" value="<?= isset($track_data['end_date']) ? $track_data['end_date'] : ''; ?>">
                     <div class="input-group-append"><span class="input-group-text"><i
                           class="fas fa-calendar-alt"></i></span></div>
                   </div>
@@ -407,13 +404,12 @@ $goal_work = unserialize($track_data['goal_work']);
                 <div class="form-group">
                   <label for="description"><?php echo lang('Main.xin_description'); ?></label>
                   <textarea class="form-control editor" placeholder="<?php echo lang('Main.xin_description'); ?>"
-                    name="description" rows="4"> <?= $track_data['description']; ?>
-                            </textarea>
+                    name="description" rows="4"><?= isset($track_data['description']) ? $track_data['description'] : ''; ?></textarea>
                 </div>
               </div>
             </div>
           </div>
-          <?php if (in_array('tracking5', staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
+          <?php if ((isset($user_info['user_type']) && $user_info['user_type'] == 'company') || (isset($staff_role_resource) && in_array('tracking5', $staff_role_resource))) { ?>
             <div class="card-footer text-right">
               <button type="submit" class="btn btn-primary">
                 <?= lang('Performance.xin_update_goal'); ?>
@@ -423,6 +419,8 @@ $goal_work = unserialize($track_data['goal_work']);
 
           <?= form_close(); ?>
         </div>
+
+        <!-- Work Tab Content -->
         <div class="tab-pane fade" id="pills-work" role="tabpanel" aria-labelledby="pills-work-tab">
           <?php $attributes = array('name' => 'add_work', 'id' => 'add_work', 'autocomplete' => 'off', 'class' => 'form-hrm'); ?>
           <?php $hidden = array('token' => $segment_id); ?>
@@ -500,8 +498,8 @@ $goal_work = unserialize($track_data['goal_work']);
                     <option value=""></option>
                     <?php foreach ($travel as $_travel) { ?>
                       <?php $travel_type = $ConstantsModel->where('constants_id', $_travel['arrangement_type'])->where('type', 'travel_type')->first(); ?>
-                      <option value="<?= $travel_type['constants_id'] ?>">
-                        <?= $travel_type['category_name'] ?>
+                      <option value="<?= $travel_type['constants_id'] ?? '' ?>">
+                        <?= $travel_type['category_name'] ?? 'Unknown' ?>
                       </option>
                     <?php } ?>
                   </select>
@@ -522,26 +520,35 @@ $goal_work = unserialize($track_data['goal_work']);
       </div>
     </div>
   </div>
-  <!-- [ trackgoal-detail-right ] end -->
 </div>
 
 <script>
   function toggleEmployeeField() {
     const forSelect = document.getElementById('for_id');
     const employeeField = document.getElementById('employee_ajax');
-    employeeField.style.display = (forSelect.value === 'all') ? 'block' : 'none';
+    if (forSelect && employeeField) {
+      employeeField.style.display = (forSelect.value === 'all') ? 'block' : 'none';
+    }
   }
-</script>
 
-<script>
   document.addEventListener('DOMContentLoaded', function() {
-    var completedProjects = parseInt(document.getElementById('completed_projects').value);
-    var totalProjects = parseInt(document.getElementById('total_projects').value);
-    var progressPercentage = (totalProjects > 0) ? (completedProjects / totalProjects) * 100 : 0;
+    // Initialize progress bar
+    const completedProjects = parseInt(document.getElementById('completed_projects')?.value || 0);
+    const totalProjects = parseInt(document.getElementById('total_projects')?.value || 0);
+    const progressPercentage = (totalProjects > 0) ? Math.round((completedProjects / totalProjects) * 100) : 0;
 
-    var progressBar = document.getElementById('progress-bar');
-    progressBar.style.width = progressPercentage.toFixed(2) + '%';
-    progressBar.setAttribute('aria-valuenow', progressPercentage.toFixed(2));
-    progressBar.textContent = progressPercentage.toFixed(2) + '%';
+    const progressBar = document.getElementById('progress-bar');
+    if (progressBar) {
+      progressBar.style.width = progressPercentage + '%';
+      progressBar.setAttribute('aria-valuenow', progressPercentage);
+      progressBar.textContent = progressPercentage + '%';
+    }
+
+    // Initialize date pickers
+    $('.date').datepicker({
+      format: 'yyyy-mm-dd',
+      autoclose: true,
+      todayHighlight: true
+    });
   });
 </script>

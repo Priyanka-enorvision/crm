@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Controllers\Erp;
+
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -27,7 +29,7 @@ class Trackgoals extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -58,7 +60,7 @@ class Trackgoals extends BaseController
 		$request = \Config\Services::request();
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			return redirect()->to(site_url('erp/desk'));
@@ -66,13 +68,10 @@ class Trackgoals extends BaseController
 		$usession = $session->get('sup_username');
 
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
-		$segment_id = $request->uri->getSegment(3);
-		$ifield_id = udecode($segment_id);
+		$segment_id = $request->getUri()->getSegment(3);
+		$ifield_id = $segment_id;
 		$isegment_val = $TrackgoalsModel->where('tracking_id', $ifield_id)->first();
-		if (!$isegment_val) {
-			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
-			return redirect()->to(site_url('erp/desk'));
-		}
+
 		if ($user_info['user_type'] == 'staff') {
 			$track_data = $TrackgoalsModel->where('company_id', $user_info['company_id'])->where('tracking_id', $ifield_id)->first();
 		} else {
@@ -238,15 +237,15 @@ class Trackgoals extends BaseController
 
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
-		
+
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$UsersModel = new UsersModel();
 		$ConstantsModel = new ConstantsModel();
 		$TrackgoalsModel = new TrackgoalsModel();
 		$ProjectsModel = new ProjectsModel();
-		
+
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if ($user_info['user_type'] == 'staff') {
 
@@ -263,9 +262,9 @@ class Trackgoals extends BaseController
 				->orWhere('FIND_IN_SET(' . $user_id . ', assigned_to) > 0')
 				->groupEnd()->findAll();
 			$projectstatus = $ProjectsModel->where('company_id', $user_info['company_id'])->where('status', '2')->findAll(); //complete project status=2
-			  
+
 		} else {
-			
+
 			$get_data = $TrackgoalsModel->where('company_id', $usession['sup_user_id'])->orderBy('tracking_id', 'ASC')->findAll();
 			$projects = $ProjectsModel->where('company_id', $usession['sup_user_id'])->findAll();
 			$projectstatus = $ProjectsModel->where('company_id', $user_info['company_id'])->where('status', '2')->findAll();
@@ -283,7 +282,7 @@ class Trackgoals extends BaseController
 				$delete = '';
 			}
 			if (in_array('tracking3', staff_role_resource()) || $user_info['user_type'] == 'company') { //delete
-				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_view_details') . '"><a href="' . site_url() . 'erp/goal-details/' . uencode($r['tracking_id']) . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light"><span class="fa fa-arrow-circle-right"></span></button></a></span>';
+				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_view_details') . '"><a href="' . site_url() . 'erp/goal-details/' . $r['tracking_id'] . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light"><span class="fa fa-arrow-circle-right"></span></button></a></span>';
 			} else {
 				$edit = '';
 			}
@@ -293,7 +292,7 @@ class Trackgoals extends BaseController
 			/// goal type
 			$tracking_type = $ConstantsModel->where('constants_id', $r['tracking_type_id'])->first();
 			/////
-			$itype = $tracking_type['category_name'];//.'<br><small class="text-muted"><i>'.$r['subject'].'<i></i></i></small>';
+			$itype = $tracking_type['category_name']; //.'<br><small class="text-muted"><i>'.$r['subject'].'<i></i></i></small>';
 
 			//goal_progress
 			if ($progress_percentage <= 20) {
@@ -352,7 +351,6 @@ class Trackgoals extends BaseController
 				$createdBy,
 				$combhr
 			);
-
 		}
 		$output = array(
 			//"draw" => $draw,
@@ -485,21 +483,18 @@ class Trackgoals extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 				exit;
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 			exit;
 		}
 	}
 	// |||update record|||
 	public function update_goal_tracking()
 	{
-
-
-
 		$validation = \Config\Services::validation();
 		$session = \Config\Services::session();
 		$request = \Config\Services::request();
@@ -628,14 +623,14 @@ class Trackgoals extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 				exit;
 			}
 		} else {
 
 
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 			exit;
 		}
 	}
@@ -738,7 +733,7 @@ class Trackgoals extends BaseController
 		if ($this->request->getPost('type') == 'delete_record') {
 			/* Define return | here result is used to return user data and error for error message */
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-			$session = \Config\Services::session($config);
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
 			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
@@ -750,7 +745,7 @@ class Trackgoals extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 		}
 	}
 }

@@ -362,9 +362,9 @@ $(document).ready(function () {
 	$(".delete_file").on("click", function () {
 		var field_id = $(this).data('field');
 		$.ajax({
-			url: main_url + "projects/delete_project_file",
-			type: "GET",
-			data: 'jd=1&data=project_file&field_id=' + field_id,
+			url: main_url + "delete-project-file",
+			type: "DELETE",
+			data: 'field_id' + field_id,
 			success: function (response) {
 				if (response) {
 					$('#file_option_id_' + field_id).fadeOut();

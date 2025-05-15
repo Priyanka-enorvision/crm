@@ -289,7 +289,7 @@ if ($user_info['user_type'] == 'staff') {
                             }
                             ?>
                             <td>
-                                <a href="<?= $showButton ? base_url('erp/view-performances/' . base64_encode($value['performance_indicator_id'])) : '#' ?>"
+                                <a href="<?= $showButton ? base_url('erp/view-performances/' . $value['performance_indicator_id']) : '#' ?>"
                                     data-bs-toggle="<?= $showButton ? 'tooltip' : ''; ?>"
                                     title="<?= $showButton ? 'View Details' : ''; ?>">
                                     <button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" <?= !$showButton ? 'disabled' : ''; ?>>
@@ -320,8 +320,8 @@ if ($user_info['user_type'] == 'staff') {
                 </div>
 
                 <?php $attributes = array('name' => 'add_performance_indicator', 'id' => '', 'autocomplete' => 'off', 'class' => 'form-hrm'); ?>
-                <?php $hidden = array('user_id' => 1); ?>
-                <?php echo form_open('erp/talent/add_indicator', $attributes, $hidden); ?>
+                <?php $hidden = array('user_id' => '1'); ?>
+                <?php echo form_open('erp/add-indicator', $attributes, $hidden); ?>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4">
@@ -490,8 +490,8 @@ if ($user_info['user_type'] == 'staff') {
             var employee = $('#employee_filter').val();
 
             $.ajax({
-                url: '<?= base_url('erp/Talent/filter_performance'); ?>',
-                type: 'POST',
+                url: '<?= base_url('erp/filter-performance'); ?>',
+                type: 'GET',
                 data: {
                     year_id: year,
                     period: period,

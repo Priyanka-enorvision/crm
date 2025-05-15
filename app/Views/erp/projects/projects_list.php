@@ -700,7 +700,8 @@ if ($session->has('entityId')) {
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form action="<?= base_url('erp/projects/copy_project'); ?>" method="post" id="copyProjectForm">
+      <form action="<?= base_url('erp/copy-project'); ?>" method="post" id="copyProjectForm">
+        <?= csrf_field() ?>
         <div class="modal-body">
           <input type="hidden" name="project_id" value=""> <!-- Hidden input for project_id -->
 

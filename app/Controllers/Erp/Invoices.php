@@ -252,7 +252,7 @@ class Invoices extends BaseController
 		$usession = $session->get('sup_username');
 		$InvoicesModel = new InvoicesModel();
 		$request = \Config\Services::request();
-		$ifield_id = udecode($request->uri->getSegment(3));
+		$ifield_id = udecode($request->getUri()->getSegment(3));
 		$isegment_val = $InvoicesModel->where('invoice_id', $ifield_id)->first();
 		if (!$isegment_val) {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -705,8 +705,6 @@ class Invoices extends BaseController
 				return redirect()->back()->withInput();
 			}
 
-
-
 			$invoice_number = filter_var($request->getPost('invoice_number'), FILTER_SANITIZE_STRING);
 			$client_id = filter_var($request->getPost('client'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
 			$project_id = filter_var($request->getPost('project'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
@@ -795,12 +793,14 @@ class Invoices extends BaseController
 				];
 			}
 
+
 			if (!$InvoiceitemsModel->insertBatch($items_data)) {
 				$return['error'] = 'Failed to add invoice items. Please try again later.';
 				log_message('error', 'Failed to insert invoice items.');
-				return $this->output($return);
+				return $this->response->setJSON($return);
 			}
 			$current_url = $this->request->getServer('HTTP_REFERER') ?? base_url('erp/invoices-list');
+
 			$session->setFlashdata('message', 'Invoice created successfully !! Invoice Number: ' . $invoice_number);
 			$return['result'] = 'Invoice created successfully. Invoice Number: ' . $invoice_number;
 
@@ -1567,7 +1567,7 @@ class Invoices extends BaseController
 		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$id = $request->getGet('field_id');
 		$data = [
@@ -1576,7 +1576,7 @@ class Invoices extends BaseController
 		if ($session->has('sup_username')) {
 			return view('erp/invoices/pay_invoice', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
 	// |||update record|||

@@ -70,7 +70,7 @@ $staff_info = $UsersModel->where('company_id', $usession['sup_user_id'])->where(
     <h5 class="modal-title" id="groupsModalLabel">Edit Timelogs</h5>
 
 </div>
-<form action="<?= base_url('erp/Timelogs/update/' . base64_encode($timelog_data['timelogs_id'])); ?>" method="POST" style="background: #f9f9f9; border-radius: 0.5rem; box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);">
+<form action="<?= base_url('erp/timelogs-update/' . $timelog_data['timelogs_id']); ?>" method="POST" style="background: #f9f9f9; border-radius: 0.5rem; box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);">
     <?= csrf_field() ?>
     <div class="modal-body">
         <div class="row">

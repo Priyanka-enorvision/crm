@@ -1278,7 +1278,7 @@ class Talent extends BaseController
                         <td>' . $managerRemark . '</td>
                         <td>' . $updatedBy . '</td>
                         <td>
-                            <a href="' . ($showButton ? base_url('erp/view-performances/' . base64_encode($value['performance_indicator_id'])) : '#') . '"
+                            <a href="' . ($showButton ? base_url('erp/view-performances/' . $value['performance_indicator_id']) : '#') . '"
                                data-bs-toggle="' . ($showButton ? 'tooltip' : '') . '"
                                title="' . ($showButton ? 'View Details' : '') . '">
                                 <button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" ' . (!$showButton ? 'disabled' : '') . '>

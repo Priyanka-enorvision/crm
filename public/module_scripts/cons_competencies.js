@@ -1,8 +1,8 @@
 $(document).ready(function () {
-	var xin_table = $('#xin_table').dataTable({
+	var xin_table = $('#xin_table').DataTable({
 		"bDestroy": true,
 		"ajax": {
-			url: main_url + "types/competencies_list",
+			url: main_url + "competencies-Datalist",
 			type: 'GET'
 		},
 		"language": {
@@ -59,25 +59,23 @@ $(document).ready(function () {
 			data: obj.serialize() + "&is_ajax=2&type=delete_record&form=" + action,
 			cache: false,
 			success: function (JSON) {
-				if (response.result) {
-					toastr.success(response.result);
+				if (JSON.error != '') {
+					toastr.error(JSON.error);
+					$('input[name="csrf_token"]').val(JSON.csrf_hash);
+					Ladda.stopAll();
+				} else {
 					$('.delete-modal').modal('toggle');
+					toastr.success(JSON.result);
+					window.location.href = main_url + 'competencies';
+					$('input[name="csrf_token"]').val(JSON.csrf_hash);
 
-					setTimeout(function () {
-						window.location.href = response.redirect_url;
-					}, 1000);
+					Ladda.stopAll();
 
-				} else if (response.error) {
-					toastr.error(response.error);
+
 				}
-				$('input[name="csrf_token"]').val(response.csrf_hash);
 			},
-			error: function (xhr, status, error) {
-				console.error("Error deleting project: ", error);
-				toastr.error('An error occurred while deleting the project.');
-				setTimeout(function () {
-					window.location.href = response.redirect_url;
-				}, 2000);
+			error: function (xhr, error, thrown) {
+				console.log("AJAX Error: ", xhr.responseText);
 			}
 		});
 	});
@@ -89,7 +87,7 @@ $(document).ready(function () {
 		var data_option = button.data('comp_option');
 		var modal = $(this);
 		$.ajax({
-			url: main_url + "types/read_competencies",
+			url: main_url + "read-competencies",
 			type: "GET",
 			data: 'jd=1&data=competencies&field_id=' + field_id + '&data_option=' + data_option,
 			success: function (response) {
@@ -117,25 +115,17 @@ $(document).ready(function () {
 			success: function (JSON) {
 				if (JSON.error != '') {
 					toastr.error(JSON.error);
-					$('input[name="csrf_token"]').val(JSON.csrf_hash);
-					Ladda.stopAll();
 				} else {
 					toastr.success(JSON.result);
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
-					$('#xin-form')[0].reset();
-					$('.add-form').removeClass('show');
-					Ladda.stopAll();
-
-					// Redirect to projects list page after success
-					if (JSON.redirect_url) {
-						window.location.href = JSON.redirect_url;
-					}
+					window.location.href = main_url + 'competencies';
 				}
 			},
-			error: function () {
-				toastr.error("An error occurred. Please try again.");
-				$('input[name="csrf_token"]').val(JSON.csrf_hash);
-				Ladda.stopAll();
+			error: function (xhr, status, error) {
+				toastr.error('Something went wrong. Please try again.');
+				if (xhr.responseJSON && xhr.responseJSON.csrf_hash) {
+					$('input[name="csrf_token"]').val(xhr.responseJSON.csrf_hash);
+				}
 			}
 		});
 	});
@@ -178,5 +168,5 @@ $(document).ready(function () {
 });
 $(document).on("click", ".delete", function () {
 	$('input[name=_token]').val($(this).data('record-id'));
-	$('#delete_record').attr('action', main_url + 'types/delete_type/' + $(this).data('record-id'));
+	$('#delete_record').attr('action', main_url + 'delete-type/' + $(this).data('record-id'));
 });

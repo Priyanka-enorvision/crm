@@ -1184,144 +1184,167 @@ class Tasks extends BaseController
 			return $this->response->setJSON($Return);
 		}
 	}
-	// public function add_tasks()
-	// {
-	// 	$validation = \Config\Services::validation();
-	// 	$session = \Config\Services::session();
-	// 	$request = \Config\Services::request();
-	// 	$usession = $session->get('sup_username');
-	// 	if ($this->request->getPost()) {
 
-	// 		$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-	// 		$Return['csrf_hash'] = csrf_hash();
-	// 		// set rules
-	// 		$rules = [
-	// 			'task_name' => [
-	// 				'rules' => 'required',
-	// 				'errors' => [
-	// 					'required' => lang('Main.xin_error_field_text')
-	// 				]
-	// 			],
-	// 			'start_date' => [
-	// 				'rules' => 'required',
-	// 				'errors' => [
-	// 					'required' => lang('Main.xin_error_field_text')
-	// 				]
-	// 			],
-	// 			'end_date' => [
-	// 				'rules' => 'required',
-	// 				'errors' => [
-	// 					'required' => lang('Main.xin_error_field_text')
-	// 				]
-	// 			],
-	// 			'project_id' => [
-	// 				'rules' => 'required',
-	// 				'errors' => [
-	// 					'required' => lang('Success.xin_project_field_error')
-	// 				]
-	// 			],
-	// 			'summary' => [
-	// 				'rules' => 'required|min_length[10]',
-	// 				'errors' => [
-	// 					'required' => lang('Main.xin_error_field_text')
-	// 				]
-	// 			]
-	// 		];
-	// 		if (!$this->validate($rules)) {
+	public function add_task()
+	{
+		$validation = \Config\Services::validation();
+		$session = \Config\Services::session();
+		$request = \Config\Services::request();
+		$usession = $session->get('sup_username');
 
-	// 			$ruleErrors = [
-	// 				"task_name" => $validation->getError('task_name'),
-	// 				"start_date" => $validation->getError('start_date'),
-	// 				"end_date" => $validation->getError('end_date'),
-	// 				"project_id" => $validation->getError('project_id'),
-	// 				"summary" => $validation->getError('summary')
-	// 			];
-	// 			foreach ($ruleErrors as $err) {
-	// 				$Return['error'] = $err;
-	// 				if ($Return['error'] != '') {
-	// 					$this->output($Return);
-	// 				}
-	// 			}
-	// 		} else {
-	// 			$task_name = $this->request->getPost('task_name', FILTER_SANITIZE_STRING);
-	// 			$start_date = $this->request->getPost('start_date', FILTER_SANITIZE_STRING);
-	// 			$end_date = $this->request->getPost('end_date', FILTER_SANITIZE_STRING);
-	// 			$project_id = $this->request->getPost('project_id', FILTER_SANITIZE_STRING);
-	// 			$task_hour = $this->request->getPost('task_hour', FILTER_SANITIZE_STRING);
-	// 			$summary = $this->request->getPost('summary', FILTER_SANITIZE_STRING);
-	// 			$description = $this->request->getPost('description', FILTER_SANITIZE_STRING);
+		if (!$this->request->getPost()) {
+			return $session->setFlashdata('error', lang('Main.xin_error_msg'));
+		}
 
-	// 			$assigned_ids = implode(',', $this->request->getPost('assigned_to', FILTER_SANITIZE_STRING));
-	// 			$employee_ids = $assigned_ids;
+		$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+		$Return['csrf_hash'] = csrf_hash();
 
-	// 			$expert_ids = implode(',', $this->request->getPost('expert_to', FILTER_SANITIZE_STRING));
+		// set rules
+		$rules = [
+			'task_name' => [
+				'rules' => 'required',
+				'errors' => [
+					'required' => lang('Main.xin_error_field_text')
+				]
+			],
+			'start_date' => [
+				'rules' => 'required',
+				'errors' => [
+					'required' => lang('Main.xin_error_field_text')
+				]
+			],
+			'end_date' => [
+				'rules' => 'required',
+				'errors' => [
+					'required' => lang('Main.xin_error_field_text')
+				]
+			],
+			'project_id' => [
+				'rules' => 'required',
+				'errors' => [
+					'required' => lang('Success.xin_project_field_error')
+				]
+			],
+			'summary' => [
+				'rules' => 'required',
+				'errors' => [
+					'required' => lang('Main.xin_error_field_text')
+				]
+			]
+		];
 
-	// 			$milestone_id = $this->request->getPost('milestone_id') ? $this->request->getPost('milestone_id') : 0;
+		if (!$this->validate($rules)) {
+			$ruleErrors = [
+				"task_name" => $validation->getError('task_name'),
+				"start_date" => $validation->getError('start_date'),
+				"end_date" => $validation->getError('end_date'),
+				"project_id" => $validation->getError('project_id'),
+				"summary" => $validation->getError('summary')
+			];
 
-	// 			$UsersModel = new UsersModel();
-	// 			$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+			foreach ($ruleErrors as $err) {
+				if (!empty($err)) {
+					$Return['error'] = $err;
+					$this->output($Return);
+					return;
+				}
+			}
+		}
 
-	// 			if ($user_info['user_type'] == 'staff') {
-	// 				$company_id = $user_info['company_id'];
-	// 			} else if ($user_info['user_type'] == 'customer') {
-	// 				$company_id = $user_info['company_id'];
-	// 			} else {
-	// 				$company_id = $usession['sup_user_id'];
-	// 			}
-	// 			$data = [
-	// 				'company_id' => $company_id,
-	// 				'task_name' => $task_name,
-	// 				'start_date' => $start_date,
-	// 				'end_date' => $end_date,
-	// 				'project_id' => $project_id,
-	// 				'milestones_id' => $milestone_id,
-	// 				'summary' => $summary,
-	// 				'task_hour' => $task_hour,
-	// 				'description' => $description,
-	// 				'assigned_to' => $employee_ids,
-	// 				'expert_to' => $expert_ids,
-	// 				'task_progress' => 0,
-	// 				'task_status' => 0,
-	// 				'task_note' => '',
-	// 				'created_by' => $usession['sup_user_id'],
-	// 				'created_at' => date('m-d-Y h:i:s')
-	// 			];
+		// Process the form data
+		$task_name = $this->request->getPost('task_name', FILTER_SANITIZE_STRING);
+		$start_date = $this->request->getPost('start_date', FILTER_SANITIZE_STRING);
+		$end_date = $this->request->getPost('end_date', FILTER_SANITIZE_STRING);
+		$project_id = $this->request->getPost('project_id', FILTER_SANITIZE_STRING);
+		$task_hour = $this->request->getPost('task_hour', FILTER_SANITIZE_STRING);
+		$summary = $this->request->getPost('summary', FILTER_SANITIZE_STRING);
+		$description = $this->request->getPost('description', FILTER_SANITIZE_STRING);
+		$employe_id = $this->request->getPost('employee_id');
 
-	// 			$TasksModel = new TasksModel();
-	// 			$result = $TasksModel->insert($data);
+		$assigned_ids = implode(',', $this->request->getPost('assigned_to', FILTER_SANITIZE_STRING));
+		$employee_ids = $assigned_ids;
 
-	// 			$Return['csrf_hash'] = csrf_hash();
-	// 			$current_url = $this->request->getServer('HTTP_REFERER');
-	// 			if ($result == TRUE) {
+		$expert_ids = implode(',', $this->request->getPost('expert_to', FILTER_SANITIZE_STRING));
+		$milestone_id = $this->request->getPost('milestone_id') ? $this->request->getPost('milestone_id') : 0;
 
-	// 				$xin_system = new SystemModel();
-	// 				$xin_system_data = $xin_system->where('setting_id', 1)->first();
+		$UsersModel = new UsersModel();
+		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 
-	// 				if ($xin_system_data && $xin_system_data['enable_email_notification'] == 1) {
-	// 					$EmailtemplatesModel = new EmailtemplatesModel();
-	// 					$itemplate = $EmailtemplatesModel->where('template_id', 10)->first();
-	// 					$isubject = $itemplate['subject'];
-	// 					$ibody = html_entity_decode($itemplate['message']);
-	// 					$fbody = str_replace(array("{site_name}", "{task_name}", "{task_due_date}"), array($user_info['company_name'], $task_name, $end_date), $ibody);
-	// 					foreach ($this->request->getPost('assigned_to', FILTER_SANITIZE_STRING) as $_staff_id) {
-	// 						$staff_info = $UsersModel->where('user_id', $_staff_id)->first();
-	// 						timehrm_mail_data($user_info['email'], $user_info['company_name'], $staff_info['email'], $isubject, $fbody);
-	// 					}
-	// 				}
-	// 				$Return['result'] = lang('Success.ci_task_added_msg');
-	// 			} else {
-	// 				$Return['error'] = lang('Main.xin_error_msg');
-	// 			}
+		if ($user_info['user_type'] == 'staff' || $user_info['user_type'] == 'customer') {
+			$company_id = $user_info['company_id'];
+		} else {
+			$company_id = $usession['sup_user_id'];
+		}
 
-	// 			return $this->response->setJSON($Return);
-	// 			exit;
-	// 		}
-	// 	} else {
-	// 		$Return['error'] = lang('Main.xin_error_msg');
-	// 		return $this->response->setJSON($Return);
-	// 		exit;
-	// 	}
-	// }
+		$data = [
+			'company_id' => $company_id,
+			'task_name' => $task_name,
+			'start_date' => $start_date,
+			'end_date' => $end_date,
+			'project_id' => $project_id,
+			'milestones_id' => $milestone_id,
+			'summary' => $summary,
+			'task_hour' => $task_hour,
+			'description' => $description,
+			'assigned_to' => $employee_ids,
+			'expert_to' => $expert_ids,
+			'employe_ID' => (int)$employe_id,
+			'task_progress' => 0,
+			'task_status' => 0,
+			'task_note' => '',
+			'created_by' => $usession['sup_user_id'],
+			'created_at' => date('Y-m-d H:i:s') // Fixed date format
+		];
+
+		$TasksModel = new TasksModel();
+		$result = $TasksModel->insert($data);
+
+		if ($result === false) {
+			$Return['error'] = lang('Main.xin_error_msg');
+			$this->output($Return);
+			return;
+		}
+
+		// Handle email notifications
+		$xin_system = new SystemModel();
+		$xin_system_data = $xin_system->where('setting_id', 1)->first();
+
+		if ($xin_system_data && $xin_system_data['enable_email_notification'] == 1) {
+			$EmailtemplatesModel = new EmailtemplatesModel();
+			$itemplate = $EmailtemplatesModel->where('template_id', 10)->first();
+
+			if ($itemplate) {
+				$isubject = $itemplate['subject'];
+				$ibody = html_entity_decode($itemplate['message']);
+				$fbody = str_replace(
+					["{site_name}", "{task_name}", "{task_due_date}"],
+					[$user_info['company_name'], $task_name, $end_date],
+					$ibody
+				);
+
+				foreach ($this->request->getPost('assigned_to', FILTER_SANITIZE_STRING) as $_staff_id) {
+					$staff_info = $UsersModel->where('user_id', $_staff_id)->first();
+					if ($staff_info) {
+						timehrm_mail_data(
+							$user_info['email'],
+							$user_info['company_name'],
+							$staff_info['email'],
+							$isubject,
+							$fbody
+						);
+					}
+				}
+			}
+		}
+
+		$current_url = $this->request->getServer('HTTP_REFERER');
+		$Return['result'] = lang('Success.ci_task_added_msg');
+		$Return['redirect_url'] = $current_url;
+		$session->setFlashdata('message', 'Task successfully added.');
+
+		$this->output($Return);
+		return redirect()->to($current_url);
+	}
 
 	public function add_tasks()
 	{
@@ -1459,144 +1482,6 @@ class Tasks extends BaseController
 
 
 
-
-	// |||update record|||
-	// public function update_task()
-	// {
-
-	// 	$validation = \Config\Services::validation();
-	// 	$session = \Config\Services::session();
-	// 	$request = \Config\Services::request();
-	// 	$usession = $session->get('sup_username');
-	// 	if ($this->request->getPost('type') === 'edit_record') {
-	// 		$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-	// 		$Return['csrf_hash'] = csrf_hash();
-	// 		// set rules
-	// 		$rules = [
-	// 			'task_name' => [
-	// 				'rules' => 'required',
-	// 				'errors' => [
-	// 					'required' => lang('Main.xin_error_field_text')
-	// 				]
-	// 			],
-	// 			'start_date' => [
-	// 				'rules' => 'required',
-	// 				'errors' => [
-	// 					'required' => lang('Main.xin_error_field_text')
-	// 				]
-	// 			],
-	// 			'end_date' => [
-	// 				'rules' => 'required',
-	// 				'errors' => [
-	// 					'required' => lang('Main.xin_error_field_text')
-	// 				]
-	// 			],
-	// 			'project_id' => [
-	// 				'rules' => 'required',
-	// 				'errors' => [
-	// 					'required' => lang('Success.xin_project_field_error')
-	// 				]
-	// 			],
-	// 			'summary' => [
-	// 				'rules' => 'required',
-	// 				'errors' => [
-	// 					'required' => lang('Main.xin_error_field_text')
-	// 				]
-	// 			]
-	// 		];
-	// 		if (!$this->validate($rules)) {
-	// 			$ruleErrors = [
-	// 				"task_name" => $validation->getError('task_name'),
-	// 				"start_date" => $validation->getError('start_date'),
-	// 				"end_date" => $validation->getError('end_date'),
-	// 				"project_id" => $validation->getError('project_id'),
-	// 				"summary" => $validation->getError('summary')
-	// 			];
-	// 			foreach ($ruleErrors as $err) {
-	// 				$Return['error'] = $err;
-	// 				if ($Return['error'] != '') {
-	// 					$this->output($Return);
-	// 				}
-	// 			}
-	// 		} else {
-	// 			$task_name = $this->request->getPost('task_name', FILTER_SANITIZE_STRING);
-	// 			$start_date = $this->request->getPost('start_date', FILTER_SANITIZE_STRING);
-	// 			$end_date = $this->request->getPost('end_date', FILTER_SANITIZE_STRING);
-	// 			$project_id = $this->request->getPost('project_id', FILTER_SANITIZE_STRING);
-	// 			$task_hour = $this->request->getPost('task_hour', FILTER_SANITIZE_STRING);
-	// 			$summary = $this->request->getPost('summary', FILTER_SANITIZE_STRING);
-	// 			$description = $this->request->getPost('description', FILTER_SANITIZE_STRING);
-	// 			$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
-	// 			$assigned_ids = implode(',', $this->request->getPost('assigned_to', FILTER_SANITIZE_STRING));
-	// 			$expert_ids = implode(',', $this->request->getPost('expert_to', FILTER_SANITIZE_STRING));
-	// 			$associated_goals = implode(',', $this->request->getPost('associated_goals', FILTER_SANITIZE_STRING));
-	// 			$milestone_id = $this->request->getPost('milestone_id') ? $this->request->getPost('milestone_id') : 0;
-
-	// 			$employee_ids = $assigned_ids;
-	// 			$data = [
-	// 				'task_name' => $task_name,
-	// 				'start_date' => $start_date,
-	// 				'end_date' => $end_date,
-	// 				'milestones_id' => $milestone_id,
-	// 				'summary' => $summary,
-	// 				'task_hour' => $task_hour,
-	// 				'description' => $description,
-	// 				'project_id' => $project_id,
-	// 				'assigned_to' => $employee_ids,
-	// 				'expert_to' => $expert_ids,
-	// 				'task_progress' => $this->request->getPost('progres_val', FILTER_SANITIZE_STRING),
-	// 				'associated_goals' => $associated_goals
-	// 			];
-	// 			$TasksModel = new TasksModel();
-	// 			$UsersModel = new UsersModel();
-	// 			$SystemModel = new SystemModel();
-	// 			$EmailtemplatesModel = new EmailtemplatesModel();
-	// 			$xin_system = $SystemModel->where('setting_id', 1)->first();
-	// 			$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-	// 			if ($user_info['user_type'] == 'company') {
-	// 				$company_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-	// 			} else {
-	// 				$company_info = $UsersModel->where('company_id', $user_info['company_id'])->first();
-	// 			}
-
-	// 			try {
-	// 				$result = $TasksModel->update($id, $data);
-
-	// 				$Return['csrf_hash'] = csrf_hash();
-	// 				if ($result == TRUE) {
-	// 					$Return['result'] = lang('Success.ci_task_updated_msg');
-	// 					if ($xin_system['enable_email_notification'] == 1) {
-	// 						// Send mail start
-	// 						$itemplate = $EmailtemplatesModel->where('template_id', 10)->first();
-	// 						$isubject = $itemplate['subject'];
-	// 						$ibody = html_entity_decode($itemplate['message']);
-	// 						$fbody = str_replace(array("{site_name}", "{task_name}", "{task_due_date}"), array($user_info['company_name'], $task_name, $end_date), $ibody);
-	// 						foreach ($this->request->getPost('assigned_to', FILTER_SANITIZE_STRING) as $_staff_id) {
-	// 							$staff_info = $UsersModel->where('user_id', $_staff_id)->first();
-	// 							timehrm_mail_data($user_info['email'], $user_info['company_name'], $staff_info['email'], $isubject, $fbody);
-	// 						}
-	// 						// Send mail end
-	// 					}
-	// 				} else {
-	// 					$db = \Config\Database::connect();
-	// 					$error = $db->error();
-	// 					log_message('error', 'Database update failed. Error: ' . $error['message']);
-	// 					$Return['error'] = 'Database update failed. ' . $error['message'];
-	// 				}
-	// 			} catch (\Exception $e) {
-	// 				log_message('error', 'Database exception: ' . $e->getMessage());
-	// 				$Return['error'] = 'Database error: ' . $e->getMessage();
-	// 			}
-
-	// 			return $this->response->setJSON($Return);
-	// 			exit;
-	// 		}
-	// 	} else {
-	// 		$Return['error'] = lang('Main.xin_error_msg');
-	// 		return $this->response->setJSON($Return);
-	// 		exit;
-	// 	}
-	// }
 
 	public function update_task()
 	{
@@ -1840,11 +1725,10 @@ class Tasks extends BaseController
 
 	public function taskUpdate($id)
 	{
-
 		$validation = \Config\Services::validation();
 		$session = \Config\Services::session();
 
-		if ($this->request->getMethod() === 'post') {
+		if ($this->request->getMethod()) {
 
 			// CSRF hash for security
 			$Return = ['result' => '', 'error' => '', 'csrf_hash' => csrf_hash()];
@@ -1905,7 +1789,7 @@ class Tasks extends BaseController
 				return redirect()->to(site_url('erp/project-detail/' . uencode($project_id)));
 			} else {
 				$session->setFlashdata('error', lang('Main.xin_error_msg'));
-				return redirect()->to(site_url('erp/edit-task/' . uencode($decoded_id)));
+				return redirect()->to(site_url('erp/tasks-list'));
 			}
 		} else {
 
@@ -2368,6 +2252,26 @@ class Tasks extends BaseController
 			return $this->response->setJSON($Return);
 		}
 	}
+	public function delete_projecttask()
+	{
+		if ($this->request->getPost('type') == 'delete_record') {
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$session = \Config\Services::session();
+			$request = \Config\Services::request();
+			$usession = $session->get('sup_username');
+			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
+			$Return['csrf_hash'] = csrf_hash();
+			$TasksModel = new TasksModel();
+			$result = $TasksModel->where('task_id', $id)->delete($id);
+			if ($result == TRUE) {
+				$Return['result'] = lang('Success.ci_task_deleted_msg');
+			} else {
+				$Return['error'] = lang('Main.xin_error_msg');
+			}
+			return $this->response->setJSON($Return);
+		}
+	}
+
 	public function delete_tasks()
 	{
 		if ($this->request->getPost('type') == 'delete_record') {
@@ -2469,7 +2373,7 @@ class Tasks extends BaseController
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 
-		$segment_id = $request->uri->getSegment(3);
+		$segment_id = $request->getUri()->getSegment(3);
 		$task_id = udecode($segment_id);
 		$task_data = $Model->where('task_id', $task_id)->first();
 

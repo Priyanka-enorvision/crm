@@ -24,7 +24,7 @@ $locale = service('request')->getLocale();
 
 $request = \Config\Services::request();
 
-$segment_id = $request->uri->getSegment(3);
+$segment_id = $request->getUri()->getSegment(3);
 
 $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 try {
@@ -198,10 +198,10 @@ if ($user_info['user_type'] == 'staff') {
 <div class="row m-b-1 animated fadeInRight">
     <div class="col-md-12">
         <?php if (in_array('project2', staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
-            <div id="add_form" class="add-form <?= $get_animate; ?>" data-parent="#accordion" style="">
+            <div id="add_form" class="add-form " data-parent="#accordion" style="">
                 <?php $attributes = array('name' => 'update_project', 'autocomplete' => 'off'); ?>
                 <?php $hidden = array('token' => $segment_id); ?>
-                <?= form_open('erp/projects/update_project', $attributes, $hidden); ?>
+                <?= form_open('erp/update-project', $attributes, $hidden); ?>
                 <div class="card mb-2">
                     <div id="accordion">
                         <div class="card-header">
@@ -534,18 +534,19 @@ if ($user_info['user_type'] == 'staff') {
     });
 </script>
 
+
+
 <script>
     $(document).ready(function() {
         $('[data-plugin="select_hrm"]').select2();
+        $('#company_id').change(function() {
+            var selectedEmployeeId = <?= isset($project_data['employe_ID']) ? $project_data['employe_ID'] : 'null' ?>;
+            var company_id = $(this).val();
 
-        var selectedEmployeeId = <?= isset($project_data['employe_ID']) ? $project_data['employe_ID'] : 'null' ?>;
-
-        // Function to load employees
-        function loadEmployees(company_id) {
             if (company_id) {
                 $.ajax({
-                    url: '<?= base_url('erp/projects/get_employe'); ?>',
-                    type: 'POST',
+                    url: '<?= base_url('erp/get-employelist'); ?>',
+                    type: 'GET',
                     data: {
                         company_id: company_id
                     },
@@ -559,7 +560,7 @@ if ($user_info['user_type'] == 'staff') {
                                 .attr('value', employee.id)
                                 .text(employee.name);
 
-                            // Select if matches stored employee ID
+                            // If this employee is the selected one, mark it as selected
                             if (selectedEmployeeId && employee.id == selectedEmployeeId) {
                                 option.attr('selected', 'selected');
                             }
@@ -567,7 +568,7 @@ if ($user_info['user_type'] == 'staff') {
                             $('#employe_id').append(option);
                         });
 
-                        // Refresh select2
+                        // Refresh select2 to show the selected value
                         $('#employe_id').trigger('change');
                     },
                     error: function(xhr, status, error) {
@@ -580,16 +581,11 @@ if ($user_info['user_type'] == 'staff') {
                 $('#employe_id').empty();
                 $('#employe_id').append('<option value="">Select a company first</option>');
             }
-        }
-
-        // Handle company change
-        $('#company_id').change(function() {
-            loadEmployees($(this).val());
         });
 
-        // Trigger change on page load if company is selected
-        <?php if (isset($project_data['companies_ID']) && !empty($project_data['companies_ID'])): ?>
+        // Trigger the change event on page load if company_id has a value
+        if ($('#company_id').val()) {
             $('#company_id').trigger('change');
-        <?php endif; ?>
+        }
     });
 </script>

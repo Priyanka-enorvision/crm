@@ -2238,12 +2238,12 @@ class Types extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 				exit;
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 			exit;
 		}
 	}

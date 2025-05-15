@@ -32,7 +32,7 @@ class Talent extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -582,103 +582,7 @@ class Talent extends BaseController
 
 
 
-	// public function update_indicator()
-	// {
-	// 	$validation = \Config\Services::validation();
-	// 	$session = \Config\Services::session();
-	// 	$request = \Config\Services::request();
 
-	// 	if ($request->getPost()) {
-	// 		$Return = ['result' => '', 'error' => '', 'csrf_hash' => csrf_hash()];
-
-	// 		// Validation rules
-	// 		$rules = [
-	// 			'title' => [
-	// 				'rules'  => 'required',
-	// 				'errors' => [
-	// 					'required' => lang('Main.xin_error_field_text')
-	// 				]
-	// 			],
-	// 			'designation_id' => [
-	// 				'rules'  => 'required',
-	// 				'errors' => [
-	// 					'required' => lang('Employees.xin_employee_error_designation')
-	// 				]
-	// 			]
-	// 		];
-
-	// 		if (!$this->validate($rules)) {
-	// 			$errors = $validation->getErrors();
-	// 			$Return['error'] = implode(', ', $errors);
-	// 			return $this->output($Return);
-	// 		}
-
-	// 		// Sanitize inputs
-	// 		$title = $this->request->getPost('title', FILTER_SANITIZE_STRING);
-	// 		$designation_id = $this->request->getPost('designation_id', FILTER_SANITIZE_STRING);
-	// 		$id = $this->request->getPost('token', FILTER_SANITIZE_STRING);
-
-	// 		$data = [
-	// 			'title' => $title,
-	// 			'designation_id' => $designation_id,
-	// 			'emp_total_rating' => $this->request->getPost('employee_total_rating'),
-	// 			'mang_total_rating' => $this->request->getPost('manager_total_rating'),
-	// 			'manager_overallRemark' => $this->request->getPost('manager_overall_remark'),
-	// 		];
-
-	// 		$KpiModel = new KpiModel();
-	// 		$KpioptionsModel = new KpioptionsModel();
-
-	// 		if ($KpiModel->update($id, $data)) {
-	// 			$db = \Config\Database::connect();
-	// 			$builderOptions = $db->table('ci_performance_indicator_options');
-
-	// 			// Update employee data
-	// 			$employee_data = $this->request->getPost('employee_data');
-	// 			$employee_remarks = $this->request->getPost('employee_remarks');
-
-	// 			if (is_array($employee_data)) {
-	// 				foreach ($employee_data as $key => $tech_value) {
-	// 					$empData = [
-	// 						'indicator_option_id' => $key,
-	// 						'indicator_option_value' => $tech_value,
-	// 						'remarks' => $employee_remarks[$key] ?? '',
-	// 						'total_rating' => $this->request->getPost('employee_total_rating'),
-	// 					];
-	// 					$builderOptions->where('indicator_id', $id)->where('indicator_type', 'employee')->where('indicator_option_id', $key)->update($empData);
-	// 				}
-	// 			}
-
-	// 			// Update manager data
-	// 			$manager_data = $this->request->getPost('manager_data');
-	// 			$manager_remarks = $this->request->getPost('manager_remarks');
-
-	// 			if (is_array($manager_data)) {
-	// 				foreach ($manager_data as $ikey => $org_value) {
-	// 					foreach ($org_value as $org_option_id => $star_data_org) {
-	// 						$managerData = [
-	// 							'indicator_option_id' => $org_option_id,
-	// 							'indicator_option_value' => $star_data_org,
-	// 							'remarks' => $manager_remarks[$org_option_id] ?? '',
-	// 							'total_rating' => $this->request->getPost('manager_total_rating'),
-	// 						];
-	// 						$builderOptions->where('performance_indicator_options_id', $ikey)->update($managerData);
-	// 					}
-	// 				}
-	// 			}
-
-	// 			$current_url = $this->request->getServer('HTTP_REFERER') ?? base_url('erp/performance-indicator-list');
-	// 			$session->setFlashdata('message', 'Performance saved successfully.');
-	// 			return redirect()->to($current_url);
-	// 		} else {
-	// 			$session->setFlashdata('error', 'Failed to save performance.');
-	// 			return redirect()->back()->withInput();
-	// 		}
-	// 	} else {
-	// 		$session->setFlashdata('error', lang('Main.xin_error_msg'));
-	// 		return redirect()->back();
-	// 	}
-	// }
 
 	public function update_indicator()
 	{
@@ -1054,21 +958,21 @@ class Talent extends BaseController
 		return view('erp/layout/layout_main', $data); //page load
 	}
 
-	public function view_performance($per_id)
+	public function view_performance($performances_id)
 	{
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$SystemModel = new SystemModel();
 		$UsersModel = new UsersModel();
 		$KpiModel = new KpiModel();
 
 		$request = \Config\Services::request();
-		$performances_id = base64_decode($per_id);
 		$usession = $session->get('sup_username');
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$kpi_performance = $KpiModel->where('performance_indicator_id', $performances_id)->first();
 
 		$data['title'] = 'Edit Performances';
 		$data['breadcrumbs'] = 'Edit Performances';
+		$data['path_url'] = '';
 		$data['performances'] = $kpi_performance;
 
 		$data['subview'] = view('erp/talent/view_performance', $data);
@@ -1076,123 +980,11 @@ class Talent extends BaseController
 		return view('erp/layout/layout_main', $data); //page load
 	}
 
-	// public function filter_performance()
-	// {
-	// 	$session = \Config\Services::session();
-	// 	$UsersModel = new UsersModel();
-	// 	$KpiModel = new KpiModel();
-	// 	$cache = \Config\Services::cache();
-	// 	$usession = $session->get('sup_username');
-	// 	$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 
-	// 	$year = $this->request->getPost('year_id');
-	// 	$period = $this->request->getPost('period');
-
-	// 	$db = \Config\Database::connect();
-	// 	$builder = $db->table('ci_performance_indicator');
-
-	// 	if (!empty($year)) {
-	// 		$builder->where('year', $year);
-	// 	}
-	// 	if (!empty($period)) {
-	// 		$builder->where('review_period', $period);
-	// 	}
-
-	// 	if ($user_info['user_type'] == 'staff') {
-	// 		$user_id = $user_info['user_id'];
-	// 		$builder = $db->table('ci_erp_users_details');
-	// 		$builder->select('ci_erp_users.first_name , ci_erp_users.last_name,ci_erp_users.user_id');
-	// 		$builder->join('ci_erp_users', 'ci_erp_users.user_id = ci_erp_users_details.user_id');
-	// 		$builder->where('ci_erp_users_details.reporting_manager', $user_id);
-	// 		$query = $builder->get();
-	// 		$result = $query->getResultArray();
-	// 		$get_data = [];
-
-	// 		if (!empty($result)) {
-	// 			$user_ids = array_column($result, 'user_id');
-	// 			$user_ids[] = $user_info['user_id'];
-
-	// 			$get_data = $KpiModel->where('company_id', $user_info['company_id'])
-	// 				->whereIn('user_id', $user_ids)
-	// 				->orderBy('performance_indicator_id', 'ASC')
-	// 				->findAll();
-	// 		} else {
-	// 			$get_data = $KpiModel->where('company_id', $user_info['company_id'])
-	// 				->where('user_id', $user_info['user_id'])
-	// 				->orderBy('performance_indicator_id', 'ASC')
-	// 				->findAll();
-	// 		}
-	// 	} else {
-	// 		$get_data = $KpiModel->where('company_id', $user_info['company_id'])->orderBy('performance_indicator_id', 'ASC')->findAll();
-	// 	}
-
-	// 	$query = $builder->get();
-	// 	$data['get_data'] = $query->getResultArray();
-
-	// 	// Initialize HTML table
-	// 	$html = ' <thead>
-	//             <tr>
-	//                 <th>S. No</th>
-	//                 <th>Year</th>
-	//                 <th>Review Period</th>
-	//                 <th>Rating</th>
-	//                 <th>Manager Rating</th>
-	//                 <th>Manager Remark</th>
-	//                 <th>Updated By</th>
-	//                 <th>Edit</th>
-	//             </tr>
-	//         </thead><tbody>';
-
-	// 	if (!empty($data['get_data'])) {
-	// 		$i = 1;
-	// 		foreach ($data['get_data'] as $value) {
-	// 			$rating = $value['emp_total_rating'];
-	// 			$ManagerRating = isset($value['mang_total_rating']) ? $value['mang_total_rating'] : null;
-	// 			$managerRemark = isset($value['manager_overallRemark']) ? $value['manager_overallRemark'] : '-';
-	// 			$updatedBy = getClientname($value['updated_by']);
-
-	// 			// Rating logic for employee and manager
-	// 			$ratingLabel = $this->getRatingLabel($rating);
-	// 			$ManagerRatingLabel = $this->getRatingLabel($ManagerRating);
-
-	// 			// Calculate end date for the review period
-	// 			$createdDate = date('Y-m-d', strtotime($value['created_at']));
-	// 			$endDate = $this->calculateEndDate($value['review_period'], $createdDate);
-	// 			$currentDate = date('Y-m-d');
-	// 			$showButton = (strtotime($endDate) - strtotime($currentDate)) <= (2 * 24 * 60 * 60) && strtotime($currentDate) <= strtotime($endDate);
-
-	// 			// Append the row to HTML
-	// 			$html .= '<tr>
-	//                     <td>' . $i++ . '</td>
-	//                     <td>' . $value['year'] . '</td>
-	//                     <td>' . $value['review_period'] . '</td>
-	//                     <td>' . $rating . ' ' . $ratingLabel . '</td>
-	//                     <td>' . ($ManagerRating === null ? '-' : $ManagerRating . ' ' . $ManagerRatingLabel) . '</td>
-	//                     <td>' . $managerRemark . '</td>
-	//                     <td>' . $updatedBy . '</td>
-	//                     <td>
-	//                         <a href="' . ($showButton ? base_url('erp/view-performances/' . base64_encode($value['performance_indicator_id'])) : '#') . '"
-	//                            data-bs-toggle="' . ($showButton ? 'tooltip' : '') . '"
-	//                            title="' . ($showButton ? 'View Details' : '') . '">
-	//                             <button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" ' . (!$showButton ? 'disabled' : '') . '>
-	//                                 <i class="feather icon-eye"></i>
-	//                             </button>
-	//                         </a>
-	//                     </td>
-	//                 </tr>';
-	// 		}
-	// 	} else {
-	// 		// No data found row
-	// 		$html .= '<tr><td colspan="8" style="text-align: center;">No data found</td></tr>';
-	// 	}
-
-	// 	$html .= '</tbody>'; // Close tbody
-
-	// 	return $html;
-	// }
 
 	public function filter_performance()
 	{
+
 		$session = \Config\Services::session();
 		$UsersModel = new UsersModel();
 		$KpiModel = new KpiModel();
@@ -1201,9 +993,9 @@ class Talent extends BaseController
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 
-		$year = $this->request->getPost('year_id');
-		$period = $this->request->getPost('period');
-		$employee_id = $this->request->getPost('employee_id');
+		$year = $this->request->getGet('year_id');
+		$period = $this->request->getGet('period');
+		$employee_id = $this->request->getGet('employee_id');
 
 		// Get all performance indicators
 		$get_data = $KpiModel->where('company_id', $user_info['company_id'])->orderBy('performance_indicator_id', 'ASC')->findAll();
@@ -1284,7 +1076,7 @@ class Talent extends BaseController
                         <td>' . $managerRemark . '</td>
                         <td>' . $updatedBy . '</td>
                         <td>
-                            <a href="' . ($showButton ? base_url('erp/view-performances/' . base64_encode($value['performance_indicator_id'])) : '#') . '"
+                            <a href="' . ($showButton ? base_url('erp/view-performances/' . $value['performance_indicator_id']) : '#') . '"
                                data-bs-toggle="' . ($showButton ? 'tooltip' : '') . '"
                                title="' . ($showButton ? 'View Details' : '') . '">
                                 <button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" ' . (!$showButton ? 'disabled' : '') . '>

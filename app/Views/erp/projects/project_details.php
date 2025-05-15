@@ -38,7 +38,7 @@ $xin_system = $SystemModel->where('setting_id', 1)->first();
 $locale = service('request')->getLocale();
 $request = \Config\Services::request();
 
-$segment_id = $request->uri->getSegment(3);
+$segment_id = $request->getUri()->getSegment(3);
 $project_id = udecode($segment_id);
 
 $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
@@ -640,8 +640,8 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                         <div class="media" style="display: flex; align-items: center;">
                           <div class="media-left">
                             <?php
-                            $default_img = base_url('public/uploads/users/default/' . ($member['gender'] == 1 ? 'default_male.png' : 'default_female.png'));
-                            $profile_img_path = 'public/uploads/users/' . $member['profile_photo'];
+                            $default_img = base_url('uploads/users/default/' . ($member['gender'] == 1 ? 'default_male.png' : 'default_female.png'));
+                            $profile_img_path = 'uploads/users/' . $member['profile_photo'];
                             $profile_img = file_exists($profile_img_path) && !empty($member['profile_photo']) ? base_url($profile_img_path) : $default_img;
                             ?>
                             <img src="<?= $profile_img; ?>" class="staff-profile-image-small media-object"
@@ -650,11 +650,11 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                           <div class="media-body"
                             style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                             <h5 class="media-heading mtop5" style="margin-top: 5px; margin-left: 13px;">
-                              <a href="https://connect195.com/crm/admin/profile/<?= $member['user_id']; ?>">
+                              <a href="#">
                                 <?= $member['first_name'] . ' ' . $member['last_name']; ?>
                               </a>
                             </h5>
-                            <a href="https://connect195.com/crm/admin/projects/remove_team_member/54/<?= $member['user_id']; ?>"
+                            <a href="#"
                               class="text-danger _delete" style="font-size: 13px; display: flex; align-items: center;">
                               <i class="fa fa-times"></i>
                             </a>
@@ -782,7 +782,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                                 <button type="button"
                                   class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete"
                                   data-toggle="modal" data-target="#deleteModal"
-                                  data-url="<?= base_url('erp/Milestones/delete') ?>"
+                                  data-url="<?= base_url('erp/milestones-delete') ?>"
                                   data-record-id="<?= htmlspecialchars($list['id']); ?>"
                                   data-project-id="<?= $project_data['project_id']; ?>">
                                   <i class="feather icon-trash-2"></i>
@@ -966,7 +966,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                               <button type="button"
                                 class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete"
                                 data-toggle="modal" data-target="#deleteModal"
-                                data-url="<?= base_url('erp/Timelogs/delete') ?>"
+                                data-url="<?= base_url('erp/timelogs-delete') ?>"
                                 data-record-id="<?= htmlspecialchars($list['timelogs_id']); ?>"
                                 data-project-id="<?= $project_data['project_id']; ?>">
                                 <i class="feather icon-trash-2"></i>
@@ -992,7 +992,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                 <?php
                 $attributes = array('name' => 'add_attachment', 'id' => 'add_attachment', 'class' => 'dropzone', 'autocomplete' => 'off', 'enctype' => 'multipart/form-data');
                 $hidden = array('token' => $segment_id);
-                echo form_open('erp/projects/add_attachment', $attributes, $hidden);
+                echo form_open('erp/projects-add-attachment', $attributes, $hidden);
                 ?>
                 <div class="bg-white">
                   <div class="row mt-4">
@@ -1038,7 +1038,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                         <?php $file_user = $UsersModel->where('user_id', $_files['employee_id'])->first(); ?>
                         <tr>
                           <td><?= $index + 1; ?></td>
-                          <td><img src="<?= base_url('public/uploads/project_files/' . $_files['attachment_file']) ?>"
+                          <td><img src="<?= base_url('uploads/project_files/' . $_files['attachment_file']) ?>"
                               height="50px" width="50px"> </td>
                           <td><?= $_files['file_title']; ?></td>
                           <td>
@@ -1079,7 +1079,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                 <div id="discussionForm" class="mb-4 d-none form-style">
                   <?php $attributes = array('name' => 'add_discussion', 'id' => 'add_discussion', 'autocomplete' => 'off'); ?>
                   <?php $hidden = array('token' => $segment_id); ?>
-                  <?= form_open('erp/projects/add_discussion', $attributes, $hidden); ?>
+                  <?= form_open('erp/add-discussion', $attributes, $hidden); ?>
                   <input type="hidden" name="discussion_id" id="discussion_id">
                   <div class="form-group">
                     <label for="subject">Subject</label>
@@ -1121,7 +1121,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                                 <i class="fas fa-edit"></i>
                               </a>
 
-                              <a href="#!" data-field="<?= $_discussion['project_discussion_id']; ?>"
+                              <a href="#!" data-field="<?= $_discussion['project_discussion_id'] ?? '' ?>"
                                 class="btn btn-sm btn-danger delete_discussion" data-toggle="tooltip"
                                 title="Delete Discussion">
                                 <i class="fas fa-trash-alt"></i>
@@ -1192,11 +1192,24 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                 <?php
                 $attributes = array('name' => 'add_bug', 'id' => 'add_bug', 'autocomplete' => 'off');
                 $hidden = array('token' => $segment_id);
-                echo form_open('erp/projects/add_bug', $attributes, $hidden);
+                echo form_open('erp/add-bug', $attributes, $hidden);
                 ?>
-                <textarea id="summernote" name="description"></textarea>
+                <textarea
+                  name="bug_description"
+                  id="bug_description"
+                  class="form-control bug-description"
+                  rows="5"
+                  cols="50"
+                  minlength="20"
+                  maxlength="2000"
+                  placeholder="Please describe the bug in detail, including steps to reproduce..."
+                  required
+                  aria-label="Bug description"
+                  aria-describedby="bug_description_help"
+                  spellcheck="true"
+                  data-validate="true"></textarea>
                 <button type="submit" class="btn btn-primary"
-                  style="background-color: #007bff !important; border-color: #007bff !important;">Save Bugs</button>
+                  style="background-color: #007bff !important; border-color: #007bff !important; margin-top:10px">Save Bugs</button>
                 <?= form_close(); ?>
                 <hr>
                 <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper">
@@ -1251,10 +1264,23 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                 <hr>
                 <?php $attributes = array('name' => 'add_note', 'id' => 'add_note', 'autocomplete' => 'off'); ?>
                 <?php $hidden = array('token' => $segment_id); ?>
-                <?= form_open('erp/projects/add_note', $attributes, $hidden); ?>
-                <textarea id="summernote1" name="description"><?= $project_notes['project_note']; ?></textarea>
+                <?= form_open('erp/add-note', $attributes, $hidden); ?>
+                <textarea
+                  name="description"
+                  id="description"
+                  class="form-control description"
+                  rows="5"
+                  cols="50"
+                  minlength="20"
+                  maxlength="2000"
+                  placeholder="write Note"
+                  required
+                  aria-label="description"
+                  aria-describedby="description_help"
+                  spellcheck="true"
+                  data-validate="true"><?= $project_notes['project_note']; ?></textarea>
                 <button type="submit" class="btn btn-primary"
-                  style="background-color: #007bff !important; border-color: #007bff !important;">Save Note</button>
+                  style="background-color: #007bff !important; border-color: #007bff !important; margin-top:10px;">Save Note</button>
 
                 <?= form_close(); ?>
 
@@ -1267,7 +1293,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
               <div class="panel-body">
                 <div class="d-flex justify-content-between mb-4 mt-2">
                   <h5>Invoice List</h5>
-                  <a href="<?= base_url('erp/project-invoice/' . base64_encode($project_data['project_id'])) ?>"
+                  <a href="<?= base_url('erp/project-invoice/' . $project_data['project_id']) ?>"
                     class="btn btn-info btn-sm">Create Invoice</a>
                 </div>
 
@@ -1370,7 +1396,8 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
             <h5 class="modal-title" id="groupsModalLabel" style="color: #fff;">New Milestone </h5> <button type="button"
               class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
           </div>
-          <form action="<?= base_url('erp/Milestones/save'); ?>" method="post">
+          <form action="<?= base_url('erp/milestones-save'); ?>" method="post">
+            <input type="hidden" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
             <div class="modal-body">
               <div class="row">
                 <div class="col-md-12">
@@ -1436,8 +1463,8 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                 aria-hidden="true">&times;</span> </button>
           </div>
           <?php $attributes = array('name' => 'add_task', 'autocomplete' => 'off'); ?>
-          <?php $hidden = array('user_id' => 0); ?>
-          <?php echo form_open('erp/tasks/add_task', $attributes, $hidden); ?>
+          <?php $hidden = array('user_id' => '0'); ?>
+          <?php echo form_open('erp/add-projectTask', $attributes, $hidden); ?>
           <div class="modal-body">
             <div class="row">
               <div class="col-md-12">
@@ -1565,7 +1592,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span
                 aria-hidden="true">&times;</span> </button>
           </div>
-          <form action="<?= base_url('erp/Timelogs/save'); ?>" method="POST">
+          <form action="<?= base_url('erp/timelogs-save'); ?>" method="POST">
             <div class="modal-body">
               <div class="row">
                 <div class="col-md-12">
@@ -1873,7 +1900,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
           // Perform the AJAX request
           $.ajax({
             url: url + '/' + recordId, // Use the dynamic URL
-            type: 'POST',
+            type: 'DELETE',
             dataType: "json",
             data: {
               <?= csrf_token() ?>: '<?= csrf_hash() ?>',
@@ -2029,7 +2056,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
       var base_url = '<?= site_url(); ?>'; // Use site_url() for dynamic routes
 
       function openModal(id) {
-        fetch(base_url + 'erp/Milestones/getdata/' + id) // Add base_url to the request
+        fetch(base_url + 'erp/milestones-getdata/' + id) // Add base_url to the request
           .then(response => response.text())
           .then(data => {
             document.getElementById('modalBody').innerHTML = data;

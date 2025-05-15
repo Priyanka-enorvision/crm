@@ -57,7 +57,7 @@ class Projects extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 
@@ -373,14 +373,14 @@ class Projects extends BaseController
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			return redirect()->to(site_url('erp/desk'));
 		}
 		$usession = $session->get('sup_username');
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
-		$segment_id = $request->uri->getSegment(3);
+		$segment_id = $request->getUri()->getSegment(3);
 		$ifield_id = udecode($segment_id);
 		$project_val = $ProjectsModel->where('project_id', $ifield_id)->first();
 		if (!$project_val) {
@@ -1126,7 +1126,6 @@ class Projects extends BaseController
 
 			$experts_ids = implode(',', $this->request->getPost('expert_to', FILTER_SANITIZE_STRING));
 			$send_email = $this->request->getPost('send_email') === 'on' ? true : false;
-			$send_email = $this->request->getPost('send_email') === 'on' ? true : false;
 
 			$UsersModel = new UsersModel();
 			$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
@@ -1321,12 +1320,6 @@ class Projects extends BaseController
 
 				];
 
-
-				// $db = \Config\Database::connect();
-				// $builder = $db->table('ci_projects');
-				// $builder->where('project_id', $id);
-				// $result = $builder->update($data);
-
 				$ProjectsModel = new ProjectsModel();
 				$result = $ProjectsModel->update($id, $data);
 				$Return['csrf_hash'] = csrf_hash();
@@ -1337,12 +1330,12 @@ class Projects extends BaseController
 					$session->setFlashdata('error', lang('Main.xin_error_msg'));
 					return redirect()->to(site_url('erp/projects-list'));
 				}
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 				exit;
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 			exit;
 		}
 	}
@@ -1510,12 +1503,12 @@ class Projects extends BaseController
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 
-		if ($this->request->getMethod() === 'post') {
+		if ($this->request->getMethod()) {
 			$Return = ['result' => '', 'error' => '', 'csrf_hash' => csrf_hash()];
 
 			// Validation rules
 			$rules = [
-				'description' => [
+				'bug_description' => [
 					'rules' => 'required',
 					'errors' => [
 						'required' => lang('Success.xin_bug_field_error'),
@@ -1524,7 +1517,7 @@ class Projects extends BaseController
 			];
 
 			if (!$this->validate($rules)) {
-				$Return['error'] = $validation->getError('description');
+				$Return['error'] = $validation->getError('bug_description');
 				return $this->response->setJSON($Return);
 			}
 
@@ -1537,7 +1530,7 @@ class Projects extends BaseController
 				: $usession['sup_user_id'];
 
 			// Retrieve and sanitize input
-			$description = $this->request->getPost('description');
+			$description = $this->request->getPost('bug_description');
 			$project_id = udecode($this->request->getPost('token'));
 
 			$data = [
@@ -1908,7 +1901,7 @@ class Projects extends BaseController
 				$attachment = $this->request->getFile('attachment_file');
 				if ($attachment->isValid() && !$attachment->hasMoved()) {
 					$file_name = $attachment->getRandomName(); // Get a random file name to avoid conflicts
-					$attachment->move('public/uploads/project_files/', $file_name); // Move file to desired folder
+					$attachment->move('uploads/project_files/', $file_name); // Move file to desired folder
 
 					// Retrieve other form inputs
 					$file_title = $this->request->getPost('file_name', FILTER_SANITIZE_STRING);
@@ -2218,7 +2211,7 @@ class Projects extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 		}
 	}
 	// delete record
@@ -2314,7 +2307,7 @@ class Projects extends BaseController
 	{
 
 		if ($this->request->getVar('field_id')) {
-			/* Define return | here result is used to return user data and error for error message */
+
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$session = \Config\Services::session();
 			$request = \Config\Services::request();
@@ -2342,7 +2335,7 @@ class Projects extends BaseController
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 
-		$segment_id = $request->uri->getSegment(3);
+		$segment_id = $request->getUri()->getSegment(3);
 		$project_id = udecode($segment_id);
 
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
@@ -2362,7 +2355,8 @@ class Projects extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 
-		$project_id = $this->request->getPost('project_id');
+		$project_id = $this->request->getVar('project_id');
+
 		$project_data = $ProjectsModel->where('project_id', $project_id)->first();
 
 		// Check if project data exists
@@ -2413,9 +2407,8 @@ class Projects extends BaseController
 	}
 
 
-	public function project_invoice($enc_id)
+	public function project_invoice($project_id)
 	{
-		$project_id = base64_decode($enc_id);
 		$session = \Config\Services::session();
 		$SystemModel = new SystemModel();
 		$UsersModel = new UsersModel();
@@ -2425,7 +2418,7 @@ class Projects extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -2456,13 +2449,14 @@ class Projects extends BaseController
 		$InvoicesModel = new InvoicesModel();
 
 		$request = \Config\Services::request();
-		$invoice_id = udecode($request->uri->getSegment(3));
+		$invoice_id = udecode($request->getUri()->getSegment(3));
 		$usession = $session->get('sup_username');
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 
 		$invoice_data = $InvoicesModel->where('invoice_id', $invoice_id)->first();
 		$data['title'] = 'Edit Project Invoice';
+		$data['path_url'] = '';
 
 		$data['breadcrumbs'] = 'Edit Project Invoice';
 		$data['invoice'] = $invoice_data;
@@ -2499,7 +2493,7 @@ class Projects extends BaseController
 	}
 	public function get_employe()
 	{
-		$company_id = $this->request->getPost('company_id');
+		$company_id = $this->request->getVar('company_id');
 		if (!$company_id) {
 			return $this->response->setJSON([]);
 		}
@@ -2508,6 +2502,7 @@ class Projects extends BaseController
 		$employees = $UsersModel->where('user_type', 'staff')
 			->where('company_id', $company_id)
 			->findAll();
+
 
 		$formattedEmployees = [];
 		foreach ($employees as $employee) {

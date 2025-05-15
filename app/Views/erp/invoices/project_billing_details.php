@@ -21,7 +21,7 @@ $InvoiceitemsModel = new InvoiceitemsModel();
 $session = \Config\Services::session();
 $usession = $session->get('sup_username');
 $request = \Config\Services::request();
-$segment_id = $request->uri->getSegment(3);
+$segment_id = $request->getUri()->getSegment(3);
 /////
 $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 
@@ -31,7 +31,7 @@ $xin_system = erp_company_settings();
 $result = $InvoicesModel->where('invoice_id', $invoice_id)->first();
 $company_info = $UsersModel->where('user_id', $result['client_id'])->where('user_type', 'customer')->first();
 
-$invoice_items = $InvoiceitemsModel->where('project_id',$result['project_id'] )->where('invoice_id', $invoice_id)->findAll();
+$invoice_items = $InvoiceitemsModel->where('project_id', $result['project_id'])->where('invoice_id', $invoice_id)->findAll();
 
 $ci_erp_settings = $SystemModel->where('setting_id', 1)->first();
 
@@ -89,29 +89,29 @@ $_payment_method = $ConstantsModel->where('type', 'payment_method')->where('cons
                           <td>
                             <a href="#!">
                               <img class="img-fluid" width="171" height="30"
-                                src="<?= base_url(); ?>/public/uploads/logo/other/<?= !empty($logo_details['other_logo']) ? $logo_details['other_logo'] : 'images.png'; ?>"
-                                alt="<?= $xin_system['company_name']; ?>">
+                                src="<?= base_url(); ?>uploads/logo/other/<?= !empty($logo_details['other_logo']) ? $logo_details['other_logo'] : 'images.png'; ?>"
+                                alt="<?= isset($xin_system['company_name']) ? $xin_system['company_name'] : ''; ?>">
                             </a>
                           </td>
 
                         </tr>
                         <tr>
-                          <td><?= $xin_system['company_name']; ?></td>
+                          <td><?= isset($xin_system['company_name']) ? $xin_system['company_name'] : ''; ?></td>
                         </tr>
                         <tr>
                           <td>
-                            <?= $xin_system['address_1']; ?>
+                            <?= isset($xin_system['address_1']) ? $xin_system['address_1'] : ''; ?>
                             <br>
-                            <?= $xin_system['address_2']; ?>
+                            <?= isset($xin_system['address_2']) ? $xin_system['address_2'] : ''; ?>
                           </td>
                         </tr>
                         <tr>
-                          <td><a class="text-secondary" href="mailto:<?= $xin_system['email']; ?>" target="_top">
-                              <?= $xin_system['email']; ?>
+                          <td><a class="text-secondary" href="mailto:<?= isset($xin_system['email']) ? $xin_system['email'] : ''; ?>" target="_top">
+                              <?= isset($xin_system['email']) ? $xin_system['email'] : ''; ?>
                             </a></td>
                         </tr>
                         <tr>
-                          <td><?= $xin_system['contact_number']; ?></td>
+                          <td><?= isset($xin_system['contact_number']) ? $xin_system['contact_number'] : ''; ?></td>
                         </tr>
                       </tbody>
                     </table>

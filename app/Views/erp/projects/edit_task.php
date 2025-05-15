@@ -23,7 +23,7 @@ $locale = service('request')->getLocale();
 
 $request = \Config\Services::request();
 
-$segment_id = $request->uri->getSegment(3);
+$segment_id = $request->getUri()->getSegment(3);
 
 $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 
@@ -198,9 +198,9 @@ $result  = $MilestonesModel->where('project_id', $task_data['project_id'])->orde
 <div class="row m-b-1 animated fadeInRight">
     <div class="col-md-12">
         <?php if (in_array('project2', staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
-            <div id="add_form" class="add-form <?= $get_animate; ?>" data-parent="#accordion" style="">
+            <div id="add_form" class="add-form " data-parent="#accordion" style="">
 
-                <form action="<?= base_url('erp/tasks/taskUpdate/' . $task_data['task_id']) ?>" method="POST">
+                <form action="<?= base_url('erp/update-projectTask/' . $task_data['task_id']) ?>" method="POST">
                     <?= csrf_field() ?>
                     <div class="card mb-2">
                         <div id="accordion">
@@ -286,7 +286,13 @@ $result  = $MilestonesModel->where('project_id', $task_data['project_id'])->orde
                                             <input type="hidden" id="progres_val" name="progres_val" value="<?= $task_data['task_progress']; ?>">
                                             <input type="range" id="range_grid" class="form-range" min="0" max="100" value="<?= $task_data['task_progress']; ?>" step="1">
                                             <div class="progress">
-                                                <div id="progress_bar" class="progress-bar" role="progressbar" style="width: <?= $task_data['task_progress']; ?>%;" aria-valuenow="<?= $project_data['project_progress']; ?>" aria-valuemin="0" aria-valuemax="100"><?= $project_data['project_progress']; ?>%</div>
+                                                <div id="progress_bar" class="progress-bar" role="progressbar"
+                                                    style="width: <?= $task_data['task_progress']; ?>%;"
+                                                    aria-valuenow="<?= $task_data['task_progress']; ?>"
+                                                    aria-valuemin="0"
+                                                    aria-valuemax="100">
+                                                    <?= $task_data['task_progress']; ?>%
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

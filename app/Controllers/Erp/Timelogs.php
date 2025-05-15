@@ -26,7 +26,7 @@ class Timelogs extends BaseController
 
     public function index()
     {
-        $session = \Config\Services::session($config);
+        $session = \Config\Services::session();
         $SystemModel = new SystemModel();
         $UsersModel = new UsersModel();
         $Model = new \App\Models\MilestonesModel();
@@ -46,7 +46,7 @@ class Timelogs extends BaseController
 
     public function save()
     {
-        
+
         $UsersModel = new \App\Models\UsersModel();
         $Model = new \App\Models\TimelogsModel();
         $validation = \Config\Services::validation();
@@ -66,7 +66,7 @@ class Timelogs extends BaseController
             'note' => 'permit_empty',
         ]);
 
-        if ($this->request->getMethod() === 'post' && $validation->withRequest($this->request)->run()) {
+        if ($this->request->getMethod()) {
 
             // Calculate total hours based on start and end time
             $startDateTime = new \DateTime($this->request->getPost('start_date') . ' ' . $this->request->getPost('start_time'));
@@ -115,11 +115,7 @@ class Timelogs extends BaseController
             return $this->response->setJSON($Return);
         }
 
-        $project_id = $this->request->getPost('project_id');
-        if (empty($project_id)) {
-            $Return['error'] = 'Project ID is required.';
-            return $this->response->setJSON($Return);
-        }
+
 
         if (!is_numeric($id) || $id <= 0) {
             $Return['error'] = 'Invalid record ID.';
@@ -132,7 +128,6 @@ class Timelogs extends BaseController
 
             if ($result) {
                 $Return['result'] = 'Timelog deleted successfully.';
-                $Return['redirect_url'] = base_url('erp/project-detail/' . uencode($project_id));
             } else {
                 $Return['error'] = 'Failed to delete the timelog. Please try again.';
             }
@@ -142,6 +137,8 @@ class Timelogs extends BaseController
 
         return $this->response->setJSON($Return);
     }
+
+
 
 
 
@@ -155,7 +152,7 @@ class Timelogs extends BaseController
         $request = \Config\Services::request();
         $usession = $session->get('sup_username');
 
-        $segment_id = $request->uri->getSegment(3);
+        $segment_id = $request->getUri()->getSegment(3);
         $timelog_id = udecode($segment_id);
         $timelog_data = $Model->where('timelogs_id', $timelog_id)->first();
         $task  = $taskModel->where('project_id', $timelog_data['project_id'])->findAll();
@@ -172,9 +169,8 @@ class Timelogs extends BaseController
         return view('erp/layout/layout_main', $data);
     }
 
-    public function update($enc_id)
+    public function update($timelog_id)
     {
-        $timelog_id = base64_decode($enc_id);
         $session = session();
         $model = new \App\Models\TimelogsModel();
 
@@ -205,8 +201,6 @@ class Timelogs extends BaseController
             $session->setFlashdata('error', 'An error occurred: ' . $e->getMessage());
         }
 
-
-        // Redirect back to the form with input
         return redirect()->back()->withInput();
     }
 }

@@ -87,7 +87,7 @@ $xin_system = erp_company_settings();
     }
 </style>
 
-<div class="row <?php echo $get_animate; ?>">
+<div class="row">
     <div class="col-md-12">
         <div class="card">
             <div class="card-header with-elements"> <span class="card-header-title mr-2"><strong>
@@ -97,8 +97,8 @@ $xin_system = erp_company_settings();
                 <div class="row m-b-1">
                     <div class="col-md-12">
                         <?php $attributes = array('name' => 'create_invoice', 'id' => '', 'autocomplete' => 'off', 'class' => 'form'); ?>
-                        <?php $hidden = array('user_id' => 0); ?>
-                        <?php echo form_open('erp/invoices/create_new_invoice', $attributes, $hidden); ?>
+                        <?php $hidden = array('user_id' => '0'); ?>
+                        <?php echo form_open('erp/create-new-invoice', $attributes, $hidden); ?>
                         <?php $inv_info = generate_random_employeeid(); ?>
                         <div class="bg-white">
                             <div class="box-block">
@@ -110,8 +110,8 @@ $xin_system = erp_company_settings();
                                             </label>
                                             <div class="input-group">
                                                 <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-file-invoice"></i></span></div>
-                                                <input class="form-control input-sm-custom" placeholder="<?= lang('Invoices.xin_invoice_number'); ?>" name="invoice_number" type="text" value="<?= $inv_info; ?>">
-                                                <!-- <input type="hidden" name="project_id" value="<?= $projectid; ?>"> -->
+                                                <input class="form-control input-sm-custom" placeholder="<?= lang('Invoices.xin_invoice_number'); ?>" name="invoice_number" type="text" value="<?= isset($inv_info) ? $inv_info : ''; ?>">
+
                                             </div>
                                         </div>
                                     </div>

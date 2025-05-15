@@ -56,7 +56,7 @@
 <div class="modal-header">
     <h5 class="modal-title" id="groupsModalLabel" style="color: #fff;">Edit Milestone </h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
 </div>
-<form action="<?= base_url('erp/milestones-update/' . base64_encode($result['id'])); ?>" method="post">
+<form action="<?= base_url('erp/milestones-update/' . $result['id']); ?>" method="post">
     <?= csrf_field() ?>
     <div class="modal-body">
         <div class="row">

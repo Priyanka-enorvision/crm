@@ -1,5 +1,6 @@
 <?php
 
+
 use App\Models\SystemModel;
 use App\Models\UsersModel;
 use App\Models\LanguageModel;
@@ -77,7 +78,7 @@ if ($user_info['user_type'] == 'staff') {
 
                 <?php $attributes = array('name' => 'update_indicator', 'id' => 'update_indicator', 'autocomplete' => 'off', 'class' => 'form-hrm'); ?>
                 <?php $hidden = array('token' => $performances['performance_indicator_id']); ?>
-                <?php echo form_open('erp/talent/update_indicator', $attributes, $hidden); ?>
+                <?php echo form_open('erp/update-indicator', $attributes, $hidden); ?>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4">
