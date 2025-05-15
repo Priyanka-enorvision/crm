@@ -35,7 +35,7 @@ class Payroll extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -152,7 +152,7 @@ class Payroll extends BaseController
 		$data['subview'] = view('erp/payroll/payslip_history', $data);
 		return view('erp/layout/layout_main', $data); //page load
 	}
-	public function payroll_view()
+	public function payroll_view($id=null)
 	{
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
@@ -162,7 +162,7 @@ class Payroll extends BaseController
 
 		$PayrollModel = new PayrollModel();
 		$request = \Config\Services::request();
-		$ifield_id = udecode($request->getUri()->getSegment(3));
+		$ifield_id = $id;
 		$isegment_val = $PayrollModel->where('payslip_id', $ifield_id)->first();
 		if (!$isegment_val) {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -185,432 +185,283 @@ class Payroll extends BaseController
 		return view('erp/layout/pre_layout_main', $data); //page load
 	}
 
-	// list
-	// public function payslip_list($user_id = null, $paymentdate = null)
-	// {
-
-	// 	$session = \Config\Services::session();
-	// 	$usession = $session->get('sup_username');
-	// 	$request = \Config\Services::request();
-	// 	if (!$session->has('sup_username')) {
-	// 		return redirect()->to(site_url('/'));
-	// 	}
-	// 	$UsersModel = new UsersModel();
-	// 	$config         = new \Config\Encryption();
-	// 	$config->key    = 'aBigsecret_ofAtleast32Characters';
-	// 	$config->driver = 'OpenSSL';
-
-	// 	$encrypter = \Config\Services::encrypter($config);
-	// 	$RolesModel = new RolesModel();
-	// 	$SystemModel = new SystemModel();
-	// 	$ContractModel = new ContractModel();
-	// 	$MainModel = new MainModel();
-	// 	$PayrollModel = new PayrollModel();
-	// 	$StaffdetailsModel = new StaffdetailsModel();
-	// 	$AdvancesalaryModel = new AdvancesalaryModel();
-	// 	$payment_date = $this->request->getVar('payment_date', FILTER_SANITIZE_STRING);
-	// 	$employee_id = $this->request->getVar('staff_id', FILTER_SANITIZE_STRING);
-
-	// 	$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-	// 	if ($user_info['user_type'] == 'staff') {
-	// 		if ($employee_id == 0) {
-	// 			$staff = $UsersModel->where('company_id', $user_info['company_id'])->where('user_type', 'staff')->orderBy('user_id', 'ASC')->findAll();
-	// 		} else {
-	// 			$staff = $UsersModel->where('company_id', $user_info['company_id'])->where('user_id', $employee_id)->findAll();
-	// 		}
-	// 		$company_id = $user_info['company_id'];
-	// 	} else {
-	// 		if ($employee_id == 0) {
-	// 			$staff = $UsersModel->where('company_id', $usession['sup_user_id'])->where('user_type', 'staff')->orderBy('user_id', 'ASC')->findAll();
-	// 		} else {
-	// 			$staff = $UsersModel->where('company_id', $usession['sup_user_id'])->where('user_id', $employee_id)->findAll();
-	// 		}
-	// 		$company_id = $usession['sup_user_id'];
-	// 	}
-	// 	$xin_system = erp_company_settings();
-
-	// 	$data = array();
-
-	// 	foreach ($staff as $r) {
-
-	// 		$payroll_count = $PayrollModel->where('company_id', $company_id)->where('staff_id', $r['user_id'])->where('salary_month', $payment_date)->countAllResults();
-	// 		// Advance Salary //
-	// 		$advance_salary = $AdvancesalaryModel->where('employee_id', $r['user_id'])->where('status', 1)->where('salary_type', 'advance')->countAllResults();
-	// 		if ($advance_salary > 0) {
-	// 			$advance_salary = $AdvancesalaryModel->where('employee_id', $r['user_id'])->where('status', 1)->where('salary_type', 'advance')->first();
-	// 			if ($advance_salary['advance_salary'] != $advance_salary['total_paid']) {
-	// 				$monthly_installment = $advance_salary['monthly_installment'];
-	// 				$advance_amount = $advance_salary['advance_amount'];
-	// 				$total_paid = $advance_salary['total_paid'];
-	// 				//check ifpaid
-	// 				$em_advance_amount = $advance_salary['advance_amount'];
-	// 				$em_total_paid = $advance_salary['total_paid'];
-	// 				if ($advance_salary['one_time_deduct'] == 1) {
-	// 					$i_net_advance = $em_advance_amount - $total_paid;
-	// 					$deduct_salary = $i_net_advance;
-	// 					$is_advance_deducted = 0;
-	// 				} else {
-	// 					$re_amount = $em_advance_amount - $em_total_paid;
-	// 					if ($monthly_installment > $re_amount) {
-	// 						$deduct_salary = $re_amount;
-	// 					} else {
-	// 						$deduct_salary = $monthly_installment;
-	// 					}
-	// 				}
-	// 			}
-	// 		} else {
-	// 			$deduct_salary = 0.00;
-	// 			$is_advance_deducted = 0;
-	// 		}
-	// 		// Loan Request //
-	// 		$lo_advance_salary = $AdvancesalaryModel->where('employee_id', $r['user_id'])->where('status', 1)->where('salary_type', 'loan')->countAllResults();
-	// 		if ($lo_advance_salary > 0) {
-	// 			$lo_advance_salary = $AdvancesalaryModel->where('employee_id', $r['user_id'])->where('status', 1)->where('salary_type', 'loan')->first();
-	// 			if ($lo_advance_salary['advance_salary'] != $lo_advance_salary['total_paid']) {
-	// 				$lo_monthly_installment = $lo_advance_salary['monthly_installment'];
-	// 				$lo_advance_amount = $lo_advance_salary['advance_amount'];
-	// 				$lo_total_paid = $lo_advance_salary['total_paid'];
-	// 				//check ifpaid
-	// 				$lo_em_advance_amount = $lo_advance_salary['advance_amount'];
-	// 				$lo_em_total_paid = $lo_advance_salary['total_paid'];
-	// 				if ($lo_advance_salary['one_time_deduct'] == 1) {
-	// 					$lo_i_net_advance = $lo_em_advance_amount - $lo_total_paid;
-	// 					$lo_deduct_salary = $lo_i_net_advance;
-	// 					$lo_is_advance_deducted = 0;
-	// 				} else {
-	// 					$lo_re_amount = $lo_em_advance_amount - $lo_em_total_paid;
-	// 					if ($lo_monthly_installment > $lo_re_amount) {
-	// 						$lo_deduct_salary = $lo_re_amount;
-	// 					} else {
-	// 						$lo_deduct_salary = $lo_monthly_installment;
-	// 					}
-	// 				}
-	// 			}
-	// 		} else {
-	// 			$lo_deduct_salary = 0.00;
-	// 			$lo_is_advance_deducted = 0;
-	// 		}
-	// 		if ($payroll_count > 0) {
-	// 			$payroll_link = $PayrollModel->where('company_id', $company_id)->where('staff_id', $r['user_id'])->where('salary_month', $payment_date)->first();
-	// 			$pay_salary = '';
-	// 			if (in_array('pay3', staff_role_resource()) || $user_info['user_type'] == 'company') {
-	// 				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . uencode($payroll_link['payslip_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
-	// 			} else {
-	// 				$delete = '';
-	// 			}
-	// 			$view = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Payroll.xin_view_payslip') . '"><a target="_blank" href="' . site_url('erp/payroll-view') . '/' . uencode($payroll_link['payslip_id']) . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light"><i class="feather icon-arrow-right"></i></button></a></span>';
-	// 			$combhr = $pay_salary . $view . $delete;
-	// 			$status = '<span class="badge badge-light-success">' . lang('Invoices.xin_paid') . '</span>';
-	// 		} else {
-	// 			if (in_array('pay2', staff_role_resource()) || $user_info['user_type'] == 'company') {
-	// 				$pay_salary = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Payroll.xin_payroll_make_payment') . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" data-toggle="modal" data-target=".payroll-modal-data" data-field_id="' . uencode($r['user_id']) . '" data-payment_date=' . uencode($payment_date) . ' data-advance_salary=' . $deduct_salary . ' data-loan=' . $lo_deduct_salary . '><i class="feather icon-credit-card"></i></button></span>';
-	// 			} else {
-	// 				$pay_salary = '';
-	// 			}
-
-	// 			$view = '';
-	// 			$delete = '';
-	// 			$combhr = $pay_salary . $view . $delete;
-	// 			$status = '<span class="badge badge-light-danger">' . lang('Invoices.xin_unpaid') . '</span>';
-	// 		}
-	// 		$user_detail = $StaffdetailsModel->where('user_id', $r['user_id'])->first();
-	// 		if ($user_detail['salay_type'] == 1) {
-	// 			$wages_type = lang('Membership.xin_per_month');
-	// 		} else {
-	// 			$wages_type = lang('Membership.xin_per_hour');
-	// 		}
-	// 		$ibasic_salary = $user_detail['basic_salary'];
-	// 		$name = $r['first_name'] . ' ' . $r['last_name'];
-	// 		$uname = '<div class="d-inline-block align-middle">
-	// 				<img src="' . base_url() . '/public/uploads/users/thumb/' . $r['profile_photo'] . '" alt="user image" class="img-radius align-top m-r-15" style="width:40px;">
-	// 				<div class="d-inline-block">
-	// 					<h6 class="m-b-0">' . $name . '</h6>
-	// 					<p class="m-b-0">' . $r['email'] . '</p>
-	// 				</div>
-	// 			</div>';
-	// 		// Salary Options //
-	// 		// 1:: Allowances
-	// 		$count_allowances = $ContractModel->where('user_id', $r['user_id'])->where('salay_type', 'allowances')->countAllResults();
-	// 		$salary_allowances = $ContractModel->where('user_id', $r['user_id'])->where('salay_type', 'allowances')->findAll();
-	// 		$allowance_amount = 0;
-	// 		if ($count_allowances > 0) {
-	// 			foreach ($salary_allowances as $sl_allowances) {
-	// 				$allowance_amount += $sl_allowances['contract_amount'];
-	// 			}
-	// 		} else {
-	// 			$allowance_amount = 0;
-	// 		}
-	// 		// 2:: Commissions
-	// 		$count_commissions = $ContractModel->where('user_id', $r['user_id'])->where('salay_type', 'commissions')->countAllResults();
-	// 		$salary_commissions = $ContractModel->where('user_id', $r['user_id'])->where('salay_type', 'commissions')->findAll();
-	// 		$commissions_amount = 0;
-	// 		if ($count_commissions > 0) {
-	// 			foreach ($salary_commissions as $sl_salary_commissions) {
-	// 				$commissions_amount += $sl_salary_commissions['contract_amount'];
-	// 			}
-	// 		} else {
-	// 			$commissions_amount = 0;
-	// 		}
-	// 		// 3:: Other Payments
-	// 		$count_other_payments = $ContractModel->where('user_id', $r['user_id'])->where('salay_type', 'other_payments')->countAllResults();
-	// 		$other_payments = $ContractModel->where('user_id', $r['user_id'])->where('salay_type', 'other_payments')->findAll();
-	// 		$other_payments_amount = 0;
-	// 		if ($count_other_payments > 0) {
-	// 			foreach ($other_payments as $sl_other_payments) {
-	// 				$other_payments_amount += $sl_other_payments['contract_amount'];
-	// 			}
-	// 		} else {
-	// 			$other_payments_amount = 0;
-	// 		}
-	// 		// 4:: Statutory
-	// 		$count_statutory_deductions = $ContractModel->where('user_id', $r['user_id'])->where('salay_type', 'statutory')->countAllResults();
-	// 		$statutory_deductions = $ContractModel->where('user_id', $r['user_id'])->where('salay_type', 'statutory')->findAll();
-	// 		$statutory_deductions_amount = 0;
-	// 		if ($count_statutory_deductions > 0) {
-	// 			foreach ($statutory_deductions as $sl_salary_statutory_deductions) {
-	// 				$statutory_deductions_amount += $sl_salary_statutory_deductions['contract_amount'];
-	// 			}
-	// 		} else {
-	// 			$statutory_deductions_amount = 0;
-	// 		}
-
-	// 		// net salary
-	// 		$inet_salary = $ibasic_salary + $allowance_amount + $commissions_amount + $other_payments_amount - $statutory_deductions_amount + $deduct_salary + $lo_deduct_salary;
-	// 		$net_salary = '<h6 class="text-success">' . number_to_currency($inet_salary, $xin_system['default_currency'], null, 2) . '</h6>';
-	// 		$basic_salary = '<h6 class="text-primary">' . number_to_currency($ibasic_salary, $xin_system['default_currency'], null, 2) . '</h6>';
-	// 		$links = '
-	// 				' . $uname . '
-	// 				<div class="overlay-edit">
-	// 					' . $combhr . '
-	// 				</div>
-	// 			';
-	// 		$data[] = array(
-	// 			$links,
-	// 			$user_detail['employee_id'],
-	// 			$wages_type,
-	// 			$basic_salary,
-	// 			$net_salary,
-	// 			$status
-	// 		);
-	// 	}
-	// 	$output = array(
-	// 		"data" => $data
-	// 	);
-	// 	echo json_encode($output);
-	// 	exit();
-	// }
-
-
+	
 	public function payslip_list($user_id = 0, $payment_date = null)
+    {
+        // Initialize response array
+        $response = [
+            'success' => false,
+            'message' => '',
+            'data' => []
+        ];
+
+        // Get session and verify login
+        $session = \Config\Services::session();
+        $usession = $session->get('sup_username');
+
+        if (!$session->has('sup_username')) {
+            log_message('error', 'Unauthorized access attempt to payslip_list');
+            $response['message'] = 'Session expired. Please login again.';
+            return $this->response->setJSON($response)->setStatusCode(401);
+        }
+
+        try {
+            // Load all required models
+            $models = [
+                'UsersModel' => new UsersModel(),
+                'RolesModel' => new RolesModel(),
+                'SystemModel' => new SystemModel(),
+                'ContractModel' => new ContractModel(),
+                'PayrollModel' => new PayrollModel(),
+                'StaffdetailsModel' => new StaffdetailsModel(),
+                'AdvancesalaryModel' => new AdvancesalaryModel()
+            ];
+
+            // Get company settings
+            $xin_system = erp_company_settings();
+            if (!$xin_system) {
+                throw new \Exception("Company settings not found");
+            }
+
+            // Get user info and determine company ID
+            $user_info = $models['UsersModel']->where('user_id', $usession['sup_user_id'])->first();
+            if (!$user_info) {
+                throw new \Exception("User not found");
+            }
+
+            $company_id = ($user_info['user_type'] == 'staff') ? $user_info['company_id'] : $usession['sup_user_id'];
+
+            // Validate payment date
+            if (empty($payment_date) || !preg_match('/^\d{4}-\d{2}$/', $payment_date)) {
+                throw new \Exception("Invalid payment date format. Expected YYYY-MM");
+            }
+
+            // Get staff data based on parameters
+            $staffQuery = $models['UsersModel']->where('company_id', $company_id);
+            
+            if ($user_id != 0) {
+                $staffQuery->where('user_id', $user_id);
+            } else {
+                $staffQuery->where('user_type', 'staff');
+            }
+
+            $staff = $staffQuery->orderBy('user_id', 'ASC')->findAll();
+            if (!$staff) {
+                throw new \Exception("No staff members found");
+            }
+
+            // Process each staff member
+            $data = [];
+            foreach ($staff as $staff_member) {
+                $staff_id = $staff_member['user_id'];
+                
+                // Calculate advance salary deductions
+                $advance_deduction = $this->calculateAdvanceDeductions(
+                    $models['AdvancesalaryModel'], 
+                    $staff_id, 
+                    'advance'
+                );
+
+                // Calculate loan deductions
+                $loan_deduction = $this->calculateAdvanceDeductions(
+                    $models['AdvancesalaryModel'], 
+                    $staff_id, 
+                    'loan'
+                );
+
+                // Check if payroll exists
+                $payroll_count = $models['PayrollModel']
+                    ->where('company_id', $company_id)
+                    ->where('staff_id', $staff_id)
+                    ->where('salary_month', $payment_date)
+                    ->countAllResults();
+
+                // Generate action buttons based on payroll status and permissions
+                $action_buttons = $this->generateActionButtons(
+                    $payroll_count,
+                    $models['PayrollModel'],
+                    $company_id,
+                    $staff_id,
+                    $payment_date,
+                    $advance_deduction,
+                    $loan_deduction,
+                    $user_info
+                );
+
+                // Get staff details
+                $user_detail = $models['StaffdetailsModel']->where('user_id', $staff_id)->first();
+                if (!$user_detail) {
+                    log_message('warning', "Staff details not found for user ID: {$staff_id}");
+                    continue;
+                }
+
+                // Calculate salary components
+                $salary_components = $this->calculateSalaryComponents(
+                    $models['ContractModel'],
+                    $staff_id,
+                    $user_detail['basic_salary']
+                );
+
+                // Calculate net salary
+                $net_salary = $salary_components['basic_salary'] 
+                    + $salary_components['allowances'] 
+                    + $salary_components['commissions'] 
+                    + $salary_components['other_payments'] 
+                    - $salary_components['statutory_deductions'] 
+                    + $advance_deduction 
+                    + $loan_deduction;
+
+                // Prepare data row
+                $data[] = [
+                    $this->generateStaffDisplay($staff_member, $action_buttons),
+                    $user_detail['employee_id'] ?? '',
+                    $user_detail['salay_type'] == 1 ? lang('Membership.xin_per_month') : lang('Membership.xin_per_hour'),
+                    '<h6 class="text-primary">' . number_to_currency($salary_components['basic_salary'], $xin_system['default_currency'], null, 2) . '</h6>',
+                    '<h6 class="text-success">' . number_to_currency($net_salary, $xin_system['default_currency'], null, 2) . '</h6>',
+                    $payroll_count > 0 ? '<span class="badge badge-light-success">' . lang('Invoices.xin_paid') . '</span>' 
+                                      : '<span class="badge badge-light-danger">' . lang('Invoices.xin_unpaid') . '</span>'
+                ];
+            }
+
+            $response['success'] = true;
+            $response['data'] = $data;
+            return $this->response->setJSON($response);
+
+        } catch (\Exception $e) {
+            log_message('error', 'Error in payslip_list: ' . $e->getMessage() . ' - ' . $e->getTraceAsString());
+            $response['message'] = 'An error occurred: ' . $e->getMessage();
+            return $this->response->setJSON($response)->setStatusCode(500);
+        }
+    }
+
+    /**
+     * Calculate advance salary or loan deductions
+     */
+    private function calculateAdvanceDeductions($model, $staff_id, $type = 'advance')
 	{
-		$session = \Config\Services::session();
-		$usession = $session->get('sup_username');
+		$deduction = 0.00;
+		$records = $model->where('employee_id', $staff_id)
+						->where('status', 1)
+						->where('salary_type', $type)
+						->findAll();
 
-		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('/'));
-		}
+		foreach ($records as $record) {
+			// Check if required keys exist and have values
+			$advance_salary = $record['advance_salary'] ?? 0;
+			$total_paid = $record['total_paid'] ?? 0;
+			$advance_amount = $record['advance_amount'] ?? 0;
+			$monthly_installment = $record['monthly_installment'] ?? 0;
+			$one_time_deduct = $record['one_time_deduct'] ?? 0;
 
-		// Load models
-		$UsersModel = new UsersModel();
-		$RolesModel = new RolesModel();
-		$SystemModel = new SystemModel();
-		$ContractModel = new ContractModel();
-		$PayrollModel = new PayrollModel();
-		$StaffdetailsModel = new StaffdetailsModel();
-		$AdvancesalaryModel = new AdvancesalaryModel();
-
-		// Get company settings
-		$xin_system = erp_company_settings();
-
-		// Determine company ID based on user type
-		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		$company_id = ($user_info['user_type'] == 'staff') ? $user_info['company_id'] : $usession['sup_user_id'];
-
-		// Get staff data based on user_id parameter
-		if ($user_id == 0) {
-			$staff = $UsersModel->where('company_id', $company_id)
-				->where('user_type', 'staff')
-				->orderBy('user_id', 'ASC')
-				->findAll();
-		} else {
-			$staff = $UsersModel->where('company_id', $company_id)
-				->where('user_id', $user_id)
-				->findAll();
-		}
-
-		$data = array();
-
-		foreach ($staff as $r) {
-			$payroll_count = $PayrollModel->where('company_id', $company_id)->where('staff_id', $r['user_id'])->where('salary_month', $payment_date)->countAllResults();
-			// Advance Salary //
-			$advance_salary = $AdvancesalaryModel->where('employee_id', $r['user_id'])->where('status', 1)->where('salary_type', 'advance')->countAllResults();
-			if ($advance_salary > 0) {
-				$advance_salary = $AdvancesalaryModel->where('employee_id', $r['user_id'])->where('status', 1)->where('salary_type', 'advance')->first();
-				if ($advance_salary['advance_salary'] != $advance_salary['total_paid']) {
-					$monthly_installment = $advance_salary['monthly_installment'];
-					$advance_amount = $advance_salary['advance_amount'];
-					$total_paid = $advance_salary['total_paid'];
-					//check ifpaid
-					$em_advance_amount = $advance_salary['advance_amount'];
-					$em_total_paid = $advance_salary['total_paid'];
-					if ($advance_salary['one_time_deduct'] == 1) {
-						$i_net_advance = $em_advance_amount - $total_paid;
-						$deduct_salary = $i_net_advance;
-						$is_advance_deducted = 0;
-					} else {
-						$re_amount = $em_advance_amount - $em_total_paid;
-						if ($monthly_installment > $re_amount) {
-							$deduct_salary = $re_amount;
-						} else {
-							$deduct_salary = $monthly_installment;
-						}
-					}
-				}
-			} else {
-				$deduct_salary = 0.00;
-				$is_advance_deducted = 0;
-			}
-			// Loan Request //
-			$lo_advance_salary = $AdvancesalaryModel->where('employee_id', $r['user_id'])->where('status', 1)->where('salary_type', 'loan')->countAllResults();
-			if ($lo_advance_salary > 0) {
-				$lo_advance_salary = $AdvancesalaryModel->where('employee_id', $r['user_id'])->where('status', 1)->where('salary_type', 'loan')->first();
-				if ($lo_advance_salary['advance_salary'] != $lo_advance_salary['total_paid']) {
-					$lo_monthly_installment = $lo_advance_salary['monthly_installment'];
-					$lo_advance_amount = $lo_advance_salary['advance_amount'];
-					$lo_total_paid = $lo_advance_salary['total_paid'];
-					//check ifpaid
-					$lo_em_advance_amount = $lo_advance_salary['advance_amount'];
-					$lo_em_total_paid = $lo_advance_salary['total_paid'];
-					if ($lo_advance_salary['one_time_deduct'] == 1) {
-						$lo_i_net_advance = $lo_em_advance_amount - $lo_total_paid;
-						$lo_deduct_salary = $lo_i_net_advance;
-						$lo_is_advance_deducted = 0;
-					} else {
-						$lo_re_amount = $lo_em_advance_amount - $lo_em_total_paid;
-						if ($lo_monthly_installment > $lo_re_amount) {
-							$lo_deduct_salary = $lo_re_amount;
-						} else {
-							$lo_deduct_salary = $lo_monthly_installment;
-						}
-					}
-				}
-			} else {
-				$lo_deduct_salary = 0.00;
-				$lo_is_advance_deducted = 0;
-			}
-			if ($payroll_count > 0) {
-				$payroll_link = $PayrollModel->where('company_id', $company_id)->where('staff_id', $r['user_id'])->where('salary_month', $payment_date)->first();
-				$pay_salary = '';
-				if (in_array('pay3', staff_role_resource()) || $user_info['user_type'] == 'company') {
-					$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . uencode($payroll_link['payslip_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
+			// Only process if advance_salary is not equal to total_paid
+			if ($advance_salary != $total_paid) {
+				if ($one_time_deduct == 1) {
+					$deduction += ($advance_amount - $total_paid);
 				} else {
-					$delete = '';
+					$remaining = $advance_amount - $total_paid;
+					$deduction += min($monthly_installment, $remaining);
 				}
-				$view = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Payroll.xin_view_payslip') . '"><a target="_blank" href="' . site_url('erp/payroll-view') . '/' . uencode($payroll_link['payslip_id']) . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light"><i class="feather icon-arrow-right"></i></button></a></span>';
-				$combhr = $pay_salary . $view . $delete;
-				$status = '<span class="badge badge-light-success">' . lang('Invoices.xin_paid') . '</span>';
-			} else {
-				if (in_array('pay2', staff_role_resource()) || $user_info['user_type'] == 'company') {
-					$pay_salary = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Payroll.xin_payroll_make_payment') . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" data-toggle="modal" data-target=".payroll-modal-data" data-field_id="' . uencode($r['user_id']) . '" data-payment_date=' . uencode($payment_date) . ' data-advance_salary=' . $deduct_salary . ' data-loan=' . $lo_deduct_salary . '><i class="feather icon-credit-card"></i></button></span>';
-				} else {
-					$pay_salary = '';
-				}
-
-				$view = '';
-				$delete = '';
-				$combhr = $pay_salary . $view . $delete;
-				$status = '<span class="badge badge-light-danger">' . lang('Invoices.xin_unpaid') . '</span>';
 			}
-			$user_detail = $StaffdetailsModel->where('user_id', $r['user_id'])->first();
-			if ($user_detail['salay_type'] == 1) {
-				$wages_type = lang('Membership.xin_per_month');
-			} else {
-				$wages_type = lang('Membership.xin_per_hour');
-			}
-			$ibasic_salary = $user_detail['basic_salary'];
-			$name = $r['first_name'] . ' ' . $r['last_name'];
-			$uname = '<div class="d-inline-block align-middle">
-					<img src="' . base_url() . '/public/uploads/users/thumb/' . $r['profile_photo'] . '" alt="user image" class="img-radius align-top m-r-15" style="width:40px;">
-					<div class="d-inline-block">
-						<h6 class="m-b-0">' . $name . '</h6>
-						<p class="m-b-0">' . $r['email'] . '</p>
-					</div>
-				</div>';
-			// Salary Options //
-			// 1:: Allowances
-			$count_allowances = $ContractModel->where('user_id', $r['user_id'])->where('salay_type', 'allowances')->countAllResults();
-			$salary_allowances = $ContractModel->where('user_id', $r['user_id'])->where('salay_type', 'allowances')->findAll();
-			$allowance_amount = 0;
-			if ($count_allowances > 0) {
-				foreach ($salary_allowances as $sl_allowances) {
-					$allowance_amount += $sl_allowances['contract_amount'];
-				}
-			} else {
-				$allowance_amount = 0;
-			}
-			// 2:: Commissions
-			$count_commissions = $ContractModel->where('user_id', $r['user_id'])->where('salay_type', 'commissions')->countAllResults();
-			$salary_commissions = $ContractModel->where('user_id', $r['user_id'])->where('salay_type', 'commissions')->findAll();
-			$commissions_amount = 0;
-			if ($count_commissions > 0) {
-				foreach ($salary_commissions as $sl_salary_commissions) {
-					$commissions_amount += $sl_salary_commissions['contract_amount'];
-				}
-			} else {
-				$commissions_amount = 0;
-			}
-			// 3:: Other Payments
-			$count_other_payments = $ContractModel->where('user_id', $r['user_id'])->where('salay_type', 'other_payments')->countAllResults();
-			$other_payments = $ContractModel->where('user_id', $r['user_id'])->where('salay_type', 'other_payments')->findAll();
-			$other_payments_amount = 0;
-			if ($count_other_payments > 0) {
-				foreach ($other_payments as $sl_other_payments) {
-					$other_payments_amount += $sl_other_payments['contract_amount'];
-				}
-			} else {
-				$other_payments_amount = 0;
-			}
-			// 4:: Statutory
-			$count_statutory_deductions = $ContractModel->where('user_id', $r['user_id'])->where('salay_type', 'statutory')->countAllResults();
-			$statutory_deductions = $ContractModel->where('user_id', $r['user_id'])->where('salay_type', 'statutory')->findAll();
-			$statutory_deductions_amount = 0;
-			if ($count_statutory_deductions > 0) {
-				foreach ($statutory_deductions as $sl_salary_statutory_deductions) {
-					$statutory_deductions_amount += $sl_salary_statutory_deductions['contract_amount'];
-				}
-			} else {
-				$statutory_deductions_amount = 0;
-			}
-
-			// net salary
-			$inet_salary = $ibasic_salary + $allowance_amount + $commissions_amount + $other_payments_amount - $statutory_deductions_amount + $deduct_salary + $lo_deduct_salary;
-			$net_salary = '<h6 class="text-success">' . number_to_currency($inet_salary, $xin_system['default_currency'], null, 2) . '</h6>';
-			$basic_salary = '<h6 class="text-primary">' . number_to_currency($ibasic_salary, $xin_system['default_currency'], null, 2) . '</h6>';
-			$links = '
-					' . $uname . '
-					<div class="overlay-edit">
-						' . $combhr . '
-					</div>
-				';
-
-			$data[] = array(
-				$links,
-				$user_detail['employee_id'],
-				$wages_type,
-				$basic_salary,
-				$net_salary,
-				$status
-			);
 		}
 
-		return $this->response->setJSON([
-			"data" => $data
-		]);
+		return $deduction;
 	}
+
+    private function generateActionButtons($payroll_count, $payrollModel, $company_id, $staff_id, $payment_date, $advance_deduction, $loan_deduction, $user_info)
+    {
+        if ($payroll_count > 0) {
+            $payroll = $payrollModel->where('company_id', $company_id)
+                                  ->where('staff_id', $staff_id)
+                                  ->where('salary_month', $payment_date)
+                                  ->first();
+
+            $buttons = [
+                'view' => '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Payroll.xin_view_payslip') . '">
+                    <a target="_blank" href="' . site_url('erp/payroll-view/' . uencode($payroll['payslip_id'])) . '">
+                        <button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light">
+                            <i class="feather icon-arrow-right"></i>
+                        </button>
+                    </a>
+                </span>'
+            ];
+
+            if (in_array('pay3', staff_role_resource()) || $user_info['user_type'] == 'company') {
+                $buttons['delete'] = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '">
+                    <button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" 
+                        data-toggle="modal" data-target=".delete-modal" 
+                        data-record-id="' . uencode($payroll['payslip_id']) . '">
+                        <i class="feather icon-trash-2"></i>
+                    </button>
+                </span>';
+            }
+
+            return implode('', $buttons);
+        } else {
+            if (in_array('pay2', staff_role_resource()) || $user_info['user_type'] == 'company') {
+                return '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Payroll.xin_payroll_make_payment') . '">
+                    <button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" 
+                        data-toggle="modal" data-target=".payroll-modal-data" 
+                        data-field_id="' . uencode($staff_id) . '" 
+                        data-payment_date="' . uencode($payment_date) . '" 
+                        data-advance_salary="' . $advance_deduction . '" 
+                        data-loan="' . $loan_deduction . '">
+                        <i class="feather icon-credit-card"></i>
+                    </button>
+                </span>';
+            }
+            return '';
+        }
+    }
+
+    /**
+     * Calculate all salary components
+     */
+    private function calculateSalaryComponents($contractModel, $staff_id, $basic_salary)
+    {
+        $components = [
+            'basic_salary' => $basic_salary,
+            'allowances' => 0,
+            'commissions' => 0,
+            'other_payments' => 0,
+            'statutory_deductions' => 0
+        ];
+
+        $types = ['allowances', 'commissions', 'other_payments', 'statutory'];
+        foreach ($types as $type) {
+            $records = $contractModel->where('user_id', $staff_id)
+                                    ->where('salay_type', $type)
+                                    ->findAll();
+
+            foreach ($records as $record) {
+                $key = ($type == 'statutory') ? 'statutory_deductions' : $type;
+                $components[$key] += $record['contract_amount'];
+            }
+        }
+
+        return $components;
+    }
+
+    /**
+     * Generate staff display HTML
+     */
+    private function generateStaffDisplay($staff, $action_buttons)
+    {
+        $name = $staff['first_name'] . ' ' . $staff['last_name'];
+        $profile_photo = !empty($staff['profile_photo']) ? $staff['profile_photo'] : 'default-user.png';
+
+        return '<div class="d-inline-block align-middle">
+            <img src="' . base_url('public/uploads/users/thumb/' . $profile_photo) . '" alt="user image" 
+                class="img-radius align-top m-r-15" style="width:40px;">
+            <div class="d-inline-block">
+                <h6 class="m-b-0">' . $name . '</h6>
+                <p class="m-b-0">' . $staff['email'] . '</p>
+            </div>
+            <div class="overlay-edit">' . $action_buttons . '</div>
+        </div>';
+    }
 
 	public function advance_salary_list()
 	{
-
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 
@@ -633,184 +484,217 @@ class Payroll extends BaseController
 			}
 
 			// Get data based on user type
+			$query = $AdvancesalaryModel->where('salary_type', 'advance')
+									->orderBy('advance_salary_id', 'ASC');
+
 			if ($user_info['user_type'] == 'staff') {
-				$get_data = $AdvancesalaryModel->where('employee_id', $user_info['user_id'])
-					->where('salary_type', 'advance')
-					->orderBy('advance_salary_id', 'ASC')
-					->findAll();
+				$get_data = $query->where('employee_id', $user_info['user_id'])->findAll();
 			} else {
-				$get_data = $AdvancesalaryModel->where('company_id', $usession['sup_user_id'])
-					->where('salary_type', 'advance')
-					->orderBy('advance_salary_id', 'ASC')
-					->findAll();
+				$get_data = $query->where('company_id', $usession['sup_user_id'])->findAll();
 			}
 
 			$data = [];
 
 			foreach ($get_data as $r) {
-				// Delete button
-				$delete = '';
-				if (in_array('advance_salary4', staff_role_resource()) || $user_info['user_type'] == 'company') {
-					$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '">
-                        <button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" 
-                            data-toggle="modal" data-target=".delete-modal" 
-                            data-record-id="' . uencode($r['advance_salary_id']) . '">
-                            <i class="feather icon-trash-2"></i>
-                        </button>
-                    </span>';
+				try {
+					// Delete button
+					$delete = '';
+					if (in_array('advance_salary4', staff_role_resource()) || $user_info['user_type'] == 'company') {
+						$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '">
+							<button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" 
+								data-toggle="modal" data-target=".delete-modal" 
+								data-record-id="' . uencode($r['advance_salary_id']) . '">
+								<i class="feather icon-trash-2"></i>
+							</button>
+						</span>';
+					}
+
+					// Edit button
+					$edit = '';
+					if (in_array('advance_salary3', staff_role_resource()) || $user_info['user_type'] == 'company') {
+						$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_edit') . '">
+							<button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" 
+								data-toggle="modal" data-target=".view-modal-data" 
+								data-field_id="' . uencode($r['advance_salary_id']) . '">
+								<i class="feather icon-edit"></i>
+							</button>
+						</span>';
+					}
+
+					// Month year formatting with validation
+					$month_year = '';
+					if (!empty($r['month_year'])) {
+						$d = explode('-', $r['month_year']);
+						if (count($d) >= 2 && is_numeric($d[0]) && is_numeric($d[1])) {
+							$get_month = date('F', mktime(0, 0, 0, $d[1], 10));
+							$month_year = $get_month . ', ' . $d[0];
+						} else {
+							$month_year = $r['month_year']; // Fallback to original if invalid format
+						}
+					}
+
+					// User info with validation
+					$iuser_info = $UsersModel->where('user_id', $r['employee_id'])->first();
+					if (!$iuser_info) {
+						continue; // Skip if user not found
+					}
+
+					$combhr = $edit . $delete;
+
+					// One time deduct
+					$onetime = ($r['one_time_deduct'] == 1) ? lang('Main.xin_yes') : lang('Main.xin_no');
+
+					// Status
+					switch ($r['status']) {
+						case 0:
+							$app_status = '<span class="badge badge-light-warning">' . lang('Main.xin_pending') . '</span>';
+							break;
+						case 1:
+							$app_status = '<span class="badge badge-light-success">' . lang('Main.xin_accepted') . '</span>';
+							break;
+						case 2:
+							$app_status = '<span class="badge badge-light-danger">' . lang('Main.xin_rejected') . '</span>';
+							break;
+						default:
+							$app_status = '<span class="badge badge-light-secondary">' . lang('Main.xin_unknown') . '</span>';
+					}
+
+					$created_at = set_date_format($r['created_at']);
+					$advance_amount = number_to_currency($r['advance_amount'], $xin_system['default_currency'], null, 2);
+					$monthly_installment = number_to_currency($r['monthly_installment'], $xin_system['default_currency'], null, 2);
+					$total_paid = number_to_currency($r['total_paid'], $xin_system['default_currency'], null, 2);
+					$itotal_paid = $advance_amount . '<br>' . lang('Invoices.xin_paid') . ': ' . $total_paid;
+					$iapp_status = $created_at . '<br>' . $app_status;
+
+					$employee_name = ($iuser_info['first_name'] ?? '') . ' ' . ($iuser_info['last_name'] ?? '');
+					$profile_photo = !empty($iuser_info['profile_photo']) ? $iuser_info['profile_photo'] : 'default.png';
+
+					$uname = '<div class="d-inline-block align-middle">
+						<img src="' . base_url('public/uploads/users/thumb/' . $profile_photo) . '" 
+							alt="user image" class="img-radius align-top m-r-15" style="width:40px;">
+						<div class="d-inline-block">
+							<h6 class="m-b-0">' . htmlspecialchars($employee_name) . '</h6>
+							<p class="m-b-0">' . htmlspecialchars($iuser_info['email'] ?? '') . '</p>
+						</div>
+					</div>';
+
+					if (in_array('advance_salary3', staff_role_resource()) ||
+						in_array('advance_salary4', staff_role_resource()) ||
+						$user_info['user_type'] == 'company') {
+						$icname = $uname . '<div class="overlay-edit">' . $combhr . '</div>';
+					} else {
+						$icname = $uname;
+					}
+
+					$data[] = [
+						$icname,
+						$itotal_paid,
+						$month_year,
+						$onetime,
+						$monthly_installment,
+						$iapp_status,
+					];
+				} catch (\Exception $e) {
+					log_message('error', 'Error processing advance salary record: ' . $e->getMessage());
+					continue; // Skip this record but continue with others
 				}
-
-				// Edit button
-				$edit = '';
-				if (in_array('advance_salary3', staff_role_resource()) || $user_info['user_type'] == 'company') {
-					$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_edit') . '">
-                        <button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" 
-                            data-toggle="modal" data-target=".view-modal-data" 
-                            data-field_id="' . uencode($r['advance_salary_id']) . '">
-                            <i class="feather icon-edit"></i>
-                        </button>
-                    </span>';
-				}
-
-				// Month year formatting
-				$d = explode('-', $r['month_year']);
-				$get_month = date('F', mktime(0, 0, 0, $d[1], 10));
-				$month_year = $get_month . ', ' . $d[0];
-
-				// User info
-				$iuser_info = $UsersModel->where('user_id', $r['employee_id'])->first();
-				if (!$iuser_info) {
-					continue; // Skip if user not found
-				}
-
-				$combhr = $edit . $delete;
-
-				// One time deduct
-				$onetime = ($r['one_time_deduct'] == 1) ? lang('Main.xin_yes') : lang('Main.xin_no');
-
-				// Status
-				switch ($r['status']) {
-					case 0:
-						$app_status = '<span class="badge badge-light-warning">' . lang('Main.xin_pending') . '</span>';
-						break;
-					case 1:
-						$app_status = '<span class="badge badge-light-success">' . lang('Main.xin_accepted') . '</span>';
-						break;
-					case 2:
-						$app_status = '<span class="badge badge-light-danger">' . lang('Main.xin_rejected') . '</span>';
-						break;
-					default:
-						$app_status = '';
-				}
-
-				$created_at = set_date_format($r['created_at']);
-				$advance_amount = number_to_currency($r['advance_amount'], $xin_system['default_currency'], null, 2);
-				$monthly_installment = number_to_currency($r['monthly_installment'], $xin_system['default_currency'], null, 2);
-				$total_paid = number_to_currency($r['total_paid'], $xin_system['default_currency'], null, 2);
-				$itotal_paid = $advance_amount . '<br>' . lang('Invoices.xin_paid') . ': ' . $total_paid;
-				$iapp_status = $created_at . '<br>' . $app_status;
-
-				$employee_name = $iuser_info['first_name'] . ' ' . $iuser_info['last_name'];
-
-				$uname = '<div class="d-inline-block align-middle">
-                    <img src="' . base_url() . 'uploads/users/thumb/' . $iuser_info['profile_photo'] . '" 
-                        alt="user image" class="img-radius align-top m-r-15" style="width:40px;">
-                    <div class="d-inline-block">
-                        <h6 class="m-b-0">' . $employee_name . '</h6>
-                        <p class="m-b-0">' . $iuser_info['email'] . '</p>
-                    </div>
-                </div>';
-
-				if (
-					in_array('advance_salary3', staff_role_resource()) ||
-					in_array('advance_salary4', staff_role_resource()) ||
-					$user_info['user_type'] == 'company'
-				) {
-					$icname = $uname . '<div class="overlay-edit">' . $combhr . '</div>';
-				} else {
-					$icname = $uname;
-				}
-
-				$data[] = [
-					$icname,
-					$itotal_paid,
-					$month_year,
-					$onetime,
-					$monthly_installment,
-					$iapp_status,
-				];
 			}
 
 			return $this->response->setJSON([
 				"data" => $data
 			]);
+
 		} catch (\Exception $e) {
 			log_message('error', 'Error in advance_salary_list: ' . $e->getMessage());
 			return $this->response->setStatusCode(500)->setJSON([
-				'error' => 'An error occurred while processing your request'
+				'error' => 'An error occurred while processing your request',
+				'details' => ENVIRONMENT === 'development' ? $e->getMessage() : null
 			]);
 		}
 	}
 	// record list
 	public function loan_list()
 	{
-
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
 			return redirect()->to(site_url('/'));
 		}
+		
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
 		$SystemModel = new SystemModel();
 		$AdvancesalaryModel = new AdvancesalaryModel();
-		//$ConstantsModel = new ConstantsModel();
 		$xin_system = erp_company_settings();
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+		
 		if ($user_info['user_type'] == 'staff') {
-			$get_data = $AdvancesalaryModel->where('employee_id', $user_info['user_id'])->where('salary_type', 'loan')->orderBy('advance_salary_id', 'ASC')->findAll();
+			$get_data = $AdvancesalaryModel->where('employee_id', $user_info['user_id'])
+										->where('salary_type', 'loan')
+										->orderBy('advance_salary_id', 'ASC')
+										->findAll();
 		} else {
-			$get_data = $AdvancesalaryModel->where('company_id', $usession['sup_user_id'])->where('salary_type', 'loan')->orderBy('advance_salary_id', 'ASC')->findAll();
+			$get_data = $AdvancesalaryModel->where('company_id', $usession['sup_user_id'])
+										->where('salary_type', 'loan')
+										->orderBy('advance_salary_id', 'ASC')
+										->findAll();
 		}
+		
 		$data = [];
 
 		foreach ($get_data as $r) {
-
-			if (in_array('advance_salary4', staff_role_resource()) || $user_info['user_type'] == 'company') { //delete
+			// Check permissions for delete and edit buttons
+			if (in_array('advance_salary4', staff_role_resource()) || $user_info['user_type'] == 'company') {
 				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . uencode($r['advance_salary_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
 			} else {
 				$delete = '';
 			}
+			
 			if (in_array('advance_salary3', staff_role_resource()) || $user_info['user_type'] == 'company') {
 				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_edit') . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="' . uencode($r['advance_salary_id']) . '"><i class="feather icon-edit"></i></button></span>';
 			} else {
 				$edit = '';
 			}
-			// awards month year
-			$d = explode('-', $r['month_year']);
-			$get_month = date('F', mktime(0, 0, 0, $d[1], 10));
-			$month_year = $get_month . ', ' . $d[0];
-			// user info
+
+			// Handle month_year safely
+			$month_year = '';
+			if (!empty($r['month_year'])) {
+				$d = explode('-', $r['month_year']);
+				if (count($d) >= 2 && is_numeric($d[0]) && is_numeric($d[1])) {
+					$get_month = date('F', mktime(0, 0, 0, $d[1], 10));
+					$month_year = $get_month . ', ' . $d[0];
+				} else {
+					$month_year = $r['month_year']; // Fallback to original value if format is invalid
+				}
+			}
+
+			// Get user info
 			$iuser_info = $UsersModel->where('user_id', $r['employee_id'])->first();
 			$combhr = $edit . $delete;
-			if ($r['one_time_deduct'] == 1): $onetime = lang('Main.xin_yes');
-			else: $onetime = lang('Main.xin_no');
-			endif;
-			if ($r['status'] == 0) {
-				$app_status = '<span class="badge badge-light-warning">' . lang('Main.xin_pending') . '</span>';
-			} else if ($r['status'] == 1) {
-				$app_status = '<span class="badge badge-light-success">' . lang('Main.xin_accepted') . '</span>';
-			} else if ($r['status'] == 2) {
-				$app_status = '<span class="badge badge-light-danger">' . lang('Main.xin_rejected') . '</span>';
+			
+			$onetime = ($r['one_time_deduct'] == 1) ? lang('Main.xin_yes') : lang('Main.xin_no');
+			
+			switch ($r['status']) {
+				case 0:
+					$app_status = '<span class="badge badge-light-warning">' . lang('Main.xin_pending') . '</span>';
+					break;
+				case 1:
+					$app_status = '<span class="badge badge-light-success">' . lang('Main.xin_accepted') . '</span>';
+					break;
+				case 2:
+					$app_status = '<span class="badge badge-light-danger">' . lang('Main.xin_rejected') . '</span>';
+					break;
+				default:
+					$app_status = '<span class="badge badge-light-secondary">' . lang('Main.xin_unknown') . '</span>';
 			}
+			
 			$created_at = set_date_format($r['created_at']);
-			// advance_amount
 			$advance_amount = number_to_currency($r['advance_amount'], $xin_system['default_currency'], null, 2);
 			$monthly_installment = number_to_currency($r['monthly_installment'], $xin_system['default_currency'], null, 2);
 			$total_paid = number_to_currency($r['total_paid'], $xin_system['default_currency'], null, 2);
 			$itotal_paid = $advance_amount . '<br>' . lang('Invoices.xin_paid') . ': ' . $total_paid;
 			$iapp_status = $created_at . '<br>' . $app_status;
-			//'xin_paid' => 'Paid',
+			
 			$employee_name = $iuser_info['first_name'] . ' ' . $iuser_info['last_name'];
 			$uname = '<div class="d-inline-block align-middle">
 				<img src="' . base_url() . '/public/uploads/users/thumb/' . $iuser_info['profile_photo'] . '" alt="user image" class="img-radius align-top m-r-15" style="width:40px;">
@@ -819,12 +703,9 @@ class Payroll extends BaseController
 					<p class="m-b-0">' . $iuser_info['email'] . '</p>
 				</div>
 			</div>';
+			
 			if (in_array('advance_salary3', staff_role_resource()) || in_array('advance_salary4', staff_role_resource()) || $user_info['user_type'] == 'company') {
-				$icname = '
-				' . $uname . '
-				<div class="overlay-edit">
-					' . $combhr . '
-				</div>';
+				$icname = $uname . '<div class="overlay-edit">' . $combhr . '</div>';
 			} else {
 				$icname = $uname;
 			}
@@ -838,9 +719,11 @@ class Payroll extends BaseController
 				$iapp_status,
 			];
 		}
-		$output = array(
+		
+		$output = [
 			"data" => $data
-		);
+		];
+		
 		echo json_encode($output);
 		exit();
 	}
@@ -981,7 +864,7 @@ class Payroll extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -1034,12 +917,12 @@ class Payroll extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||update record|||
@@ -1090,7 +973,7 @@ class Payroll extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -1144,13 +1027,11 @@ class Payroll extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
-				exit;
+				return $this->response->setJSON($Return);
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// |||add record|||
@@ -1254,12 +1135,12 @@ class Payroll extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return	$this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return	$this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||update record|||
@@ -1310,7 +1191,7 @@ class Payroll extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return	$this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -1364,13 +1245,11 @@ class Payroll extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
-				exit;
+				return	$this->response->setJSON($Return);
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return	$this->response->setJSON($Return);
 		}
 	}
 	// add payslip
@@ -1378,11 +1257,11 @@ class Payroll extends BaseController
 	{
 
 		$validation =  \Config\Services::validation();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($this->request->getPost('type') === 'add_monthly_payment') {
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
@@ -1664,7 +1543,7 @@ class Payroll extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 
 		$RolesModel = new RolesModel();
@@ -1703,7 +1582,7 @@ class Payroll extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
@@ -1741,10 +1620,10 @@ class Payroll extends BaseController
 	// read record
 	public function read_advance_salary()
 	{
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$id = $request->getGet('field_id');
 		$data = [
@@ -1753,16 +1632,16 @@ class Payroll extends BaseController
 		if ($session->has('sup_username')) {
 			return view('erp/payroll/dialog_advance_salary', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
 	// read record
 	public function read_loan()
 	{
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$id = $request->getGet('field_id');
 		$data = [
@@ -1771,16 +1650,16 @@ class Payroll extends BaseController
 		if ($session->has('sup_username')) {
 			return view('erp/payroll/dialog_loan', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
 	// read record
 	public function read_payroll()
 	{
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$id = $request->getGet('field_id');
 		$data = [
@@ -1789,7 +1668,7 @@ class Payroll extends BaseController
 		if ($session->has('sup_username')) {
 			return view('erp/payroll/dialog_make_payment', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
 	// delete record

@@ -41,12 +41,15 @@ $(document).ready(function () {
 					Ladda.stopAll();
 				} else {
 					$('.delete-modal').modal('toggle');
-					xin_table.api().ajax.reload(function () {
-						toastr.success(JSON.result);
-					}, true);
+					toastr.success(JSON.result);
+					window.location.href = main_url + 'loan-request';
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
+
 					Ladda.stopAll();
 				}
+			},
+			error: function (xhr, error, thrown) {
+				console.log("AJAX Error: ", xhr.responseText);
 			}
 		});
 	});
@@ -57,7 +60,7 @@ $(document).ready(function () {
 		var field_id = button.data('field_id');
 		var modal = $(this);
 		$.ajax({
-			url: main_url + "payroll/read_loan",
+			url: main_url + "read-loan",
 			type: "GET",
 			data: 'jd=1&data=loan_amount&field_id=' + field_id,
 			success: function (response) {
@@ -111,5 +114,5 @@ $(document).ready(function () {
 });
 $(document).on("click", ".delete", function () {
 	$('input[name=_token]').val($(this).data('record-id'));
-	$('#delete_record').attr('action', main_url + 'payroll/delete_loan');
+	$('#delete_record').attr('action', main_url + 'delete-loan');
 });

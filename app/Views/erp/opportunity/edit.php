@@ -11,8 +11,8 @@
     </button>
 </div>
 
-<form id="editLeadForm" action="<?= base_url('Erp/Opportunity/update/' . base64_encode($result['id'])); ?>" method="POST">
-    <?= csrf_field() ?>
+<form id="editLeadForm" action="<?= base_url('erp/opportunity-update/' . $result['id']) ?>" method="POST">
+    <input type="hidden" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>">
     <div class="modal-body">
         <div class="row">
             <div class="form-group col-6">
@@ -54,7 +54,7 @@
             <div class="form-group col-6">
                 <label for="probability">Probability (%)</label>
                 <span class="text-danger">*</span>
-                <input type="text" class="form-control" id="probability" name="probability" required min="0" max="100" placeholder="Enter Probability"
+                <input type="number" class="form-control" id="probability" name="probability" required min="0" max="100" placeholder="Enter Probability"
                     value="<?= $result['probability']; ?>">
             </div>
 

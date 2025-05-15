@@ -82,6 +82,7 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
                         <?php
                         $i = 1;
                         foreach ($result as $value) { ?>
+                     
                             <tr>
                                 <td><?= $i++; ?></td>
                                 <td>
@@ -100,13 +101,19 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
                                 <td><?= esc($value['probability']); ?></td>
                                 <td><?= esc($value['comments']); ?></td>
                                 <td>
-                                    <?php if ($value['status'] == 't'): ?>
-                                        <a href="<?= base_url('opportunity/update-status/' . base64_encode($value['id']) . '/false') ?>"
-                                            class="btn btn-success">Active</a>
-                                    <?php elseif ($value['status'] == 'f'): ?>
-                                        <a href="<?= base_url('opportunity/update-status/' . base64_encode($value['id']) . '/true') ?>"
-                                            class="btn btn-danger">Inactive</a>
-                                    <?php endif; ?>
+                                    <?php
+                                        $isActive = $value['status'] == 1;
+                                        $newStatus = $isActive ? 0 : 1;
+                                        $statusText = $isActive ? 'Active' : 'Inactive';
+                                        $btnClass = $isActive ? 'success' : 'danger';
+                                        $toggleText = $isActive ? 'Deactivate' : 'Activate';
+                                    ?>
+
+                                    <a href="<?= base_url('opportunity/update-status/' . $value['id'] . '/' . $newStatus) ?>"
+                                    class="btn btn-<?= $btnClass ?>">
+                                        <?= $statusText ?>
+                                    </a>
+
                                 </td>
                                 <td>
                                     <?php if (in_array('opportunity3', staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
@@ -118,7 +125,7 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
                                     <?php } ?>
                                     <?php if (in_array('opportunity4', staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
 
-                                        <a href="<?= base_url('opportunity/delete/' . base64_encode($value['id'])); ?>"
+                                        <a href="<?= base_url('erp/opportunity-delete' .'/'.$value['id']); ?>"
                                             class="btn btn-danger"
                                             onclick="return confirm('Are you sure you want to delete this item?');"
                                             data-toggle="tooltip" title="Delete Item">
@@ -147,7 +154,8 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="addLeadForm" action="<?= base_url('Erp/Opportunity/save'); ?>" method="POST">
+                <form id="addLeadForm" action="<?= base_url('erp/opportunity-save'); ?>" method="POST">
+                    <input type="hidden" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>">
                     <div class="modal-body">
                         <div class="row">
                             <div class="form-group col-6">
@@ -188,7 +196,7 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
                             <div class="form-group col-6">
                                 <label for="probability">Probability (%)</label>
                                 <span class="text-danger">*</span>
-                                <input type="text" class="form-control" id="probability" name="probability" required min="0"
+                                <input type="number" class="form-control" id="probability" name="probability" required min="0"
                                     max="100" placeholder="Enter Probability">
                             </div>
 

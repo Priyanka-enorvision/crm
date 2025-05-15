@@ -30,34 +30,37 @@ $leadFields = $LeadConfig->groupStart()
   ->orderBy('id', 'ASC')
   ->findAll();
 
-$segment_id = $request->uri->getSegment(3);
-$lead_id = udecode($segment_id);
+// $segment_id = $request->uri->getSegment(3);
+// $lead_id = udecode($segment_id);
+$segment_id = $lead_id;
 
-$result = $LeadsModel->where('lead_id', $lead_id)->first();
+$result = $leadData;
+// $result = $LeadsModel->where('lead_id', $lead_id)->first();
+
+$status = $result['status'];
+$status_label = "";
 
 $account_list = $AccountDetails->where(['company_id' => $user_info['company_id'], 'lead_id' => $lead_id])->orderBy('account_id', 'ASC')->findAll();
-// echo '<pre>';
-// print_r($account_list);
-// die;
 
 
-if ($result['status'] == 1) {
+if ($status  == 1) {
   $status = '<span class="badge badge-light-primary"><em class="icon ni ni-check-circle"></em> ' . lang('Dashboard.xin_lead') . '</span>';
   $status_label = '<i class="fas fa-certificate text-primary bg-icon"></i><i class="fas fa-check front-icon text-white"></i>';
 }
+
+
 ?>
-<?php if ($result['profile_photo'] != '' || $result['profile_photo'] != 'no-file') { ?>
+<?php if ($result['profile_image'] != '' || $result['profile_image'] != 'no-file') { ?>
   <?php
   $imageProperties = [
-    'src' => base_url() . '/public/uploads/clients/thumb/' . $result['profile_photo'],
-    'alt' => $result['company_name'],
+    'src' => base_url() . 'uploads/clients/thumb/' . $result['profile_image'],
     'class' => 'd-block img-radius img-fluid wid-80',
     'width' => '50',
     'height' => '50',
-    'title' => $result['company_name']
   ];
 ?>
 <?php } ?>
+
 
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
@@ -73,21 +76,11 @@ if ($result['status'] == 1) {
         <input type="hidden" id="client_id" value="<?= $segment_id; ?>" />
         <div class="media user-about-block align-items-center mt-0 mb-3">
           <div class="position-relative d-inline-block">
-            <?php if ($result['profile_photo'] != '' || $result['profile_photo'] != 'no-file') { ?>
-              <?php
-              $imageProperties = [
-                'src' => base_url() . '/public/uploads/clients/thumb/' . $result['profile_photo'],
-                'alt' => $result['company_name'],
-                'class' => 'd-block img-radius img-fluid wid-80',
-                'width' => '50',
-                'height' => '50',
-                'title' => $result['company_name']
-              ];
-              ?>
+              
               <?php
               $imagePath = $imageProperties['src'] ?? null;
 
-              $dummyImage = base_url('public/uploads/leads/dummy-image.jpg');
+              $dummyImage = base_url('uploads/leads/dummy-image.jpg');
               $imageSrc = (isset($imagePath) && file_exists(FCPATH . ltrim(parse_url($imagePath, PHP_URL_PATH), '/')))
                 ? img($imageProperties)
                 : img(['src' => $dummyImage, 'alt' => 'Default Image', 'width' => '50', 'height' => '50', 'class' => 'd-block img-radius img-fluid wid-80']);
@@ -95,14 +88,13 @@ if ($result['status'] == 1) {
 
               <?= $imageSrc; ?>
 
-            <?php } ?>
             <div class="certificated-badge">
               <?= $status_label; ?>
             </div>
           </div>
           <div class="media-body ml-3">
             <h6 class="mb-1">
-              <?= $leadData['user_name']; ?>
+              <?= $leadData['name']; ?>
             </h6>
           </div>
         </div>
@@ -116,12 +108,13 @@ if ($result['status'] == 1) {
         <li class="list-group-item"> <span class="f-w-500"><i class="feather icon-phone-call m-r-10"></i>
             <?= lang('Main.xin_contact_number'); ?>
           </span> <a href="#" class="float-right text-body">
-            <?= $leadData['mobile']; ?>
+            <?= $leadData['contact']; ?>
           </a> </li>
       </ul>
 
       <div class="nav flex-column nav-pills list-group list-group-flush list-pills" id="user-set-tab" role="tablist"
-        aria-orientation="vertical"> <a class="nav-link list-group-item list-group-item-action active"
+        aria-orientation="vertical"> 
+        <a class="nav-link list-group-item list-group-item-action active"
           id="user-basic-tab" data-toggle="pill" href="#user-edit-account" role="tab" aria-controls="user-edit-account"
           aria-selected="false"> <span class="f-w-500"><i class="feather icon-user m-r-10 h5 "></i>
             <?= lang('Main.xin_personal_info'); ?>
@@ -146,14 +139,12 @@ if ($result['status'] == 1) {
         <div class="card">
           <?php $attributes = array('name' => 'update_lead', 'id' => 'update_lead', 'autocomplete' => 'off', 'enctype' => 'multipart/form-data', 'class' => 'm-b-1'); ?>
           <?php $hidden = array('_method' => 'EDIT', 'token' => $segment_id); ?>
-          <?= form_open('erp/clients/update_lead', $attributes, $hidden); ?>
+          <?= form_open('erp/update-lead', $attributes, $hidden); ?>
           <div class="card-header">
             <h5><i data-feather="user" class="icon-svg-primary wid-20"></i><span class="p-l-5">
                 <?= lang('Main.xin_personal_info'); ?>
               </span></h5>
           </div>
-
-
 
           <div class="card-body">
 
@@ -292,7 +283,8 @@ if ($result['status'] == 1) {
 
             <!-- Add Account Form (Initially Hidden) -->
             <div id="add-account-form" style="display: none;">
-              <form action="<?= base_url('erp/clients/save_accountDetails'); ?>" method="POST">
+              <form action="<?= base_url('erp/save_client-account-details'); ?>" method="POST">
+                <input type="hidden" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>">
                 <input type="hidden" name="lead_id" value="<?= $lead_id; ?>">
                 <div class="row">
                   <div class="col-md-6">
@@ -368,7 +360,7 @@ if ($result['status'] == 1) {
                             <i class="feather icon-edit-2 text-white"></i>
                           </a>
 
-                          <a href="<?= base_url('erp/clients/delete_accountRecord/' . base64_encode($list['account_id'])); ?>"
+                          <a href="<?= base_url('erp/delete-client-account-record/' . $list['account_id']); ?>"
                             class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this item?');"
                             data-toggle="tooltip" title="Delete Item">
                             <i class="feather icon-trash-2"></i>
@@ -436,7 +428,7 @@ if ($result['status'] == 1) {
                           <i class="feather icon-edit-2 text-white"></i>
                         </a>
 
-                        <a href="<?= base_url('erp/clients/delete_follow/' . base64_encode($follow['followup_id'])); ?>"
+                        <a href="<?= base_url('erp/delete-follow/' . $follow['followup_id']); ?>"
                           class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this item?');"
                           data-toggle="tooltip" title="Delete Item">
                           <i class="feather icon-trash-2"></i>
@@ -459,7 +451,7 @@ if ($result['status'] == 1) {
 
           <?php $attributes = array('name' => 'add_followup', 'id' => 'followup_info', 'autocomplete' => 'off', 'class' => 'm-b-1'); ?>
           <?php $hidden = array('_method' => 'EDIT', 'token' => $segment_id); ?>
-          <?= form_open('erp/clients/add_followup', $attributes, $hidden); ?>
+          <?= form_open('erp/add-client-followup', $attributes, $hidden); ?>
           <div class="card-body">
             <div class="row">
               <div class="col-md-4">
@@ -534,7 +526,7 @@ if ($result['status'] == 1) {
   var base_url = '<?= site_url(); ?>'; // Use site_url() for dynamic routes
 
   function openModal(id) {
-    fetch(base_url + 'erp/clients/follow_up_view/' + id) // Add base_url to the request
+    fetch(base_url + 'erp/follow-up-view/' + id) // Add base_url to the request
       .then(response => response.text())
       .then(data => {
         document.getElementById('modalBody').innerHTML = data;
@@ -552,7 +544,7 @@ if ($result['status'] == 1) {
   var base_url = '<?= site_url(); ?>'; // Use site_url() for dynamic routes
 
   function viewModal(id) {
-    fetch(base_url + 'erp/clients/account_view_details/' + id) // Add base_url to the request
+    fetch(base_url + 'erp/account-view-details/' + id) // Add base_url to the request
       .then(response => response.text())
       .then(data => {
         document.getElementById('viewBody').innerHTML = data;

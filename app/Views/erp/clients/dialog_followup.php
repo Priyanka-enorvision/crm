@@ -9,30 +9,27 @@
 	<p>We need below required information to update this record.</p>
 
 </div>
-
-<form id="addLeadForm" action="<?= base_url('erp/clients/update_followup/' . base64_encode($result['followup_id'])); ?>" method="POST">
-	<?= csrf_field() ?>
-	<div class="modal-body">
-
-		<div class="form-group">
-			<label for="leadName">Next Follow Up</label>
-			<span class="text-danger">*</span>
-			<input type="date" class="form-control " name="next_follow_up" id="next_follow_up" required
-				value="<?= $result['next_followup']; ?>" onkeypress="return onlyAlphabet(event)">
-		</div>
-		<div class="form-group">
-			<label for="leadName">Description</label>
-			<span class="text-danger">*</span>
-			<textarea type="text" class="form-control" name="description"><?= $result['description']; ?></textarea>
-		</div>
-
-
-
-	</div>
-	<div class="modal-footer">
-		<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-		<button type="submit" class="btn btn-primary" style="background-color: blue !important;">Update</button>
-	</div>
+<form id="editFollowupForm" action="<?= base_url('erp/update-follow-up/'. $result['followup_id']); ?>" method="POST">
+    <!-- Add CSRF Token -->
+    <input type="hidden" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>">
+    
+    <div class="modal-body">
+        <div class="form-group">
+            <label for="next_follow_up">Next Follow Up</label>
+            <span class="text-danger">*</span>
+            <input type="date" class="form-control" name="next_follow_up" id="next_follow_up" required
+                value="<?= date('Y-m-d', strtotime($result['next_followup'])) ?>">
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <span class="text-danger">*</span>
+            <textarea class="form-control" name="description" id="description" required><?= esc($result['description']) ?></textarea>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" style="background-color: blue !important;">Update</button>
+    </div>
 </form>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
