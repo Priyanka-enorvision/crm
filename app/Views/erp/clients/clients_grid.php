@@ -41,10 +41,10 @@ $employee_id = generate_random_employeeid();
 ?>
 <?php if(in_array('client2',staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
 <div id="accordion">
-  <div id="add_form" class="collapse add-form <?php echo $get_animate;?>" data-parent="#accordion" style="">
+  <div id="add_form" class="collapse add-form" data-parent="#accordion" style="">
     <?php $attributes = array('name' => 'add_client', 'id' => 'xin-form', 'autocomplete' => 'off');?>
-    <?php $hidden = array('user_id' => 0);?>
-    <?= form_open_multipart('erp/clients/add_client', $attributes, $hidden);?>
+    <?php $hidden = array('user_id' => '0');?>
+    <?= form_open_multipart('erp/add-client', $attributes, $hidden);?>
     <div class="row">
       <div class="col-md-8">
         <div class="card">
@@ -221,18 +221,18 @@ $employee_id = generate_random_employeeid();
             <div class="col text-left pb-3">
               <?= $status;?>
             </div>
-            <div class="col"><img class="img-radius img-fluid wid-80" src="<?= base_url().'/public/uploads/clients/thumb/'.$r['profile_photo'];?>" alt="<?= $r['first_name'].' '.$r['last_name'];?>"></div>
+            <div class="col"><img class="img-radius img-fluid wid-80" src="<?= base_url().'uploads/clients/thumb/'.$r['profile_photo'];?>" alt="<?= $r['first_name'].' '.$r['last_name'];?>"></div>
             <div class="col text-right pb-3">
               <?php if(in_array('client3',staff_role_resource()) || in_array('client4',staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
               <div class="dropdown"> <a class="drp-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="feather icon-more-horizontal"></i></a>
                 <div class="dropdown-menu dropdown-menu-right">
                 <?php if(in_array('client3',staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
-                	<a class="dropdown-item" href="<?= site_url('erp/view-client-info').'/'.uencode($r['user_id']);?>"><i class="feather icon-eye"></i>
+                	<a class="dropdown-item" href="<?= site_url('erp/view-client-info').'/'.$r['user_id'];?>"><i class="feather icon-eye"></i>
                   <?= lang('Main.xin_view');?>
                   </a> 
                   <?php } ?>
                   <?php if(in_array('client4',staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
-                  <a href="#!" class="dropdown-item delete" data-toggle="modal" data-target=".delete-modal" data-record-id="<?= uencode($r['user_id']);?>"><i class="feather icon-trash-2"></i>
+                  <a href="#!" class="dropdown-item delete" data-toggle="modal" data-target=".delete-modal" data-record-id="<?= $r['user_id'];?>"><i class="feather icon-trash-2"></i>
                   <?= lang('Main.xin_delete');?>
                   </a>
                   <?php } ?>

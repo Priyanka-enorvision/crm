@@ -209,19 +209,35 @@ $routes->get('api/erp/customization-lead-field/(:segment)', 'Lead_config::fetchG
 $routes->get('api/erp/customization-lead-field', 'Lead_config::fetchGlobalLeadFields', ['namespace' => 'App\Controllers\Erp']);
 
 $routes->get('erp/opportunity-list', 'Opportunity::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+$routes->post('erp/opportunity-save', 'Opportunity::save', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+$routes->get('opportunity/update-status/(:any)/(:any)', 'Opportunity::updateStatus/$1/$2', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('Opportunity/getdata/(:any)', 'Opportunity::getData/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
-$routes->match(['get', 'post'], 'opportunity/delete/(:any)', 'Opportunity::delete/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
-$routes->match(['get', 'post'], 'opportunity/update-status/(:any)/(:any)', 'Opportunity::updateStatus/$1/$2', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/opportunity-update/(:any)', 'Opportunity::update/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->match(['get', 'post'], 'erp/opportunity-delete/(:any)', 'Opportunity::delete/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
 
 // leads
-$routes->get('erp/leads-list/', 'Clients::leads_index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/leads-list/','Clients::leads_index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/clients-insert-lead/', 'Clients::insertLead', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/web-leads-list/', 'Clients::web_leads_index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
+$routes->get('erp/view-lead-info/(:any)', 'Clients::lead_details/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-lead', 'Clients::update_lead', ['namespace' => 'App\Controllers\Erp']);
+$routes->post('erp/save_client-account-details', 'Clients::save_accountDetails', ['namespace' => 'App\Controllers\Erp']);
+$routes->get('erp/account-view-details/(:any)', 'Clients::account_view_details/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-client-account/(:any)', 'Clients::update_account/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/delete-client-account-record/(:any)', 'Clients::delete_accountRecord/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-client-followup/', 'Clients::add_followup', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-follow-up/(:any)', 'Clients::update_followup/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/follow-up-view/(:any)', 'Clients::follow_up_view/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/delete-follow/(:any)', 'Clients::delete_follow/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/clients-read-lead', 'Clients::read_lead', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/convert-lead', 'Clients::convert_lead', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/delete-leads/(:any)', 'Clients::delete_leads/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+$routes->get('erp/filter-leads', 'Clients::filter_leads', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-bulk-lead', 'Clients::add_bulk_lead', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/delete-client', 'Clients::delete_client', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
 $routes->post('api/insert-lead', 'Clients::insertLeadApi', ['namespace' => 'App\Controllers\Erp']);
-
-$routes->get('erp/view-lead-info/(:segment)', 'Clients::lead_details', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->match(['get', 'post'], 'erp/delete-leads/(:any)', 'Clients::delete_leads/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
-
 // Items
 $routes->get('erp/milestones-list', 'Milestones::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/milestones-update/(:any)', 'Milestones::update/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -564,9 +580,13 @@ $routes->get('erp/my-tasks-list/', 'Tasks::task_client', ['namespace' => 'App\Co
 $routes->get('erp/task-details/(:segment)', 'Tasks::client_task_details', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // clients
 $routes->get('erp/clients-list/', 'Clients::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/clients-datalist/', 'Clients::clients_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-client', 'Clients::add_client', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/clients-grid/', 'Clients::clients_grid', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->get('erp/view-client-info/(:segment)', 'Clients::client_details', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/view-client-info/(:any)', 'Clients::client_details/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/clients-overview', 'Clients::overview', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-client', 'Clients::update_client', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-profile-photo', 'Clients::update_profile_photo', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 // performance
 $routes->get('erp/performance-indicator-list', 'Talent::performance_indicator', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -594,25 +614,29 @@ $routes->get('erp/payment-details/(:segment)', 'Paymenthistory::billing_details'
 $routes->get('erp/contact-support/', 'Contact::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // payroll
 $routes->get('erp/payroll-list/', 'Payroll::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->get('erp/payroll/payslip_list/(:num)/(:any)', 'Payroll::payslip_list/$1/$2', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-
-
-
+$routes->get('erp/payroll/payslip_list/(:any)/(:any)', 'Payroll::payslip_list/$1/$2', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/payroll-view/(:segment)', 'Payroll::payroll_view', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/read-payroll', 'Payroll::read_payroll', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/delete-payslip/(:any)', 'Payroll::delete_payslip', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 $routes->get('erp/payslip-history/', 'Payroll::payroll_history', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/payslip-history-dataList', 'payroll::payslip_history_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 
 $routes->get('erp/advance-salary/', 'Payroll::advance_salary', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->get('erp/advance-salary-Datalist', 'payroll::advance_salary_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/advance-salary-data-list', 'payroll::advance_salary_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/add-advance-salary', 'payroll::add_advance_salary', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/read-advance-salary', 'payroll::read_advance_salary', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/edit-advance-salary', 'payroll::edit_advance_salary', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->delete('erp/delete-advance-salary', 'payroll::delete_advance_salary', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 
 $routes->get('erp/loan-request/', 'Payroll::request_loan', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/loan_dataList', 'payroll::loan_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/add-loan', 'payroll::add_loan', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/read-loan', 'payroll::read_loan', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/edit-loan', 'payroll::edit_loan', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/delete-loan', 'payroll::delete_loan', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 // invoices || Staff
 $routes->get('erp/invoices-list', 'Invoices::project_invoices', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);

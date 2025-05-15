@@ -8,14 +8,15 @@ $session = \Config\Services::session();
 $usession = $session->get('sup_username');
 
 $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+$get_animate="";
 
 ?>
 <?php if(in_array('client2',staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
 <div id="accordion">
   <div id="add_form" class="collapse add-form <?php echo $get_animate;?>" data-parent="#accordion" style="">
     <?php $attributes = array('name' => 'add_client', 'id' => 'xin-form', 'autocomplete' => 'off');?>
-    <?php $hidden = array('user_id' => 0);?>
-    <?= form_open_multipart('erp/clients/add_client', $attributes, $hidden);?>
+    <?php $hidden = array('user_id' => '0');?>
+    <?= form_open_multipart('erp/add-client', $attributes, $hidden);?>
     <div class="row">
       <div class="col-md-8">
         <div class="card mb-2">

@@ -9,9 +9,10 @@ $UsersModel = new UsersModel();
 $request = \Config\Services::request();
 
 $roles = $SuperroleModel->orderBy('role_id', 'ASC')->findAll();
-$segment_id = $request->uri->getSegment(3);
-$user_id = udecode($segment_id);
-$result = $UsersModel->where('user_id', $user_id)->first();
+$segment_id = $client_id;
+// $segment_id = $request->uri->getSegment(3);
+// $user_id = udecode($segment_id);
+$result = $UsersModel->where('user_id', $segment_id)->first();
 /////
 $all_countries = $CountryModel->orderBy('country_id', 'ASC')->findAll();
 
@@ -26,7 +27,7 @@ if($result['is_active'] == 1){
 <?php if($result['profile_photo']!='' || $result['profile_photo']!='no-file'){?>
 <?php
       $imageProperties = [
-        'src'    => base_url().'/public/uploads/clients/thumb/'.$result['profile_photo'],
+        'src'    => base_url().'uploads/clients/thumb/'.$result['profile_photo'],
         'alt'    => $result['company_name'],
         'class'  => 'd-block img-radius img-fluid wid-80',
         'width'  => '50',
@@ -46,19 +47,9 @@ if($result['is_active'] == 1){
         <input type="hidden" id="client_id" value="<?= $segment_id;?>" />
         <div class="media user-about-block align-items-center mt-0 mb-3">
           <div class="position-relative d-inline-block">
-            <?php if($result['profile_photo']!='' || $result['profile_photo']!='no-file'){?>
-            <?php
-				  $imageProperties = [
-					'src'    => base_url().'/public/uploads/clients/thumb/'.$result['profile_photo'],
-					'alt'    => $result['company_name'],
-					'class'  => 'd-block img-radius img-fluid wid-80',
-					'width'  => '50',
-					'height' => '50',
-					'title'  => $result['company_name']
-				];
-				 ?>
+            
             <?= img($imageProperties);?>
-            <?php } ?>
+            
             <div class="certificated-badge">
               <?= $status_label;?>
             </div>
@@ -111,7 +102,7 @@ if($result['is_active'] == 1){
           </div>
           <?php $attributes = array('name' => 'update_client', 'id' => 'update_client', 'autocomplete' => 'off', 'class'=>'m-b-1');?>
           <?php $hidden = array('_method' => 'EDIT', 'token' => $segment_id);?>
-          <?= form_open('erp/clients/update_client', $attributes, $hidden);?>
+          <?= form_open('erp/update-client', $attributes, $hidden);?>
           <div class="card-body">
             <div class="row">
               <div class="col-md-4">
@@ -257,8 +248,8 @@ if($result['is_active'] == 1){
               </span></h5>
           </div>
           <?php $attributes = array('name' => 'profile_photo', 'id' => 'profile_photo', 'autocomplete' => 'off');?>
-          <?php $hidden = array('user_id' => 0, 'token' => $segment_id);?>
-          <?= form_open_multipart('erp/clients/update_profile_photo', $attributes, $hidden);?>
+          <?php $hidden = array('user_id' => '0', 'token' => $segment_id);?>
+          <?= form_open_multipart('erp/update-profile-photo', $attributes, $hidden);?>
           <div class="card-body pb-2">
             <div class="row">
               <div class="col-md-12">

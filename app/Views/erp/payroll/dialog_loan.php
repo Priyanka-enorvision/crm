@@ -41,7 +41,7 @@ $result = $AdvancesalaryModel->where('advance_salary_id', $advance_salary_id)->f
 </div>
 <?php $attributes = array('name' => 'edit_loan', 'id' => 'edit_loan', 'autocomplete' => 'off', 'class'=>'m-b-1');?>
 <?php $hidden = array('_method' => 'EDIT', 'token' => $field_id);?>
-<?php echo form_open('erp/payroll/edit_loan', $attributes, $hidden);?>
+<?php echo form_open('erp/edit-loan', $attributes, $hidden);?>
 <div class="modal-body">
   <div class="row">
 	  <?php if($user_info['user_type'] == 'company'){?>
@@ -247,7 +247,7 @@ $result = $AdvancesalaryModel->where('advance_salary_id', $advance_salary_id)->f
 					var xin_table = $('#xin_table').dataTable({
 						"bDestroy": true,
 						"ajax": {
-							url : "<?php echo site_url("erp/payroll/loan_list") ?>",
+							url : "<?php echo site_url("erp/loan_dataList") ?>",
 							type : 'GET'
 						},
 						"language": {

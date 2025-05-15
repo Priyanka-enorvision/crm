@@ -62,7 +62,7 @@ class Opportunity extends BaseController
             'comments' => 'permit_empty|string',
         ]);
 
-        if ($this->request->getMethod() === 'post' && $validation->withRequest($this->request)->run()) {
+        if ($this->request->getMethod() === 'POST' && $validation->withRequest($this->request)->run()) {
             $opportunity_name = $this->request->getPost('opportunity_name');
 
             $existing_data = $OpportunityModel->where(['opportunity_name' => $opportunity_name, 'company_id' => $user_info['company_id']])->first();
@@ -113,7 +113,7 @@ class Opportunity extends BaseController
 
     public function delete($enc_id)
     {
-        $id = base64_decode($enc_id);
+        $id = $enc_id;
         $session = \Config\Services::session();
         $request = \Config\Services::request();
 
@@ -145,19 +145,41 @@ class Opportunity extends BaseController
 
     public function updateStatus($enc_id, $status)
     {
-        $opp_id = base64_decode($enc_id);
-        $request = \Config\Services::request();
+        // Initialize services
         $session = \Config\Services::session();
-
-        $data = array('status' => $status);
-        // $msg = lang('Language.xin_success_update_status');
         $opportunityModel = new OpportunityModel();
-        $result = $opportunityModel->update($opp_id, $data);
-        if ($result) {
-            session()->setFlashdata('message', lang('Language.xin_success_update_status'));
-        } else {
+        
+        try {
+            // Validate status input
+            $validStatuses = ['true', 'false', '1', '0'];
+            if (!in_array($status, $validStatuses)) {
+                throw new \InvalidArgumentException('Invalid status value');
+            }
+
+            // Convert status to boolean/int for database
+            $dbStatus = ($status === 'true' || $status === '1') ? 1 : 0;
+            
+            // Update the record
+            $data = ['status' => $dbStatus];
+            $result = $opportunityModel->update($enc_id, $data);
+            
+            if ($result) {
+                $session->setFlashdata('message', lang('Language.xin_success_update_status'));
+            } else {
+                // Check if the record exists
+                $exists = $opportunityModel->find($enc_id);
+                if (!$exists) {
+                    $session->setFlashdata('error', lang('Language.xin_error_record_not_found'));
+                } else {
+                    $session->setFlashdata('error', lang('Main.xin_error_msg'));
+                    log_message('error', 'Failed to update opportunity status. ID: ' . $enc_id);
+                }
+            }
+        } catch (\Exception $e) {
+            log_message('error', 'Error updating opportunity status: ' . $e->getMessage());
             $session->setFlashdata('error', lang('Main.xin_error_msg'));
         }
+        
         return redirect()->back();
     }
 
@@ -185,41 +207,62 @@ class Opportunity extends BaseController
 
     public function update($enc_id)
     {
-
-        $opp_id = base64_decode($enc_id);
         $session = session();
         $opportunityModel = new OpportunityModel();
-
         $validation = \Config\Services::validation();
+
+        // Set validation rules for all fields
         $validation->setRules([
             'opportunity_name' => 'required|min_length[3]',
+            'user_id' => 'required|numeric',
+            'opportunity_stage' => 'required',
+            'expected_closing_date' => 'required|valid_date',
+            'value' => 'required|numeric',
+            'probability' => 'required|numeric|greater_than_equal_to[0]|less_than_equal_to[100]',
+            'comments' => 'permit_empty'
         ]);
 
-        if ($validation->withRequest($this->request)->run()) {
+        // Log incoming data for debugging
+        log_message('debug', 'Update data: ' . print_r($this->request->getPost(), true));
+        log_message('debug', 'Opportunity ID: ' . $enc_id);
+
+        if (!$validation->withRequest($this->request)->run()) {
+            $errors = implode(", ", $validation->getErrors());
+            log_message('error', 'Validation failed: ' . $errors);
+            $session->setFlashdata('error', $errors);
+            return redirect()->back()->withInput();
+        }
+
+        try {
+            // Verify opportunity exists
+            $opportunity = $opportunityModel->find($enc_id);
+            if (!$opportunity) {
+                throw new \RuntimeException('Opportunity not found');
+            }
+
             $data = [
-                'user_id'   => $this->request->getPost('user_id'),
-                'opportunity_name'   => $this->request->getPost('opportunity_name'),
-                'opportunity_stage'   => $this->request->getPost('opportunity_stage'),
-                'expected_closing_date'   => $this->request->getPost('expected_closing_date'),
-                'value'   => $this->request->getPost('value'),
-                'probability'   => $this->request->getPost('probability'),
-                'comments'   => $this->request->getPost('comments'),
+                'user_id' => $this->request->getPost('user_id'),
+                'opportunity_name' => $this->request->getPost('opportunity_name'),
+                'opportunity_stage' => $this->request->getPost('opportunity_stage'),
+                'expected_closing_date' => $this->request->getPost('expected_closing_date'),
+                'value' => $this->request->getPost('value'),
+                'probability' => $this->request->getPost('probability'),
+                'comments' => $this->request->getPost('comments'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ];
 
-            try {
-                $result = $opportunityModel->update($opp_id, $data);
-                if ($result) {
-                    $session->setFlashdata('message', lang('Language.xin_update'));
-                } else {
-                    $session->setFlashdata('error', lang('Main.xin_error_msg'));
-                }
-            } catch (\Exception $e) {
-                log_message('error', 'Error updating opportunity: ' . $e->getMessage());
-                $session->setFlashdata('error', 'An error occurred: ' . $e->getMessage());
+            log_message('debug', 'Data to update: ' . print_r($data, true));
+
+            if ($opportunityModel->update($enc_id, $data)) {
+                $session->setFlashdata('message', lang('Language.xin_update'));
+            } else {
+                $error = $opportunityModel->errors() ? implode(', ', $opportunityModel->errors()) : 'Unknown database error';
+                log_message('error', 'Update failed: ' . $error);
+                $session->setFlashdata('error', $error);
             }
-        } else {
-            $session->setFlashdata('error', implode(", ", $validation->getErrors()));
+        } catch (\Exception $e) {
+            log_message('error', 'Error updating opportunity: ' . $e->getMessage());
+            $session->setFlashdata('error', 'An error occurred: ' . $e->getMessage());
         }
 
         return redirect()->to(base_url('erp/opportunity-list'));
@@ -229,7 +272,7 @@ class Opportunity extends BaseController
     public function leads_list($opp_id)
     {
         $id = base64_decode($opp_id);
-        $session = \Config\Services::session($config);
+        $session = \Config\Services::session();
         $SystemModel = new SystemModel();
         $UsersModel = new UsersModel();
         $opportunityModel = new OpportunityModel();

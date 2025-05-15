@@ -55,7 +55,7 @@ $(document).ready(function () {
 		var field_id = button.data('field_id');
 		var modal = $(this);
 		$.ajax({
-			url: main_url + "clients/read_lead",
+			url: main_url + "clients-read-lead",
 			type: "GET",
 			data: 'jd=1&type=view_lead&field_id=' + field_id,
 			success: function (response) {

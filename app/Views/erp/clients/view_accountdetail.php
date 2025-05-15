@@ -8,8 +8,8 @@
     </button>
 </div>
 
-<form id="addLeadForm" action="<?= base_url('erp/clients/update_account/' . $result['account_id']); ?>" method="POST" style="margin: 0;">
-    <?= csrf_field() ?>
+<form id="addLeadForm" action="<?= base_url('erp/update-client-account/' . $result['account_id']); ?>" method="POST" style="margin: 0;">
+    <input type="hidden" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>">
     <div class="modal-body">
         <div class="form-group">
             <label for="name">Account Name <span class="text-danger">*</span></label>

@@ -57,9 +57,6 @@ if (!$db->tableExists($table_name)) {
   return false;
 } else {
 
-  // $leadFields = $db->getFieldNames($table_name);
-  // var_dump($leadFields);
-  // die;
 
   if ($session->has('opportunity_id')) {
     $opportunity_id = $session->get('opportunity_id');
@@ -75,29 +72,7 @@ if (!$db->tableExists($table_name)) {
     $get_leadList = $query->getResult();
   }
 
-  // $get_leadList = [];
 
-  // if ($session->has('opportunity_id')) {
-  //     $opportunity_id = $session->get('opportunity_id');
-
-  //     $builder = $db->table($table_name);
-  //     $builder->where('opportunity_id', $opportunity_id);
-  //     $query = $builder->get();
-  //     $data1 = $query->getResult(); 
-  //     $data2 = $Form_model->where('opportunity_id', $opportunity_id)->findAll(); 
-
-  // } else {
-  //     $builder = $db->table($table_name);
-  //     $query = $builder->get();
-  //     $data1 = $query->getResult(); 
-  //     $data2 = $Form_model->findAll();
-  // }
-
-  // $get_leadList = array_merge($data1, $data2);
-
-  // var_dump($get_leadList);die;
-
- 
   if ($user_info['user_type'] == 'staff') {
     $departments = $DepartmentModel->where('company_id', $user_info['company_id'])->orderBy('department_id', 'ASC')->findAll();
     $designations = $DesignationModel->where('company_id', $user_info['company_id'])->orderBy('designation_id', 'ASC')->findAll();
@@ -115,7 +90,7 @@ if (!$db->tableExists($table_name)) {
 
   $employee_id = generate_random_employeeid();
 }
-
+$get_animate = "";
 ?>
 
 
@@ -128,7 +103,7 @@ if (!$db->tableExists($table_name)) {
   }
 
   .bulk-data {
-    margin-left: 700px;
+    margin-left: 800px;
   }
 
   .row .bulk-data {
@@ -140,8 +115,9 @@ if (!$db->tableExists($table_name)) {
   <div id="accordion">
     <div id="add_form" class="collapse add-form <?= $get_animate; ?>" data-parent="#accordion">
       <div class="row">
-        <form id="addLeadForm" action="<?= base_url('Erp/Clients/insertLead'); ?>" method="post"
+        <form id="addLeadForm" action="<?= base_url('erp/clients-insert-lead'); ?>" method="POST"
           enctype="multipart/form-data">
+          <input type="hidden" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>"></div>>
           <div class="col-md-8">
             <div class="card mb-2">
               <div class="card-header">
@@ -265,8 +241,8 @@ if (!$db->tableExists($table_name)) {
         </form>
 
 
-        <form action="<?= base_url('erp/Clients/add_bulk_lead'); ?>" method="POST" enctype="multipart/form-data">
-          <?= csrf_field() ?>
+        <form action="<?= base_url('erp/add-bulk-lead'); ?>" method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>">
           <div class="col-md-4 bulk-data">
             <div class="card mb-2">
               <div class="card-header d-flex" style="justify-content:space-between;">
@@ -389,12 +365,12 @@ if (!$db->tableExists($table_name)) {
                     <?php
                     if (isset($list->$field_name)) {
                       if (strpos($field_name, 'image') !== false) {
-                        $image_path = 'public/uploads/leads/' . htmlspecialchars($list->$field_name, ENT_QUOTES, 'UTF-8');
+                        $image_path = 'uploads/leads/' . htmlspecialchars($list->$field_name, ENT_QUOTES, 'UTF-8');
 
                         if (!empty($list->$field_name) && file_exists($image_path)) {
                           echo '<img src="' . base_url($image_path) . '" alt="Profile Image" width="50" height="50">';
                         } else {
-                          echo '<img src="' . base_url('public/uploads/leads/dummy-image.jpg') . '" alt="Dummy Image" width="50" height="50">';
+                          echo '<img src="' . base_url('uploads/leads/dummy-image.jpg') . '" alt="Dummy Image" width="50" height="50">';
                         }
                       } elseif (strpos($field_name, 'date') !== false) {
                         echo date('d M Y', strtotime($list->$field_name));
@@ -424,17 +400,17 @@ if (!$db->tableExists($table_name)) {
                   <?php } ?>
                 </td>
                 <td>
-                  <a href="<?= base_url('erp/view-lead-info/' . uencode($list->id)); ?>" class="btn btn-primary"
+                  <a href="<?= base_url('erp/view-lead-info/'.$list->id); ?>" class="btn btn-primary"
                     style="background-color: blue !important;" data-toggle="tooltip" title="View Details">
                     <i class="feather icon-edit-2 text-white"></i>
                   </a>
                   <?php if ($list->status == 1) { ?>
                     <button type="button" class="btn btn-info" title="Change to Client" data-toggle="modal"
-                      data-target=".view-modal-data" data-field_id="<?= uencode($list->id); ?>">
+                      data-target=".view-modal-data" data-field_id="<?= $list->id ?>">
                       <i class="feather icon-shuffle"></i>
                     </button>
                   <?php } ?>
-                  <a href="<?= base_url('erp/delete-leads/' . base64_encode($list->id)); ?>" class="btn btn-danger"
+                  <a href="<?= base_url('erp/delete-leads/'.$list->id); ?>" class="btn btn-danger"
                     onclick="return confirm('Are you sure you want to delete this item?');" data-toggle="tooltip"
                     title="Delete Item">
                     <i class="feather icon-trash-2"></i>
@@ -464,8 +440,8 @@ if (!$db->tableExists($table_name)) {
         var status = statusElement.options[statusElement.selectedIndex].value;
 
         $.ajax({
-          url: '<?= base_url('erp/Clients/filter_leads'); ?>',
-          type: 'POST',
+          url: '<?= base_url('erp/filter-leads'); ?>',
+          type: 'GET',
           data: {
             opportunity_id: opportunityId,
             status: status

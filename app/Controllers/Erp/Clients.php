@@ -30,7 +30,7 @@ class Clients extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -63,7 +63,7 @@ class Clients extends BaseController
 
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -97,7 +97,7 @@ class Clients extends BaseController
 
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -131,7 +131,7 @@ class Clients extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -151,7 +151,7 @@ class Clients extends BaseController
 		$data['subview'] = view('erp/clients/clients_grid', $data);
 		return view('erp/layout/layout_main', $data); //page load
 	}
-	public function client_details()
+	public function client_details($id=null)
 	{
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
@@ -160,8 +160,10 @@ class Clients extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		$request = \Config\Services::request();
-		$ifield_id = udecode($request->uri->getSegment(3));
-		$isegment_val = $UsersModel->where('user_id', $ifield_id)->first();
+		// $ifield_id = udecode($request->uri->getSegment(3));
+		
+		$isegment_val = $UsersModel->where('user_id', $id)->first();
+		
 		if (!$isegment_val) {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
 			return redirect()->to(site_url('erp/desk'));
@@ -169,7 +171,7 @@ class Clients extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -185,7 +187,7 @@ class Clients extends BaseController
 		$data['title'] = lang('Main.xin_client_details') . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'client_details';
 		$data['breadcrumbs'] = lang('Main.xin_client_details');
-
+		$data['client_id'] = $id;
 		$data['subview'] = view('erp/clients/client_details', $data);
 		return view('erp/layout/layout_main', $data); //page load
 	}
@@ -193,86 +195,137 @@ class Clients extends BaseController
 	// list
 	public function clients_list()
 	{
-
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
+		
+		// Check session
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
+
+		// Load models
 		$UsersModel = new UsersModel();
 		$RolesModel = new RolesModel();
 		$SystemModel = new SystemModel();
 		$CountryModel = new CountryModel();
-		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		if ($user_info['user_type'] == 'staff') {
-			$staff = $UsersModel->where('company_id', $user_info['company_id'])->where('user_type', 'customer')->orderBy('user_id', 'ASC')->findAll();
-		} else {
-			$staff = $UsersModel->where('company_id', $usession['sup_user_id'])->where('user_type', 'customer')->orderBy('user_id', 'ASC')->findAll();
+		
+		try {
+			$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+			if (!$user_info) {
+				throw new \Exception('User not found');
+			}
+
+			// Get clients based on user type
+			$query = $UsersModel->where('user_type', 'customer')->orderBy('user_id', 'ASC');
+			
+			if ($user_info['user_type'] == 'staff') {
+				$clients = $query->where('company_id', $user_info['company_id'])->findAll();
+			} else {
+				$clients = $query->where('company_id', $usession['sup_user_id'])->findAll();
+			}
+
+			$xin_system = $SystemModel->where('setting_id', 1)->first();
+			$data = [];
+
+			foreach ($clients as $client) {
+				try {
+					// Edit button
+					$edit = '';
+					if (in_array('client3', staff_role_resource()) || $user_info['user_type'] == 'company') {
+						$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" 
+							title="' . lang('Main.xin_view_details') . '">
+							<a href="' . site_url('erp/view-client-info') . '/' .$client['user_id']. '">
+								<button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light">
+									<i class="feather icon-arrow-right"></i>
+								</button>
+							</a>
+						</span>';
+					}
+
+					// Delete button
+					$delete = '';
+					if (in_array('client4', staff_role_resource()) || $user_info['user_type'] == 'company') {
+						$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" 
+							title="' . lang('Main.xin_delete') . '">
+							<button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" 
+								data-toggle="modal" data-target=".delete-modal" 
+								data-record-id="' .$client['user_id']. '">
+								<i class="feather icon-trash-2"></i>
+							</button>
+						</span>';
+					}
+
+					// Status
+					$status = match ((int)$client['is_active']) {
+						1 => '<span class="badge badge-light-success">' . lang('Main.xin_employees_active') . '</span>',
+						2 => '<span class="badge badge-light-danger">' . lang('Main.xin_employees_inactive') . '</span>',
+						default => '<span class="badge badge-light-secondary">' . lang('Main.xin_unknown') . '</span>',
+					};
+
+					// Gender
+					$gender = match ((int)$client['gender']) {
+						1 => lang('Main.xin_gender_male'),
+						default => lang('Main.xin_gender_female'),
+					};
+
+					// Country
+					$country_name = '';
+					if (!empty($client['country'])) {
+						$country_info = $CountryModel->where('country_id', $client['country'])->first();
+						$country_name = $country_info['country_name'] ?? '';
+					}
+
+					// Client name and photo
+					$name = htmlspecialchars(($client['first_name'] ?? '')) . ' ' . htmlspecialchars(($client['last_name'] ?? ''));
+					$profile_photo = !empty($client['profile_photo']) ? $client['profile_photo'] : 'default.png';
+					
+					$uname = '<div class="d-inline-block align-middle">
+						<img src="' . base_url('uploads/clients/thumb/' . $profile_photo) . '" 
+							alt="user image" class="img-radius align-top m-r-15" style="width:40px;">
+						<div class="d-inline-block">
+							<h6 class="m-b-0">' . $name . '</h6>
+							<p class="m-b-0">' . htmlspecialchars($client['email'] ?? '') . '</p>
+						</div>
+					</div>';
+
+					// Combine buttons
+					$combhr = $edit . $delete;
+					
+					// Final links column
+					if (in_array('client3', staff_role_resource()) || 
+						in_array('client4', staff_role_resource()) || 
+						$user_info['user_type'] == 'company') {
+						$links = $uname . '<div class="overlay-edit">' . $combhr . '</div>';
+					} else {
+						$links = $uname;
+					}
+
+					$data[] = [
+						$links,
+						htmlspecialchars($client['username'] ?? ''),
+						htmlspecialchars($client['contact_number'] ?? ''),
+						$gender,
+						$country_name,
+						$status
+					];
+
+				} catch (\Exception $e) {
+					log_message('error', 'Error processing client record: ' . $e->getMessage());
+					continue; // Skip this client but continue with others
+				}
+			}
+
+			return $this->response->setJSON([
+				"data" => $data
+			]);
+
+		} catch (\Exception $e) {
+			log_message('error', 'Error in clients_list: ' . $e->getMessage());
+			return $this->response->setStatusCode(500)->setJSON([
+				'error' => 'An error occurred while processing your request',
+				'details' => ENVIRONMENT === 'development' ? $e->getMessage() : null
+			]);
 		}
-		$xin_system = $SystemModel->where('setting_id', 1)->first();
-
-		$data = array();
-
-		foreach ($staff as $r) {
-
-			if (in_array('client3', staff_role_resource()) || $user_info['user_type'] == 'company') {
-				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_view_details') . '"><a href="' . site_url('erp/view-client-info') . '/' . uencode($r['user_id']) . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light"><i class="feather icon-arrow-right"></i></button></a></span>';
-			} else {
-				$edit = '';
-			}
-			if (in_array('client4', staff_role_resource()) || $user_info['user_type'] == 'company') {
-				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . uencode($r['user_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
-			} else {
-				$delete = '';
-			}
-
-			if ($r['is_active'] == 1) {
-				$status = '<span class="badge badge-light-success">' . lang('Main.xin_employees_active') . '</span>';
-			} else if ($r['is_active'] == 2) {
-				$status = '<span class="badge badge-light-danger">' . lang('Main.xin_employees_inactive') . '</span>';
-			}
-			if ($r['gender'] == 1) {
-				$gender = lang('Main.xin_gender_male');
-			} else {
-				$gender = lang('Main.xin_gender_female');
-			}
-			$country_info = $CountryModel->where('country_id', $r['country'])->first();
-			$name = $r['first_name'] . ' ' . $r['last_name'];
-			$uname = '<div class="d-inline-block align-middle">
-				<img src="' . base_url() . '/public/uploads/clients/thumb/' . $r['profile_photo'] . '" alt="user image" class="img-radius align-top m-r-15" style="width:40px;">
-				<div class="d-inline-block">
-					<h6 class="m-b-0">' . $name . '</h6>
-					<p class="m-b-0">' . $r['email'] . '</p>
-				</div>
-			</div>';
-			$combhr = $edit . $delete;
-			if (in_array('client3', staff_role_resource()) || in_array('client4', staff_role_resource()) || $user_info['user_type'] == 'company') {
-				$links = '
-				' . $uname . '
-				<div class="overlay-edit">
-					' . $combhr . '
-				</div>
-			';
-			} else {
-				$links = $uname;
-			}
-
-
-			$data[] = array(
-				$links,
-				$r['username'],
-				$r['contact_number'],
-				$gender,
-				$country_info['country_name'],
-				$status
-			);
-		}
-		$output = array(
-			//"draw" => $draw,
-			"data" => $data
-		);
-		echo json_encode($output);
-		exit();
 	}
 
 	// list
@@ -283,7 +336,7 @@ class Clients extends BaseController
 		$usession = $session->get('sup_username');
 		$request = \Config\Services::request();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$UsersModel = new UsersModel();
 		$LeadsfollowupModel = new LeadsfollowupModel();
@@ -370,7 +423,7 @@ class Clients extends BaseController
 					}
 				}
 			} else {
-				$lead_id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
+				$lead_id = $this->request->getPost('token', FILTER_SANITIZE_STRING);
 				$next_follow_up = $this->request->getPost('next_follow_up', FILTER_SANITIZE_STRING);
 				$description = $this->request->getPost('description', FILTER_SANITIZE_STRING);
 				$UsersModel = new UsersModel();
@@ -405,42 +458,75 @@ class Clients extends BaseController
 		}
 	}
 	// |||add record|||
-	public function update_followup($enc_id)
+	public function update_followup($follow_id)
 	{
-		$follow_id = base64_decode($enc_id);
-		$session = session();
+		$session = \Config\Services::session();
 		$LeadsfollowupModel = new LeadsfollowupModel();
 
+		// Check if this is a POST request
+		if (!$this->request->is('post')) {
+			return redirect()->back()->with('error', 'Invalid request method');
+		}
+
+		// Validate input
 		$validation = \Config\Services::validation();
 		$validation->setRules([
-			'next_follow_up' => 'required|valid_date', // Validate as required and ensure it is a valid date
-			'description' => 'required|min_length[5]' // Require description with at least 5 characters
+			'next_follow_up' => [
+				'rules' => 'required|valid_date[Y-m-d]',
+				'errors' => [
+					'required' => 'Follow up date is required',
+					'valid_date' => 'Please enter a valid date'
+				]
+			],
+			'description' => [
+				'rules' => 'required|min_length[5]|max_length[500]',
+				'errors' => [
+					'required' => 'Description is required',
+					'min_length' => 'Description must be at least 5 characters',
+					'max_length' => 'Description cannot exceed 500 characters'
+				]
+			]
 		]);
-		if ($validation->withRequest($this->request)->run()) {
+
+		if (!$validation->withRequest($this->request)->run()) {
+			$errors = implode("<br>", $validation->getErrors());
+			return redirect()->back()->with('error', $errors)->withInput();
+		}
+
+		try {
+			// Get lead_id before update in case update fails
+			$followup = $LeadsfollowupModel->find($follow_id);
+			if (!$followup) {
+				throw new \RuntimeException('Follow-up record not found');
+			}
+			$lead_id = $followup['lead_id'];
 
 			$data = [
 				'next_followup' => $this->request->getPost('next_follow_up'),
-				'description' => $this->request->getPost('description')
+				'description' => $this->request->getPost('description'),
+				'updated_at' => date('Y-m-d H:i:s')
 			];
 
-			try {
-				$result = $LeadsfollowupModel->update($follow_id, $data);
-
-				if ($result) {
-					$session->setFlashdata('message', 'Follow Up updated Sucessfully');
-				} else {
-					$session->setFlashdata('error', lang('Main.xin_error_msg'));
-				}
-			} catch (\Exception $e) {
-				log_message('error', 'Error updating follow-up: ' . $e->getMessage());
-				$session->setFlashdata('error', 'An error occurred: ' . $e->getMessage());
+			if ($LeadsfollowupModel->update($follow_id, $data)) {
+				$session->setFlashdata('message', 'Follow-up updated successfully');
+			} else {
+				throw new \RuntimeException('Failed to update follow-up');
 			}
-		} else {
-			$session->setFlashdata('error', implode(", ", $validation->getErrors()));
-		}
-		$lead_id = $LeadsfollowupModel->select('lead_id')->where('followup_id', $follow_id)->first();
 
-		return redirect()->to(base_url('erp/view-lead-info/' . uencode($lead_id['lead_id'])));
+		} catch (\Exception $e) {
+			log_message('error', 'Follow-up update error: ' . $e->getMessage());
+			$lead_id = $lead_id ?? $LeadsfollowupModel->select('lead_id')
+													->where('followup_id', $follow_id)
+													->first()['lead_id'] ?? null;
+			
+			$session->setFlashdata('error', $e->getMessage());
+			
+			if (!$lead_id) {
+				return redirect()->to(base_url('erp/leads'))->with('error', 'Could not determine lead');
+			}
+		}
+
+		return redirect()->to(base_url('erp/view-lead-info/' . $lead_id));
 	}
 
 	// |||add record|||
@@ -452,7 +538,7 @@ class Clients extends BaseController
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($this->request->getPost('type') === 'add_record') {
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
@@ -510,7 +596,7 @@ class Clients extends BaseController
 				$Return['error'] = $validation->getError('contact_number');
 			}
 			if ($Return['error'] != '') {
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 			}
 
 			$file_name = '';
@@ -531,11 +617,11 @@ class Clients extends BaseController
 
 				$avatar = $this->request->getFile('file');
 				$file_name = $avatar->getName();
-				$avatar->move('public/uploads/clients/');
+				$avatar->move('uploads/clients/');
 
-				$image->withFile('public/uploads/clients/' . $file_name)
+				$image->withFile('uploads/clients/' . $file_name)
 					->fit(100, 100, 'center')
-					->save('public/uploads/clients/thumb/' . $file_name);
+					->save('uploads/clients/thumb/' . $file_name);
 			}
 
 			$first_name = $this->request->getPost('first_name', FILTER_SANITIZE_STRING);
@@ -606,12 +692,10 @@ class Clients extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 
@@ -667,12 +751,12 @@ class Clients extends BaseController
 				// Move the uploaded file and resize it
 				$avatar = $this->request->getFile($fieldName);
 				$file_name = $avatar->getRandomName();
-				$avatar->move('public/uploads/leads/', $file_name);
+				$avatar->move('uploads/leads/', $file_name);
 
 				// Resize and save the image
-				$image->withFile('public/uploads/leads/' . $file_name)
+				$image->withFile('uploads/leads/' . $file_name)
 					->fit(100, 100, 'center')
-					->save('public/uploads/' . $file_name);
+					->save('uploads/' . $file_name);
 
 				// Save the file name in the leadData array
 				$leadData[$fieldName] = $file_name;
@@ -774,7 +858,7 @@ class Clients extends BaseController
 
 					if ($avatar->isValid() && !$avatar->hasMoved()) {
 						$file_name = $avatar->getRandomName();
-						$avatar->move('public/uploads/leads/', $file_name);
+						$avatar->move('uploads/leads/', $file_name);
 						$leadData[$fieldName] = $file_name;
 					} else {
 						return $this->response->setJSON([
@@ -818,13 +902,14 @@ class Clients extends BaseController
 	}
 
 
-	public function lead_details()
+	public function lead_details($segment_id)
 	{
 		// $lead_id = base64_decode($enc_id)
 		$request = \Config\Services::request();
 
-		$segment_id = $request->uri->getSegment(3);
-		$lead_id = udecode($segment_id);
+		// $segment_id = $request->uri->getSegment(3);
+		// $lead_id = udecode($segment_id);
+		$lead_id = $segment_id;
 		$session = \Config\Services::session();
 		$UsersModel = new UsersModel();
 		$LeadConfig = new LeadConfigModel();
@@ -855,6 +940,7 @@ class Clients extends BaseController
 		$data['breadcrumbs'] = lang('Main.xin_lead_details');
 		$data['leadData'] = $leadData;
 		$data['followup'] = $followup;
+		$data['lead_id'] = $lead_id;
 
 		$data['subview'] = view('erp/clients/lead_details', $data);
 		return view('erp/layout/layout_main', $data);
@@ -889,7 +975,7 @@ class Clients extends BaseController
 
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		$lead_id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
+		$lead_id = $this->request->getPost('token', FILTER_SANITIZE_STRING);
 
 		$company_name = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '_', $user_info['company_name']));
 		$table_name = 'leads_' . $company_name;
@@ -930,11 +1016,11 @@ class Clients extends BaseController
 
 					$avatar = $this->request->getFile($fieldName);
 					$file_name = $avatar->getRandomName();
-					$avatar->move('public/uploads/leads/', $file_name);
+					$avatar->move('uploads/leads/', $file_name);
 
-					$image->withFile('public/uploads/leads/' . $file_name)
+					$image->withFile('uploads/leads/' . $file_name)
 						->fit(100, 100, 'center')
-						->save('public/uploads/leads/' . $file_name);
+						->save('uploads/leads/' . $file_name);
 
 					$leadData[$fieldName] = $file_name;
 				} else {
@@ -1001,7 +1087,7 @@ class Clients extends BaseController
 		$usession = $session->get('sup_username');
 
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 
 		if ($this->request->getPost()) {
@@ -1191,7 +1277,7 @@ class Clients extends BaseController
 				$Return['error'] = $validation->getError('country');
 			}
 			if ($Return['error'] != '') {
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 			}
 
 			$first_name = $this->request->getPost('first_name', FILTER_SANITIZE_STRING);
@@ -1207,7 +1293,7 @@ class Clients extends BaseController
 			$state = $this->request->getPost('state', FILTER_SANITIZE_STRING);
 			$zipcode = $this->request->getPost('zipcode', FILTER_SANITIZE_STRING);
 			$status = $this->request->getPost('status', FILTER_SANITIZE_STRING);
-			$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
+			$id = $this->request->getPost('token', FILTER_SANITIZE_STRING);
 			$data = [
 				'first_name' => $first_name,
 				'last_name' => $last_name,
@@ -1232,12 +1318,11 @@ class Clients extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		} else {
+
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// update record
@@ -1269,7 +1354,7 @@ class Clients extends BaseController
 				$Return['error'] = $validation->getError('status');
 			}
 			if ($Return['error'] != '') {
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 			}
 			$status = $this->request->getPost('status', FILTER_SANITIZE_STRING);
 			$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
@@ -1284,12 +1369,10 @@ class Clients extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// update record
@@ -1301,7 +1384,7 @@ class Clients extends BaseController
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($this->request->getPost('type') === 'edit_record') {
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
@@ -1319,15 +1402,16 @@ class Clients extends BaseController
 			} else {
 				$avatar = $this->request->getFile('file');
 				$file_name = $avatar->getName();
-				$avatar->move('public/uploads/clients/');
+				$avatar->move('uploads/clients/');
 				$image->withFile(filesrc($file_name))
 					->fit(100, 100, 'center')
-					->save('public/uploads/clients/thumb/' . $file_name);
+					->save('uploads/clients/thumb/' . $file_name);
 			}
 			if ($Return['error'] != '') {
 				$this->output($Return);
 			}
-			$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
+			$id = $this->request->getPost('token', FILTER_SANITIZE_STRING);
+			// $id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
 			if ($validated) {
 				$UsersModel = new UsersModel();
 				$Return['result'] = lang('Main.xin_profile_picture_success_updated');
@@ -1339,12 +1423,10 @@ class Clients extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// update record
@@ -1356,7 +1438,7 @@ class Clients extends BaseController
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($this->request->getPost('type') === 'edit_record') {
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
@@ -1375,13 +1457,13 @@ class Clients extends BaseController
 			} else {
 				$avatar = $this->request->getFile('file');
 				$file_name = $avatar->getName();
-				$avatar->move('public/uploads/clients/');
+				$avatar->move('uploads/clients/');
 				$image->withFile(filesrc($file_name))
 					->fit(100, 100, 'center')
-					->save('public/uploads/clients/thumb/' . $file_name);
+					->save('uploads/clients/thumb/' . $file_name);
 			}
 			if ($Return['error'] != '') {
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 			}
 			$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
 			if ($validated) {
@@ -1395,12 +1477,10 @@ class Clients extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// update record
@@ -1412,7 +1492,7 @@ class Clients extends BaseController
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($this->request->getPost('type') === 'edit_record') {
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
@@ -1446,7 +1526,7 @@ class Clients extends BaseController
 				$Return['error'] = $validation->getError('confirm_password');
 			}
 			if ($Return['error'] != '') {
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 			}
 
 
@@ -1464,12 +1544,10 @@ class Clients extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// update record
@@ -1481,7 +1559,7 @@ class Clients extends BaseController
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($this->request->getPost('type') === 'edit_record') {
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
@@ -1515,7 +1593,7 @@ class Clients extends BaseController
 				$Return['error'] = $validation->getError('confirm_password');
 			}
 			if ($Return['error'] != '') {
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 			}
 
 
@@ -1533,12 +1611,10 @@ class Clients extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 
@@ -1554,13 +1630,13 @@ class Clients extends BaseController
 
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => csrf_hash());
 
-			$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
+			$id = $this->request->getPost('token', FILTER_SANITIZE_STRING);
 
 			$data = ['status' => 2];
 
 			$UsersModel = new UsersModel();
 			$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-
+			
 			$company_name = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '_', $user_info['company_name']));
 			$table_name = 'leads_' . $company_name;
 
@@ -1570,14 +1646,13 @@ class Clients extends BaseController
 			$result = $builder->update($data);
 
 			$lead_info = $db->table($table_name)->where('id', $id)->get()->getFirstRow();
-
+			
 			if (!$lead_info) {
 				$Return['error'] = lang('Main.xin_error_msg');
-				$this->output($Return);
-				exit;
+				return $this->response->setJSON($Return);
 			}
 
-			$full_name = trim($lead_info->user_name);
+			$full_name = trim($lead_info->name);
 			$name_parts = explode(' ', $full_name);
 			$first_name = $name_parts[0];
 			$last_name = isset($name_parts[1]) ? $name_parts[1] : '';
@@ -1618,8 +1693,10 @@ class Clients extends BaseController
 					'company_id' => $user_info['company_id'],
 					'created_at' => date('d-m-Y H:i:s')
 				];
+				
 
 				$result2 = $UsersModel->insert($data2);
+				
 
 				if (!$result2) {
 					$db = \Config\Database::connect();
@@ -1636,12 +1713,10 @@ class Clients extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			// Return the response
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 
@@ -1651,7 +1726,7 @@ class Clients extends BaseController
 		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$id = $request->getGet('field_id');
 		$data = [
@@ -1660,7 +1735,7 @@ class Clients extends BaseController
 		if ($session->has('sup_username')) {
 			return view('erp/clients/dialog_followup', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
 	// read record
@@ -1669,7 +1744,7 @@ class Clients extends BaseController
 		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$id = $request->getGet('field_id');
 		$data = [
@@ -1678,7 +1753,7 @@ class Clients extends BaseController
 		if ($session->has('sup_username')) {
 			return view('erp/clients/change_to_client', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
 	// delete record
@@ -1691,7 +1766,7 @@ class Clients extends BaseController
 			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
-			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
+			$id = $this->request->getPost('_token', FILTER_SANITIZE_STRING);
 			$Return['csrf_hash'] = csrf_hash();
 			$UsersModel = new UsersModel();
 			$result = $UsersModel->where('user_id', $id)->delete($id);
@@ -1700,13 +1775,13 @@ class Clients extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 		}
 	}
 	// delete record
-	public function delete_leads($enc_id)
+	public function delete_leads($id)
 	{
-		$id = base64_decode($enc_id);
+		// $id = base64_decode($enc_id);
 		$session = \Config\Services::session();
 		$db = \Config\Database::connect();
 		$UsersModel = new UsersModel();
@@ -1745,9 +1820,9 @@ class Clients extends BaseController
 	}
 
 
-	public function delete_follow($enc_id)
+	public function delete_follow($id)
 	{
-		$id = base64_decode($enc_id);
+		// $id = base64_decode($enc_id);
 		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 
@@ -1765,6 +1840,7 @@ class Clients extends BaseController
 
 	public function save_accountDetails()
 	{
+
 		$UsersModel = new UsersModel();
 		$validation = \Config\Services::validation();
 		$session = \Config\Services::session();
@@ -1781,7 +1857,7 @@ class Clients extends BaseController
 			'pan_no' => 'required|alpha_numeric|min_length[10]|max_length[10]',
 		]);
 
-		if ($this->request->getMethod() === 'post' && $validation->withRequest($this->request)->run()) {
+		if ($this->request->getMethod() === 'POST' && $validation->withRequest($this->request)->run()) {
 			$data = [
 				'lead_id' => $this->request->getPost('lead_id'),
 				'company_id' => $user_info['company_id'],
@@ -1827,20 +1903,66 @@ class Clients extends BaseController
 	}
 
 
-	public function delete_accountRecord($enc_id)
+	public function delete_accountRecord($account_id)
 	{
-		$account_id = base64_decode($enc_id);
+		// Initialize services
 		$session = \Config\Services::session();
 		$accountDetails = new AccountDetailModel();
-
-		// Attempt to delete the record by primary key (usually 'id')
-		if ($accountDetails->delete($account_id)) {
-			$session->setFlashdata('message', 'Account Details Deleted Successfully');
-		} else {
-			$session->setFlashdata('error', 'Failed to delete Account Details');
+		
+		// Check user session first
+		if (!$session->has('sup_username')) {
+			return redirect()->to('/')->with('error', 'Session expired');
 		}
 
-		return redirect()->back()->withInput();
+		try {
+			// 1. Validate account_id is numeric
+			if (!is_numeric($account_id)) {
+				throw new \InvalidArgumentException('Invalid account ID');
+			}
+
+			// 2. Get the record first to ensure it exists and get lead_id
+			$record = $accountDetails->find($account_id);
+			if (!$record) {
+				throw new \RuntimeException('Account record not found');
+			}
+
+			// Store lead_id for redirect before deletion
+			$lead_id = $record['lead_id'];
+
+			// 3. Attempt to delete
+			$deleted = $accountDetails->delete($account_id);
+			
+			if (!$deleted) {
+				// Check for database errors
+				$error = $accountDetails->errors() ? implode(', ', $accountDetails->errors()) : 'Unknown database error';
+				throw new \RuntimeException($error);
+			}
+
+			// Success
+			$session->setFlashdata('message', 'Account details deleted successfully');
+			log_message('info', "Account ID {$account_id} deleted successfully");
+
+		} catch (\Exception $e) {
+			log_message('error', 'Delete account error: ' . $e->getMessage());
+			
+			// Try to get lead_id even if deletion failed
+			if (!isset($lead_id)) {
+				$leadRecord = $accountDetails->select('lead_id')
+										->where('account_id', $account_id)
+										->first();
+				$lead_id = $leadRecord['lead_id'] ?? null;
+			}
+
+			$session->setFlashdata('error', 'Failed to delete: ' . $e->getMessage());
+			
+			// If we can't determine lead_id, redirect to leads list
+			if (!$lead_id) {
+				return redirect()->to(base_url('erp/leads'))->with('error', 'Could not determine lead');
+			}
+		}
+
+		// Redirect back to lead info page
+		return redirect()->to(base_url('erp/view-lead-info/' . $lead_id));
 	}
 
 
@@ -1906,7 +2028,7 @@ class Clients extends BaseController
 
 		$lead_id = $accountDetails->select('lead_id')->where('account_id', $account_id)->first();
 
-		return redirect()->to(base_url('erp/view-lead-info/' . uencode($lead_id['lead_id'])));
+		return redirect()->to(base_url('erp/view-lead-info/' . $lead_id['lead_id']));
 	}
 
 
@@ -1921,7 +2043,7 @@ class Clients extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 
 		$usession = $session->get('sup_username');
@@ -1936,6 +2058,7 @@ class Clients extends BaseController
 
 	public function filter_leads()
 	{
+
 		$session = \Config\Services::session();
 		$UsersModel = new UsersModel();
 		$LeadConfig = new LeadConfigModel();
@@ -1947,8 +2070,8 @@ class Clients extends BaseController
 
 		$company_name = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '_', $user_info['company_name']));
 		$table_name = 'leads_' . $company_name;
-		$opportunity_id = $this->request->getPost('opportunity_id');
-		$status = $this->request->getPost('status');
+		$opportunity_id = $this->request->getVar('opportunity_id');
+		$status = $this->request->getVar('status');
 
 		$db = \Config\Database::connect();
 		$builder = $db->table($table_name);
@@ -1961,16 +2084,17 @@ class Clients extends BaseController
 		}
 
 		$query = $builder->get();
+		
 		$cacheKey = 'lead_data_' . $user_info['user_id'];
 		$cache->delete($cacheKey);
 		$data['get_leadList'] = $query->getResultArray();
-
 		$leadFields = $LeadConfig->groupStart()
 			->where('company_id', $user_info['company_id'])
 			->orWhere('company_id', null)
 			->groupEnd()
 			->orderBy('id', 'ASC')
 			->findAll();
+
 
 		// Prepare the HTML header
 		$html = '<thead>
@@ -2004,12 +2128,12 @@ class Clients extends BaseController
 
 					if (isset($list[$field_name])) {
 						if (strpos($field_name, 'image') !== false) {
-							$image_path = 'public/uploads/leads/' . esc($list[$field_name]);
+							$image_path = 'uploads/leads/' . esc($list[$field_name]);
 
 							if (!empty($list[$field_name]) && file_exists($image_path)) {
 								$html .= '<img src="' . base_url($image_path) . '" alt="Profile Image" width="50" height="50">';
 							} else {
-								$html .= '<img src="' . base_url('public/uploads/leads/dummy-image.jpg') . '" alt="Dummy Image" width="50" height="50">';
+								$html .= '<img src="' . base_url('uploads/leads/dummy-image.jpg') . '" alt="Dummy Image" width="50" height="50">';
 							}
 						} elseif (strpos($field_name, 'date') !== false) {
 							$html .= date('d M Y', strtotime($list[$field_name]));

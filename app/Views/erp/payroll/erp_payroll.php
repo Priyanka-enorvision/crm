@@ -32,7 +32,7 @@ $locale = service('request')->getLocale();
       <div class="card-body">
         <?php $attributes = array('name' => 'set_salary_details', 'id' => 'set_salary_details'); ?>
         <?php $hidden = array('user_id' => '0'); ?>
-        <?php echo form_open('erp/payroll/set_salary_details', $attributes, $hidden); ?>
+        <?php echo form_open('erp/set-salary-details', $attributes, $hidden); ?>
         <div class="row justify-content-center">
           <div class="col-sm-12">
             <div class="row align-items-center">

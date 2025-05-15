@@ -13,12 +13,11 @@ $xin_system = $SystemModel->where('setting_id', 1)->first();
 $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 
 
-
 /* Transfers view
 */
 $get_animate = '';
 if ($request->getGet('type') === 'view_lead' && $request->getGet('field_id')) {
-	$transfer_id = udecode($field_id);
+	$transfer_id = $field_id;
 	//$result = $TransfersModel->where('transfer_id', $transfer_id)->first();
 
 ?>
@@ -31,7 +30,8 @@ if ($request->getGet('type') === 'view_lead' && $request->getGet('field_id')) {
 	</div>
 	<?php $attributes = array('name' => 'convert_lead', 'id' => 'convert_lead', 'autocomplete' => 'off', 'class' => 'm-b-1'); ?>
 	<?php $hidden = array('_method' => 'EDIT', 'token' => $field_id); ?>
-	<?php echo form_open('erp/clients/convert_lead', $attributes, $hidden); ?>
+	<?php echo form_open('erp/convert-lead', $attributes, $hidden); ?>
+	<input type="hidden" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>">
 	<div class="modal-body">
 		<div class="alert alert-danger" role="alert">
 			<?= lang('Main.xin_change_lead_not_restored'); ?>
@@ -69,9 +69,9 @@ if ($request->getGet('type') === 'view_lead' && $request->getGet('field_id')) {
 						$('input[name="csrf_token"]').val(response.csrf_hash);
 						toastr.success(response.result);
 						$('#convert_lead').closest('.modal').modal('hide');
-						setTimeout(function() {
-							window.location.href = '<?= site_url('erp/leads-list'); ?>';
-						}, 2000);
+						// setTimeout(function() {
+						// 	window.location.href = '<?= site_url('erp/leads-list'); ?>';
+						// }, 2000);
 					},
 					error: function(xhr, status, error) {
 						toastr.error('An error occurred while processing your request.');
@@ -82,10 +82,10 @@ if ($request->getGet('type') === 'view_lead' && $request->getGet('field_id')) {
 						submitButton.prop('disabled', false);
 						submitButton.html('<?= lang('Main.xin_confirm_convert'); ?>');
 
-						setTimeout(function() {
-							console.log('Redirecting to:', '<?= site_url('erp/leads-list'); ?>');
-							window.location.href = '<?= site_url('erp/leads-list'); ?>';
-						}, 2000);
+						// setTimeout(function() {
+						// 	console.log('Redirecting to:', '<?= site_url('erp/leads-list'); ?>');
+						// 	window.location.href = '<?= site_url('erp/leads-list'); ?>';
+						// }, 2000);
 					}
 
 				});

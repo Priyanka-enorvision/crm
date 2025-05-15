@@ -1,21 +1,17 @@
 $(document).ready(function () {
 
-	var xin_table = $('#xin_table').DataTable({
-		"bDestroy": true,
+	var xin_table = $('#xin_table').dataTable({
+        "bDestroy": true,
 		"ajax": {
-			url: main_url + "advance-salary-Datalist",
-			type: 'GET',
-			dataType: 'json',
-			headers: {
-				'X_Requested=With': 'XMLHttpRequest'
-			},
-		},
+            url : main_url+"advance-salary-data-list",
+            type : 'GET'
+        },
 		"language": {
-			"lengthMenu": dt_lengthMenu,
-			"zeroRecords": dt_zeroRecords,
-			"info": dt_info,
-			"infoEmpty": dt_infoEmpty,
-			"infoFiltered": dt_infoFiltered,
+            "lengthMenu": dt_lengthMenu,
+            "zeroRecords": dt_zeroRecords,
+            "info": dt_info,
+            "infoEmpty": dt_infoEmpty,
+            "infoFiltered": dt_infoFiltered,
 			"search": dt_search,
 			"paginate": {
 				"first": dt_first,
@@ -23,11 +19,11 @@ $(document).ready(function () {
 				"next": dt_next,
 				"last": dt_last
 			},
-		},
-		"fnDrawCallback": function (settings) {
-			$('[data-toggle="tooltip"]').tooltip();
+        },
+		"fnDrawCallback": function(settings){
+		$('[data-toggle="tooltip"]').tooltip();          
 		}
-	});
+    });
 
 	/* Delete data */
 	$("#delete_record").submit(function (e) {
@@ -65,7 +61,7 @@ $(document).ready(function () {
 		var field_id = button.data('field_id');
 		var modal = $(this);
 		$.ajax({
-			url: main_url + "payroll/read_advance_salary",
+			url: main_url + "read-advance-salary",
 			type: "GET",
 			data: 'jd=1&data=advance_salary&field_id=' + field_id,
 			success: function (response) {
