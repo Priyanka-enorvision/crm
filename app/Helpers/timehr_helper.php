@@ -256,7 +256,6 @@ if (!function_exists('staff_profile_photo')) {
 				}
 			} else {
 				$user_img = $user_info['profile_photo'];
-				// $user_img = base_url() . 'uploads/users/' . $user_info['profile_photo'];
 			}
 		} else {
 			if ($user_info['profile_photo'] == '' || $user_info['profile_photo'] == 'no') {
@@ -266,7 +265,6 @@ if (!function_exists('staff_profile_photo')) {
 					$user_img = base_url() . 'uploads/users/default/default_profile.jpg';
 				}
 			} else {
-				// $user_img = base_url() . 'uploads/clients/thumb/' . $user_info['profile_photo'];
 				$user_img = $user_info['profile_photo'];
 			}
 		}
@@ -347,18 +345,21 @@ if (!function_exists('multi_users_info')) {
 		$ol = '';
 		$i = 0;
 		foreach ($multi_user as $user_id) {
-			// get staff info
 			if ($user_id != 0) {
-				$assigned_to = $UsersModel->where('user_id', $user_id)->where('user_type', 'staff')->first();
-				$assigned_name = $assigned_to['first_name'] . ' ' . $assigned_to['last_name'];
-				$ol .= $i . ': ' . $assigned_name . '<br>';
+				// get staff info
+				$assigned_to = $UsersModel->where('user_id', $user_id)->first();
+				if ($assigned_to) {
+					$assigned_name = $assigned_to['first_name'] . ' ' . $assigned_to['last_name'];
+					$ol .= $i . ': ' . $assigned_name . '<br>';
+				} else {
+					$ol .= $i . ': Unknown User (ID: ' . $user_id . ')<br>';
+				}
 			}
-			$ol .= '';
 			$i++;
 		}
-		$ol .= '';
 		return $ol;
 	}
+
 }
 
 // company membership || expiry
@@ -813,7 +814,7 @@ if (!function_exists('currency_converter_values')) {
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 
 		$url = 'https://api.exchangerate-api.com/v4/latest/' . $xin_system['default_currency'];
-		$to_currency = $toCurrency;
+		// $to_currency = $toCurrency;
 		$url = file_get_contents($url);
 		$url = json_decode($url);
 		$rates = $url->rates;

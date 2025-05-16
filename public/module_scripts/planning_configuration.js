@@ -5,7 +5,7 @@ $(document).ready(function(){
     //dlete 
     $(document).on("click", ".delete", function () {
         $('input[name=_token]').val($(this).data('record-id'));
-        $('#delete_record').attr('action', main_url + 'dashboard/delete_planning_entity');
+        $('#delete_record').attr('action', main_url + 'delete-planning-entity');
     });
   
 });

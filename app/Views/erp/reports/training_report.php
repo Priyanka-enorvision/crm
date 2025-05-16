@@ -1,7 +1,5 @@
 <?php
-use App\Controllers\BaseController;
-use CodeIgniter\HTTP\RequestInterface;
-use CodeIgniter\HTTP\ResponseInterface;
+
 use App\Models\SystemModel;
 use App\Models\RolesModel;
 use App\Models\UsersModel;
@@ -22,11 +20,7 @@ $session = \Config\Services::session();
 $usession = $session->get('sup_username');
 $request = \Config\Services::request();
 
-/*if($_REQUEST['P']=='all_employees'){
-	$get_user = $_REQUEST['P'];
-} else {
-	$get_user = udecode($_REQUEST['P']);
-}*/
+
 $status = $_REQUEST['P'];
 $start_date = $_REQUEST['S'];
 $end_date = $_REQUEST['E'];
@@ -50,7 +44,7 @@ $ci_erp_settings = $SystemModel->where('setting_id', 1)->first();
       <div>
         <div class="card" id="printTable">
           <div class="card-header">
-            <h5><img class="img-fluid" width="171" height="30" src="<?= base_url();?>/public/uploads/logo/other/<?= $ci_erp_settings['other_logo'];?>" alt=""></h5>
+            <h5><img class="img-fluid" width="171" height="30" src="<?= base_url();?>uploads/logo/other/<?= $ci_erp_settings['other_logo'];?>" alt=""></h5>
           </div>
           <div class="card-body pb-0">
             <div class="row invoive-info d-pdrint-inline-flex">

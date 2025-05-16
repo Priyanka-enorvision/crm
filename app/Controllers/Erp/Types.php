@@ -966,12 +966,12 @@ class Types extends BaseController
 		foreach ($category as $r) {
 
 			if (in_array('training_skill3', staff_role_resource()) || $user_info['user_type'] == 'company') { //edit
-				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_edit') . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="' . uencode($r['constants_id']) . '"><i class="feather icon-edit"></i></button></span>';
+				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_edit') . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="' . $r['constants_id'] . '"><i class="feather icon-edit"></i></button></span>';
 			} else {
 				$edit = '';
 			}
 			if (in_array('training_skill4', staff_role_resource()) || $user_info['user_type'] == 'company') { //edit
-				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . uencode($r['constants_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
+				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r['constants_id'] . '"><i class="feather icon-trash-2"></i></button></span>';
 			} else {
 				$delete = '';
 			}
@@ -1085,19 +1085,19 @@ class Types extends BaseController
 		foreach ($category as $r) {
 
 			if (in_array('tax_type3', staff_role_resource()) || $user_info['user_type'] == 'company') { //edit
-				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_edit') . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="' . uencode($r['constants_id']) . '"><i class="feather icon-edit"></i></button></span>';
+				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_edit') . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="' . $r['constants_id'] . '"><i class="feather icon-edit"></i></button></span>';
 			} else {
 				$edit = '';
 			}
 			if (in_array('tax_type4', staff_role_resource()) || $user_info['user_type'] == 'company') { //edit
-				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . uencode($r['constants_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
+				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r['constants_id'] . '"><i class="feather icon-trash-2"></i></button></span>';
 			} else {
 				$delete = '';
 			}
 
 			$created_at = set_date_format($r['created_at']);
-			$field_one = number_to_currency($r['field_one'], $xin_system['default_currency'], null, 2);
-			if ($r['field_two'] == 'fixed') {
+			$field_one_value = is_numeric($r['field_one']) ? (float)$r['field_one'] : 0.00;
+    		$field_one = number_to_currency($field_one_value, $xin_system['default_currency'], null, 2);			if ($r['field_two'] == 'fixed') {
 				$_type = lang('Employees.xin_title_tax_fixed');
 			} else {
 				$_type = lang('Employees.xin_title_tax_percent');
@@ -1881,12 +1881,12 @@ class Types extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||add record|||
@@ -1957,7 +1957,7 @@ class Types extends BaseController
 				if ($existing_leave_type) {
 					$Return['error'] = 'Leave type name already exists for your company.';
 					return $this->response->setJSON($Return);
-					exit;
+					
 				}
 
 				// Insert new leave type
@@ -1980,12 +1980,12 @@ class Types extends BaseController
 				}
 
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 
@@ -2045,12 +2045,12 @@ class Types extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||add record|||
@@ -2109,12 +2109,12 @@ class Types extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||add record|||
@@ -2173,12 +2173,12 @@ class Types extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||add record|||
@@ -2239,12 +2239,12 @@ class Types extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||add record|||
@@ -2402,7 +2402,7 @@ class Types extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -2430,13 +2430,11 @@ class Types extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
-				exit;
+				return $this->response->setJSON($Return);
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// |||add record|||
@@ -2608,7 +2606,7 @@ class Types extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -2638,13 +2636,11 @@ class Types extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
-				exit;
+				return $this->response->setJSON($Return);
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// |||add record|||
@@ -2826,8 +2822,8 @@ class Types extends BaseController
 			} else {
 				// Get sanitized input
 				$name = $this->request->getPost('name', FILTER_SANITIZE_STRING);
-				$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
-				$erp_constant = udecode($this->request->getPost('erp_constant', FILTER_SANITIZE_STRING));
+				$id = $this->request->getPost('token', FILTER_SANITIZE_STRING);
+				$erp_constant = $this->request->getPost('erp_constant', FILTER_SANITIZE_STRING);
 
 				// Determine company ID
 				$UsersModel = new UsersModel();
@@ -2911,14 +2907,14 @@ class Types extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
 				$name = $this->request->getPost('name', FILTER_SANITIZE_STRING);
 				$fieldone = $this->request->getPost('fieldone', FILTER_SANITIZE_STRING);
 				$fieldtwo = $this->request->getPost('fieldtwo', FILTER_SANITIZE_STRING);
-				$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
+				$id = $this->request->getPost('token', FILTER_SANITIZE_STRING);
 				$UsersModel = new UsersModel();
 				$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 				if ($user_info['user_type'] == 'staff') {
@@ -2940,12 +2936,10 @@ class Types extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
 		}
 	}
 	// |||update record|||
@@ -3034,7 +3028,7 @@ class Types extends BaseController
 			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
-			$id = udecode($Id);
+			$id = $Id;
 			$Return['csrf_hash'] = csrf_hash();
 			$ConstantsModel = new ConstantsModel();
 			$UsersModel = new UsersModel();

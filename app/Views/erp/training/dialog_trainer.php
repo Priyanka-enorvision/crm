@@ -14,7 +14,7 @@ $ConstantsModel = new ConstantsModel();
 $get_animate = '';
 
 if($request->getGet('data') === 'trainer' && $request->getGet('field_id')){
-$ifield_id = udecode($field_id);
+$ifield_id = $field_id;
 $result = $TrainersModel->where('trainer_id', $ifield_id)->first();
 ?>
 
@@ -31,7 +31,7 @@ $result = $TrainersModel->where('trainer_id', $ifield_id)->first();
 </div>
 <?php $attributes = array('name' => 'edit_trainer', 'id' => 'edit_trainer', 'autocomplete' => 'off', 'class'=>'m-b-1');?>
 <?php $hidden = array('_method' => 'EDIT', 'token' => $field_id);?>
-<?php echo form_open('erp/trainers/update_trainer', $attributes, $hidden);?>
+<?php echo form_open('erp/update-trainer', $attributes, $hidden);?>
 <div class="modal-body">
   <div class="row">
     <div class="col-md-6">
@@ -134,7 +134,7 @@ $(document).ready(function(){
 					var xin_table = $('#xin_table').dataTable({
 						"bDestroy": true,
 						"ajax": {
-							url : "<?= site_url("erp/trainers/trainer_list") ?>",
+							url : "<?= site_url("erp/trainer-list") ?>",
 							type : 'GET'
 						},
 						"language": {

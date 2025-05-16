@@ -18,45 +18,7 @@ $i=1;
 ?>
 
 <?php if(in_array('training2',staff_role_resource()) || in_array('trainer1',staff_role_resource()) || in_array('training_skill1',staff_role_resource()) || in_array('training_calendar',staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
-<!-- <div id="smartwizard-2" class="border-bottom smartwizard-example sw-main sw-theme-default mt-2">
-  <ul class="nav nav-tabs step-anchor">
-    <?php if(in_array('training2',staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
-    <li class="nav-item clickable"> <a href="<?= site_url('erp/training-sessions');?>" class="mb-3 nav-link"> <span class="sw-done-icon feather icon-check-circle"></span> <span class="sw-icon feather icon-target"></span>
-      <?= lang('Dashboard.left_training');?>
-      <div class="text-muted small">
-        <?= lang('Main.xin_set_up');?>
-        <?= lang('Dashboard.left_training');?>
-      </div>
-      </a> </li>
-    <?php } ?>
-	<?php if(in_array('trainer1',staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
-    <li class="nav-item clickable"> <a href="<?= site_url('erp/trainers-list');?>" class="mb-3 nav-link"> <span class="sw-done-icon feather icon-check-circle"></span> <span class="sw-icon feather icon-user-plus"></span>
-      <?= lang('Dashboard.left_trainers');?>
-      <div class="text-muted small">
-        <?= lang('Main.xin_add');?>
-        <?= lang('Dashboard.left_trainers');?>
-      </div>
-      </a> </li>
-    <?php } ?>
-	<?php if(in_array('training_skill1',staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
-    <li class="nav-item active"> <a href="<?= site_url('erp/training-skills');?>" class="mb-3 nav-link"> <span class="sw-done-icon feather icon-check-circle"></span> <span class="sw-icon fas fa-tasks"></span>
-      <?= lang('Dashboard.left_training_skills');?>
-      <div class="text-muted small">
-        <?= lang('Main.xin_add');?>
-        <?= lang('Dashboard.left_training_skills');?>
-      </div>
-      </a> </li>
-    <?php } ?>
-	<?php if(in_array('training_calendar',staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
-    <li class="nav-item clickable"> <a href="<?= site_url('erp/training-calendar');?>" class="mb-3 nav-link"> <span class="sw-done-icon feather icon-check-circle"></span> <span class="sw-icon feather icon-calendar"></span>
-      <?= lang('Dashboard.xin_acc_calendar');?>
-      <div class="text-muted small">
-        <?= lang('Dashboard.left_training_calendar');?>
-      </div>
-    </a> </li>
-    <?php } ?>
-  </ul>
-</div> -->
+
 <hr class="border-light m-0 mb-3">
 <?php } ?>
 <div class="row m-b-1 animated fadeInRight">
@@ -70,8 +32,8 @@ $i=1;
         </span> </div>
       <div class="card-body">
         <?php $attributes = array('name' => 'add_training_type', 'id' => 'xin-form', 'autocomplete' => 'off');?>
-        <?php $hidden = array('user_id' => 0);?>
-        <?= form_open('erp/types/add_training_type', $attributes, $hidden);?>
+        <?php $hidden = array('user_id' => '0');?>
+        <?= form_open('erp/add-training-type', $attributes, $hidden);?>
         <div class="form-group">
           <label for="name">
             <?= lang('Dashboard.left_training_skill');?>

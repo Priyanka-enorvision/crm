@@ -288,7 +288,6 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
         } else {
             $message = "Great! All months for financial year $financialYear are already planned.";
         }
-
         echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
         ?>
     </div>
@@ -345,11 +344,12 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
                                 <!-- Financial Year Selection -->
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="financial_year" class="font-weight-bold">Financial Year<span class="text-danger">*</span></label>
+                                        <label for="financial_year" class="font-weight-bold">Financial Year<span
+                                                class="text-danger">*</span></label>
                                         <?php
 
-                                        $currentYear = (int)date('Y');
-                                        $currentMonth = (int)date('n');
+                                        $currentYear = (int) date('Y');
+                                        $currentMonth = (int) date('n');
                                         $unique_years = $unique_years ?? [];
                                         $financialYearStart = ($currentMonth >= 4) ? $currentYear : $currentYear - 1;
                                         $currentFY = sprintf("%d-%02d", $financialYearStart, ($financialYearStart + 1) % 100);
@@ -361,8 +361,9 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
                                                 <?php foreach ($unique_years as $year): ?>
                                                     <?php
 
-                                                    $year = (int)$year;
-                                                    if ($year < 2000 || $year > 2100) continue;
+                                                    $year = (int) $year;
+                                                    if ($year < 2000 || $year > 2100)
+                                                        continue;
 
                                                     $startYear = $year;
                                                     $endYear = $year + 1;
@@ -375,7 +376,7 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
                                                     </option>
                                                 <?php endforeach; ?>
                                             <?php else: ?>
-                                                <?php  ?>
+                                                <?php ?>
                                                 <?php for ($i = 2; $i >= -5; $i--): ?>
                                                     <?php
                                                     $startYear = $financialYearStart + $i;
@@ -395,7 +396,8 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
                                 <!-- Month Selection -->
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="month" class="font-weight-bold">Month<span class="text-danger">*</span></label>
+                                        <label for="month" class="font-weight-bold">Month<span
+                                                class="text-danger">*</span></label>
                                         <select class="form-control" id="month" name="month" required>
                                             <?php
                                             $months = [
@@ -427,58 +429,58 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
                                     </div>
                                 </div>
                             </div>
-                </div>
+                            </div>
 
-                <br>
-                <?php $columns = array_keys($planning_entities[0]); ?>
+                            <br>
+                            <?php $columns = array_keys($planning_entities[0]); ?>
 
-                <div class="row" style="padding: 10px;">
-                    <?php foreach ($planning_entities as $index => $entity): ?>
-                        <div class="col-md-6">
-                            <fieldset style="margin-bottom: 15px; padding:10px;">
-                                <input type="hidden" name="entities[<?= $entity['id']; ?>][entities_id]"
-                                    value="<?= $entity['id']; ?>">
-                                <?php foreach ($columns as $column): ?>
-                                    <?php if ($column === 'entity'): ?>
-                                        <div>
-                                            <label for="entities_<?= $entity['id']; ?>" class="font-weight-bold">
-                                                <?= htmlspecialchars($entity[$column]); ?><span class="text-danger">*</span>
-                                            </label>
-                                            <input type="<?= htmlspecialchars($entity['type']); ?>"
-                                                id="entities_<?= $entity['id']; ?>"
-                                                name="entities[<?= $entity['id']; ?>][entity_value]"
-                                                placeholder="<?= htmlspecialchars($entity[$column]); ?>"
-                                                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"
-                                                required>
-                                        </div>
+                            <div class="row">
+                                <?php foreach ($planning_entities as $index => $entity): ?>
+                                    <div class="col-md-6">
+                                        <fieldset style="margin-bottom: 15px; padding:10px;">
+                                            <input type="hidden" name="entities[<?= $entity['id']; ?>][entities_id]"
+                                                value="<?= $entity['id']; ?>">
+                                            <?php foreach ($columns as $column): ?>
+                                                <?php if ($column === 'entity'): ?>
+                                                    <div>
+                                                        <label for="entities_<?= $entity['id']; ?>" class="font-weight-bold">
+                                                            <?= htmlspecialchars($entity[$column]); ?><span class="text-danger">*</span>
+                                                        </label>
+                                                        <input type="<?= htmlspecialchars($entity['type']); ?>"
+                                                            id="entities_<?= $entity['id']; ?>"
+                                                            name="entities[<?= $entity['id']; ?>][entity_value]"
+                                                            placeholder="<?= htmlspecialchars($entity[$column]); ?>"
+                                                            style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"
+                                                            required>
+                                                    </div>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
+                                        </fieldset>
+                                    </div>
+                                    <?php if (($index + 1) % 2 == 0): ?>
+                                    </div>
+                                    <div class="row">
                                     <?php endif; ?>
                                 <?php endforeach; ?>
-                            </fieldset>
-                        </div>
-                        <?php if (($index + 1) % 2 == 0): ?>
-                </div>
-                <div class="row">
-                <?php endif; ?>
-            <?php endforeach; ?>
-                </div>
+                            </div>
 
-                <div class="text-right">
-                    <button type="submit" id="submit-btn" class="btn btn-primary text-right"
-                        style="padding: 12px 24px; background-color: #28a745; border: none; color: white; cursor: pointer; font-size: 16px; border-radius: 5px;margin-right: 10px;margin-bottom:10px;">Submit</button>
-                </div>
-                </form>
+                            <div class="text-right">
+                                <button type="submit" id="submit-btn" class="btn btn-primary text-right"
+                                    style="padding: 12px 24px; background-color: #28a745; border: none; color: white; cursor: pointer; font-size: 16px; border-radius: 5px;margin-right: 10px;margin-bottom:10px;">Submit</button>
+                            </div>
+                        </form>
 
-            <?php else: ?>
-                <p class="text-center">No planning entities found for the specified company.Please Click
-                    On
-                    <a href="<?php echo site_url('erp/planning_configuration'); ?>">Create New
-                        Entity</a>
-                </p>
-            <?php endif; ?>
+                    <?php else: ?>
+                        <p class="text-center">No planning entities found for the specified company.Please Click
+                            On
+                            <a href="<?php echo site_url('erp/planning_configuration'); ?>">Create New
+                                Entity</a>
+                        </p>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
 
@@ -486,7 +488,7 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/toastr@latest/build/toastr.min.js"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
 
         toastr.options = {
             "closeButton": true,
@@ -495,11 +497,11 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
             "extendedTimeOut": 30000
         };
 
-        $('.add-button').click(function() {
+        $('.add-button').click(function () {
             $('#form-container').toggle();
         });
 
-        $('#add-form').submit(function(event) {
+        $('#add-form').submit(function (event) {
             event.preventDefault();
             $('#submit-btn').prop('disabled', true);
 
@@ -507,17 +509,17 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
             console.log("Form Data:", formData);
 
             $.ajax({
-                    type: 'POST',
-                    url: '<?php echo base_url('erp/monthly_achive_submit'); ?>',
-                    data: formData,
-                    dataType: 'json',
-                    encode: true,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': '<?php echo csrf_hash(); ?>'
-                    }
-                })
-                .done(function(response) {
+                type: 'POST',
+                url: '<?php echo base_url('erp/monthly-achive-submit'); ?>',
+                data: formData,
+                dataType: 'json',
+                encode: true,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '<?php echo csrf_hash(); ?>'
+                }
+            })
+                .done(function (response) {
                     console.log("Response:", response);
                     if (response.message === 'Form submitted successfully!') {
                         toastr.success(response.message);
@@ -527,12 +529,12 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
                         setTimeout(() => location.reload(), 5000);
                     }
                 })
-                .fail(function(response) {
+                .fail(function (response) {
                     console.log("AJAX Error:", response);
                     toastr.error('Error occurred while submitting the form.');
                     setTimeout(() => location.reload(), 5000);
                 })
-                .always(function() {
+                .always(function () {
                     $('#submit-btn').prop('disabled', false);
                 });
         });
@@ -761,7 +763,7 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
                             // } else {
                             //     $project_revenue = 'N/A';
                             // }
-
+                    
                             $project_summary = $r['title'];
 
                             // Created by (User info)
@@ -804,7 +806,7 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         let chart;
         const currencyFormatter = new Intl.NumberFormat('en-IN', {
             style: 'currency',
@@ -831,7 +833,7 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
                 data: {
                     year: selectedYear
                 },
-                success: function(response) {
+                success: function (response) {
                     responseData = response;
 
                     if (response && response.invoice_month && response.paid_invoice && response.unpaid_invoice) {
@@ -848,7 +850,7 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
                                 const entityDiv = document.createElement('div');
                                 entityDiv.classList.add('status-item');
                                 entityDiv.style.cursor = 'pointer';
-                                entityDiv.addEventListener('click', function() {
+                                entityDiv.addEventListener('click', function () {
                                     storeEntityAndRedirect(entity.id, entity.entity_name);
                                 });
 
@@ -877,19 +879,19 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
                             data: {
                                 labels: response.invoice_month,
                                 datasets: [{
-                                        label: response.paid_inv_label,
-                                        data: response.paid_invoice,
-                                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                        borderColor: 'rgba(54, 162, 235, 1)',
-                                        borderWidth: 2
-                                    },
-                                    {
-                                        label: response.unpaid_inv_label,
-                                        data: response.unpaid_invoice,
-                                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                        borderColor: 'rgba(255, 99, 132, 1)',
-                                        borderWidth: 2
-                                    }
+                                    label: response.paid_inv_label,
+                                    data: response.paid_invoice,
+                                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 2
+                                },
+                                {
+                                    label: response.unpaid_inv_label,
+                                    data: response.unpaid_invoice,
+                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    borderWidth: 2
+                                }
                                 ]
                             },
                             options: {
@@ -926,7 +928,7 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
                         console.error("Response data is not in the expected format.");
                     }
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.log('AJAX Error:', status, error);
                 }
             });
@@ -959,7 +961,7 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
                         const entityDiv = document.createElement('div');
                         entityDiv.classList.add('status-item');
                         entityDiv.style.cursor = 'pointer';
-                        entityDiv.addEventListener('click', function() {
+                        entityDiv.addEventListener('click', function () {
                             storeEntityAndRedirect(entity.id, entity.entity_name);
                         });
 
@@ -1050,10 +1052,10 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
                 data: {
                     entityId: entityId
                 },
-                success: function() {
+                success: function () {
                     window.location.href = '<?= base_url('erp/projects-list'); ?>';
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error('Error:', error);
                     alert('Failed to set entity. Please try again.');
                 }

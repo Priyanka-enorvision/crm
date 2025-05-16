@@ -16,8 +16,10 @@ $router = service('router');
 $locale = service('request')->getLocale();
 $request = \Config\Services::request();
 
-$segment_id = $request->uri->getSegment(3);
-$planning_entity_id = udecode($segment_id);
+$segment_id = $ifield_id;
+$planning_entity_id = $ifield_id;
+// $segment_id = $request->uri->getSegment(3);
+// $planning_entity_id = udecode($segment_id);
 
 $user_info = $models['UsersModel']->where('user_id', $usession['sup_user_id'])->first();
 
@@ -44,8 +46,8 @@ $Planning_entity = $models['PlanningEntityModel']->where('company_id', $company_
         <?php endif; ?>
       </div>
       <?php $attributes = ['name' => 'update_planning_entity', 'id' => 'update_planning_entity', 'autocomplete' => 'off']; ?>
-      <?php $hidden = ['user_id' => 0]; ?>
-      <?= form_open('erp/dashboard/update_planning_entity', $attributes, $hidden); ?>
+      <?php $hidden = ['user_id' => '0']; ?>
+      <?= form_open('erp/update-planning-entity', $attributes, $hidden); ?>
       <div class="card-body">
         <div class="row">
           <div class="col-md-12">

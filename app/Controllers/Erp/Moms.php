@@ -30,7 +30,7 @@ class Moms extends BaseController {
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if(!$session->has('sup_username')){ 
 			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url(''));
 		}
 		if($user_info['user_type']!='staff' && $user_info['user_type']!='company' ){
 			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
@@ -39,64 +39,10 @@ class Moms extends BaseController {
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$data['title'] = lang('Dashboard.left_moms').' | '.$xin_system['application_name'];
 		$data['path_url'] = 'moms';
-		$data['breadcrumbs'] = lang('Dashboard.left_moms').$user_id;
+		$data['breadcrumbs'] = lang('Dashboard.left_moms');
 		$data['subview'] = view('erp/moms/staff_mom', $data);
 		return view('erp/layout/layout_main', $data); //page load
 	}
-
-
-	// public function moms_list() {
-
-	// 	$session = \Config\Services::session();
-	// 	$usession = $session->get('sup_username');
-	// 	if(!$session->has('sup_username')){ 
-	// 		return redirect()->to(site_url('erp/login'));
-	// 	}		
-	// 	$RolesModel = new RolesModel();
-	// 	$UsersModel = new UsersModel();
-	// 	$SystemModel = new SystemModel();
-	// 	$MomsModel = new MomsModel();
-	// 	$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-	// 	if($user_info['user_type'] == 'staff'){
-	// 		// $get_data = assigned_staff_tasks($usession['sup_user_id']);
-	// 		$get_data = $MomsModel->where('company_id',$user_info['company_id'])->orderBy('id', 'ASC')->findAll();
-	// 	} else {
-	// 		$get_data = $MomsModel->where('company_id',$usession['sup_user_id'])->orderBy('id', 'ASC')->findAll();
-	// 	}
-	// 	$data = array();
-		
-    //       foreach($get_data as $r) {
-			  
-	// 		if(in_array('mom4',staff_role_resource()) || $user_info['user_type'] == 'company') { //delete
-	// 			$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="'.lang('Main.xin_delete').'"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. uencode($r['id']) . '"><i class="feather icon-trash-2"></i></button></span>';
-	// 		} else {
-	// 			$delete = '';
-	// 		}
-	// 		$view = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="'.lang('Main.xin_view_details').'"><a href="'.site_url('erp/mom-detail').'/'.uencode($r['id']).'"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light"><i class="feather icon-arrow-right"></i></button></a></span>';
-	// 		$title = $r['title'];
-	// 		$summary = $r['summary'];
-	// 		$description = $r['des$description'];
-	// 		$combhr = $view.$delete;
-	// 		$itask_name = '
-	// 			'.$r['title'].'
-	// 			<div class="overlay-edit">
-	// 				'.$combhr.'
-	// 			</div>';
-	// 		$data[] = array(
-	// 			$itask_name,
-	// 			$summary,
-	// 			$description,
-	// 			$combhr
-	// 		);
-			
-	// 	}
-    //       $output = array(
-    //            //"draw" => $draw,
-	// 		   "data" => $data
-    //         );
-    //       echo json_encode($output);
-    //       exit();
-    // }
 
 
     public function moms_calendar()
@@ -111,7 +57,7 @@ class Moms extends BaseController {
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if(!$session->has('sup_username')){ 
 			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url(''));
 		}
 		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
 			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
@@ -126,7 +72,7 @@ class Moms extends BaseController {
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$data['title'] = lang('Dashboard.xin_acc_calendar').' | '.$xin_system['application_name'];
 		$data['path_url'] = 'moms';
-		$data['breadcrumbs'] = lang('Dashboard.xin_acc_calendar').$user_id;
+		$data['breadcrumbs'] = lang('Dashboard.xin_acc_calendar');
 
 		$data['subview'] = view('erp/moms/calendar_moms', $data);
 		return view('erp/layout/layout_main', $data); //page load
@@ -254,7 +200,7 @@ class Moms extends BaseController {
 				$summary = $this->request->getPost('summary');
 				$description = $this->request->getPost('description');
 				$meeting_date = $this->request->getPost('meeting_date');
-				$id = udecode($this->request->getPost('token'));
+				$id = $this->request->getPost('token');
 	
 				$associated_goals = $this->request->getPost('associated_goals') ?? [];
 				$associated_goals = is_array($associated_goals) ? implode(',', $associated_goals) : '';
@@ -334,7 +280,7 @@ class Moms extends BaseController {
 		
 		if(!$session->has('sup_username')){ 
 			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url(''));
 		}
 		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
 			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
@@ -363,7 +309,7 @@ class Moms extends BaseController {
 			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
-			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
+			$id = $this->request->getPost('_token', FILTER_SANITIZE_STRING);
 			$Return['csrf_hash'] = csrf_hash();
 			$MomsModel = new MomsModel();
 			$result = $MomsModel->where('id', $id)->delete($id);
@@ -372,11 +318,11 @@ class Moms extends BaseController {
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 		}
 	}
     
-    public function mom_details()
+    public function mom_details($ifield_id)
 	{		
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
@@ -388,15 +334,15 @@ class Moms extends BaseController {
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if(!$session->has('sup_username')){ 
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url(''));
 		}
 		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
 			return redirect()->to(site_url('erp/desk'));
 		}
 		$usession = $session->get('sup_username');
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
-		$segment_id = $request->uri->getSegment(3);
-		$ifield_id = udecode($segment_id);
+		// $segment_id = $request->uri->getSegment(3);
+		// $ifield_id = udecode($segment_id);
 
 		$isegment_val = $MomsModel->where('id', $ifield_id)->first();
 		if(!$isegment_val){
@@ -411,8 +357,8 @@ class Moms extends BaseController {
 
 		$data['title'] = lang('Mom.xin_mom_details').' | '.$xin_system['application_name'];
 		$data['path_url'] = 'mom_details';
-		$data['breadcrumbs'] = lang('Mom.xin_mom_details').$user_id;
-
+		$data['breadcrumbs'] = lang('Mom.xin_mom_details');
+		$data['ifield_id'] = $ifield_id;
 		$data['subview'] = view('erp/moms/mom_details', $data);
 		return view('erp/layout/layout_main', $data); //page load
 	}

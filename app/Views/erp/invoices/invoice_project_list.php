@@ -170,7 +170,7 @@ $paid = number_format((float)$paid, 1, '.', '');
         </li>
       </ul>
       <?php if (in_array('invoice3', staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
-        <div class="nav-item nav-grid f-view"> <a href="<?= site_url() . 'erp/create-new-invoice'; ?>" class="btn waves-effect waves-light btn-primary btn-sm m-0"> <i data-feather="plus"></i>
+        <div class="nav-item nav-grid f-view"> <a href="<?= site_url() . 'erp/create-invoice'; ?>" class="btn waves-effect waves-light btn-primary btn-sm m-0"> <i data-feather="plus"></i>
             <?= lang('Invoices.xin_create_new_invoices'); ?>
           </a> </div>
       <?php } ?>
@@ -262,22 +262,22 @@ $paid = number_format((float)$paid, 1, '.', '');
                       <?= $invoice_due_date; ?>
                     </strong></p>
                 </div>
-                <div class="task-board m-0 float-right"> <a href="<?= site_url() . 'erp/invoice-detail/' . uencode($r['invoice_id']); ?>" class="btn btn-primary"><i class="fas fa-eye m-0"></i></a>
+                <div class="task-board m-0 float-right"> <a href="<?= site_url() . 'erp/invoice-detail/' . $r['invoice_id']; ?>" class="btn btn-primary"><i class="fas fa-eye m-0"></i></a>
                   <div class="dropdown-secondary dropdown d-inline">
                     <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-bars"></i></button>
-                    <div class="dropdown-menu dropdown-menu-right" data-dropdown-in="fadeIn" data-dropdown-out="fadeOut"> <a class="dropdown-item" href="<?= site_url() . 'erp/print-invoice/' . uencode($r['invoice_id']); ?>"><i class="fas fa-download mr-2"></i>
+                    <div class="dropdown-menu dropdown-menu-right" data-dropdown-in="fadeIn" data-dropdown-out="fadeOut"> <a class="dropdown-item" href="<?= site_url() . 'erp/print-invoice/' . $r['invoice_id']; ?>"><i class="fas fa-download mr-2"></i>
                         <?= lang('Invoices.xin_download_invoice'); ?>
                       </a>
                       <div class="dropdown-divider"></div>
                       <?php if ($r['status'] == 0) { ?>
                         <?php if (in_array('invoice4', staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
-                          <a class="dropdown-item" href="<?= site_url() . 'erp/edit-invoice/' . uencode($r['invoice_id']); ?>"><i class="fas fa-edit mr-2"></i>
+                          <a class="dropdown-item" href="<?= site_url() . 'erp/edit-invoice/' . $r['invoice_id']; ?>"><i class="fas fa-edit mr-2"></i>
                             <?= lang('Invoices.xin_edit_invoice'); ?>
                           </a>
                         <?php } ?>
                       <?php } ?>
                       <?php if (in_array('invoice5', staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
-                        <a href="#!" class="dropdown-item delete" data-toggle="modal" data-target=".delete-modal" data-record-id="<?= uencode($r['invoice_id']); ?>"><i class="feather icon-trash-2"></i>
+                        <a href="#!" class="dropdown-item delete" data-toggle="modal" data-target=".delete-modal" data-record-id="<?= $r['invoice_id']; ?>"><i class="feather icon-trash-2"></i>
                           <?= lang('Invoices.xin_remove_invoice'); ?>
                         </a>
                       <?php } ?>

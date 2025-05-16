@@ -21,12 +21,14 @@ $InvoiceitemsModel = new InvoiceitemsModel();
 $session = \Config\Services::session();
 $usession = $session->get('sup_username');
 $request = \Config\Services::request();
-$segment_id = $request->getUri()->getSegment(3);
+$segment_id = $ifield_id;
+// $segment_id = $request->getUri()->getSegment(3);
 /////
 $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 
 $logo_details = $SystemModel->where('company_id', $user_info['company_id'])->first();
-$invoice_id = udecode($segment_id);
+// $invoice_id = udecode($segment_id);
+$invoice_id = $segment_id;
 $xin_system = erp_company_settings();
 $result = $InvoicesModel->where('invoice_id', $invoice_id)->first();
 $company_info = $UsersModel->where('user_id', $result['client_id'])->where('user_type', 'customer')->first();

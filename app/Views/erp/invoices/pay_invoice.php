@@ -13,7 +13,7 @@ $InvoicesModel = new InvoicesModel();
 $ConstantsModel = new ConstantsModel();
 $get_animate = '';
 if ($request->getGet('data') === 'invoice_pay' && $request->getGet('field_id')) {
-  $invoice_id = udecode($field_id);
+  $invoice_id = $field_id;
   $result = $InvoicesModel->where('invoice_id', $invoice_id)->first();
   $payment_method = $ConstantsModel->where('type', 'payment_method')->orderBy('constants_id', 'ASC')->findAll();
 ?>

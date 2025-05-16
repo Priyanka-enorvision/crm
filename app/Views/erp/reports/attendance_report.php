@@ -1,9 +1,6 @@
 <?php
 
 
-use App\Controllers\BaseController;
-use CodeIgniter\HTTP\RequestInterface;
-use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\SystemModel;
 use App\Models\RolesModel;
 use App\Models\UsersModel;
@@ -41,26 +38,19 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 if ($user_info['user_type'] == 'staff') {
 	$timesheet_data = $TimesheetModel->where('company_id', $user_info['company_id'])->where('employee_id', $seg_user_id)->first();
 	$user_data = $UsersModel->where('company_id', $user_info['company_id'])->where('user_id', $seg_user_id)->first();
-	// userdata
 	$employee_detail = $StaffdetailsModel->where('user_id', $seg_user_id)->first();
 	$idesignations = $DesignationModel->where('company_id', $user_info['company_id'])->where('designation_id', $employee_detail['designation_id'])->first();
-	//$get_data = $TimesheetModel->where('company_id', $user_info['company_id'])->where('employee_id',$seg_user_id)->where('attendance_date',$attendance_date)->findAll();
-	// total hours worked
-	//$first_data = $TimesheetModel->where('company_id', $user_info['company_id'])->where('employee_id', $seg_user_id)->where('attendance_date', $attendance_date)->first();
+	
 } else {
 	$timesheet_data = $TimesheetModel->where('company_id', $usession['sup_user_id'])->where('employee_id', $seg_user_id)->first();
 	$user_data = $UsersModel->where('company_id', $usession['sup_user_id'])->where('user_id', $seg_user_id)->first();
-	// userdata
 	$employee_detail = $StaffdetailsModel->where('user_id', $seg_user_id)->first();
 	$idesignations = $DesignationModel->where('company_id', $usession['sup_user_id'])->where('designation_id', $employee_detail['designation_id'])->first();
-	//$get_data = $TimesheetModel->where('company_id', $usession['sup_user_id'])->where('employee_id',$seg_user_id)->where('attendance_date',$attendance_date)->findAll();
-	// total hours worked
-	//$first_data = $TimesheetModel->where('company_id', $usession['sup_user_id'])->where('employee_id', $seg_user_id)->where('attendance_date', $attendance_date)->first();
+	
 }
 
 ?>
-<?php
-?>
+
 <?php
 $date_info = strtotime($req_month_year . '-01');
 $imonth_year = explode('-', $req_month_year);

@@ -18,8 +18,10 @@ $router = service('router');
 $locale = service('request')->getLocale();
 $request = \Config\Services::request();
 
-$segment_id = $request->uri->getSegment(3);
-$year_planning_id = udecode($segment_id);
+$segment_id = $ifield_id;
+$year_planning_id = $ifield_id;
+// $segment_id = $request->uri->getSegment(3);
+// $year_planning_id = udecode($segment_id);
 
 $user_info = $models['UsersModel']->where('user_id', $usession['sup_user_id'])->first();
 $company_id = $user_info['company_id'];
@@ -28,12 +30,10 @@ $year_planning_data = $models['YearPlanningModel']->where(['company_id' => $comp
 
 if (!empty($year_planning_data)) {
   $planning_entity = $models['PlanningEntityModel']->where('id', $year_planning_data['entities_id'])->first();
-  $planning_entity_name = $planning_entity['entity'];
 } else {
   $planning_entity = $models['PlanningEntityModel']->where('id', $year_planning_id)->first();
   
 }
-
 $planning_entity_name = $planning_entity['entity'];
 
 ?>
@@ -53,8 +53,8 @@ $planning_entity_name = $planning_entity['entity'];
       </div>
 
       <?php $attributes = ['name' => 'update_year_planning_entity', 'id' => 'update_year_planning_entity', 'autocomplete' => 'off']; ?>
-      <?php $hidden = ['user_id' => 0]; ?>
-      <?= form_open('erp/dashboard/update_year_planning_entity', $attributes, $hidden); ?>
+      <?php $hidden = ['user_id' => '0']; ?>
+      <?= form_open('erp/update-year-planning-entity', $attributes, $hidden); ?>
       <div class="card-body">
         <div class="row">
           <div class="col-md-12">
@@ -78,7 +78,7 @@ $planning_entity_name = $planning_entity['entity'];
                 <div class="form-group">
                   <label for="type">Entity Value <span class="text-danger">*</span></label>
                   <input type="text" class="form-control" id="entity_value" name="entity_value"
-                    value="<?= esc($year_planning_data['entity_value']) ?>" required>
+                    value="<?= esc($year_planning_data['entity_value'] ?? '') ?>" required>
                 </div>
               </div>
 
@@ -149,23 +149,19 @@ $planning_entity_name = $planning_entity['entity'];
             data: formData,
             dataType: 'json',
             success: function (response) {
-              if (response.status === 'success') {
-                toastr.success(response.message);
-                // Reset button state
-                $submitButton.prop('disabled', false);
-                $submitButton.html('<?= lang('Main.xin_update_status'); ?>');
-                
-              } else {
-                toastr.error(response.message || 'Update failed');
-                $submitButton.prop('disabled', false);
-                $submitButton.html('<?= lang('Main.xin_update_status'); ?>');
+                if (response.status === 'success') {
+                  toastr.success('Year planning inserted or  updated successfully!');
+                  setTimeout(60000);
+                  window.location.href = "<?php base_url('erp/year-planning') ?>";
+                   
+                }
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+                toastr.error('An error occurred: ' + textStatus);
+                setTimeout(60000);
+                window.location.href = "<?php base_url('erp/year-planning') ?>";
+                 
               }
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-              toastr.error('An error occurred: ' + textStatus);
-              $submitButton.prop('disabled', false);
-              $submitButton.html('<?= lang('Main.xin_update_status'); ?>');
-            }
           });
         });
       });

@@ -69,8 +69,8 @@ $i=1;
         </span> </div>
       <div class="card-body">
         <?php $attributes = array('name' => 'add_tax_type', 'id' => 'xin-form', 'autocomplete' => 'off');?>
-        <?php $hidden = array('user_id' => 0);?>
-        <?= form_open('erp/types/add_tax_type', $attributes, $hidden);?>
+        <?php $hidden = array('user_id' => '0');?>
+        <?= form_open('erp/add-tax-type', $attributes, $hidden);?>
         <div class="form-group">
           <label for="name">
             <?= lang('Invoices.xin_tax_name');?>

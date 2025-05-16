@@ -20,9 +20,13 @@ $InvoiceitemsModel = new InvoiceitemsModel();
 $session = \Config\Services::session();
 $usession = $session->get('sup_username');
 $request = \Config\Services::request();
-$segment_id = $request->uri->getSegment(3);
+// $segment_id = $request->uri->getSegment(3);
 /////
-$invoice_id = udecode($segment_id);
+// $invoice_id = udecode($segment_id);
+$segment_id = $ifield_id;
+
+$invoice_id = $segment_id;
+
 $xin_system = erp_company_settings();
 $result = $InvoicesModel->where('invoice_id', $invoice_id)->first();
 $company = $UsersModel->where('user_id',$usession['sup_user_id'])->first();
@@ -72,8 +76,8 @@ $_payment_method = $ConstantsModel->where('type','payment_method')->where('const
                           <td class="d-flex">
                               <div >
                                   <a href="#!">
-                                      <!-- <img class="img-fluid" width="171" height="30" src="<?= base_url();?>/public/uploads/logo/other/<?= $ci_erp_settings['other_logo'];?>" alt="<?= $xin_system['company_name'];?>"> -->
-                                      <img src="<?= base_url();?>/public/uploads/logo/<?= $company['profile_photo'];?>" alt="<?= $xin_system['company_name'];?>" class="img-fluid" >
+                                      
+                                      <img src="<?= base_url();?>uploads/logo/<?= $company['profile_photo'];?>" alt="<?= $company['company_name'];?>" class="img-fluid" >
                                   </a>
                               </div>
                               <div>
@@ -86,20 +90,20 @@ $_payment_method = $ConstantsModel->where('type','payment_method')->where('const
                           </td>
                         </tr>
                         <tr>
-                          <td><?= $xin_system['company_name'];?></td>
+                          <td><?= $company['company_name'];?></td>
                         </tr>
                         <tr>
-                          <td><?= $xin_system['address_1'];?>
+                          <td><?= $company['address_1'];?>
                             <br>
-                            <?= $xin_system['address_2'];?></td>
+                            <?= $company['address_2'];?></td>
                         </tr>
                         <tr>
-                          <td><a class="text-secondary" href="mailto:<?= $xin_system['email'];?>" target="_top">
-                            <?= $xin_system['email'];?>
+                          <td><a class="text-secondary" href="mailto:<?= $company['email'];?>" target="_top">
+                            <?= $company['email'];?>
                             </a></td>
                         </tr>
                         <tr>
-                          <td><?= $xin_system['contact_number'];?></td>
+                          <td><?= $company['contact_number'];?></td>
                         </tr>
                       </tbody>
                     </table>

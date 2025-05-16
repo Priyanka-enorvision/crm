@@ -31,8 +31,10 @@ $user = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 $locale = service('request')->getLocale();
 $request = \Config\Services::request();
 
-$segment_id = $request->uri->getSegment(3);
-$mom_id = udecode($segment_id);
+$segment_id = $ifield_id;
+$mom_id = $ifield_id;;
+// $segment_id = $request->uri->getSegment(3);
+// $mom_id = udecode($segment_id);
 
 $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 if($user_info['user_type'] == 'staff'){
@@ -144,7 +146,7 @@ $get_type = $request->getVar('type',FILTER_SANITIZE_STRING);
         <div class="tab-pane fade <?php if($get_type=='edit'):?>show active<?php endif;?>" id="pills-edit" role="tabpanel" aria-labelledby="pills-edit-tab">
           <?php $attributes = array('name' => 'update_mom', 'id' => 'update_mom', 'autocomplete' => 'off');?>
           <?php $hidden = array('token' => $segment_id);?>
-          <?php echo form_open('erp/moms/update_mom', $attributes, $hidden);?>
+          <?php echo form_open('erp/update-mom', $attributes, $hidden);?>
           <div class="card-body">
             <div class="row">
               <div class="col-md-4">

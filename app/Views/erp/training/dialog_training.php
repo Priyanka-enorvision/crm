@@ -19,7 +19,7 @@ $TrackgoalsModel = new TrackgoalsModel();
 $get_animate = '';
 $xin_system = erp_company_settings();
 if($request->getGet('data') === 'training' && $request->getGet('field_id')){
-$ifield_id = udecode($field_id);
+$ifield_id = $field_id;
 $result = $TrainingModel->where('training_id', $ifield_id)->first();
 $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 if($user_info['user_type'] == 'company'){
@@ -46,7 +46,7 @@ if($user_info['user_type'] == 'company'){
 </div>
 <?php $attributes = array('name' => 'edit_training', 'id' => 'edit_training', 'autocomplete' => 'off', 'class'=>'m-b-1');?>
 <?php $hidden = array('_method' => 'EDIT', 'token' => $field_id);?>
-<?php echo form_open('erp/training/update_training', $attributes, $hidden);?>
+<?php echo form_open('erp/update-training', $attributes, $hidden);?>
 <div class="modal-body">
   <div class="row">
     <div class="col-md-4">
@@ -175,20 +175,6 @@ $(document).ready(function(){
 	$('[data-plugin="select_hrm"]').select2($(this).attr('data-options'));
 	$('[data-plugin="select_hrm"]').select2({ width:'100%' });	 
 	Ladda.bind('button[type=submit]');	 
-	//$('#description2').trumbowyg();
-	$('.d_date').bootstrapMaterialDatePicker({
-		weekStart: 0,
-		time: false,
-		clearButton: false,
-		format: 'YYYY-MM-DD'
-	});
-	$(".meditor").kendoEditor({
-		resizable: {
-			content: true,
-			toolbar: true
-		}
-	});
-	
 	/* Edit data */
 	$("#edit_training").submit(function(e){
 		var fd = new FormData(this);
@@ -211,11 +197,12 @@ $(document).ready(function(){
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
 						Ladda.stopAll();
 				} else {
+          
 					// On page load: datatable
 					var xin_table = $('#xin_table').dataTable({
 						"bDestroy": true,
 						"ajax": {
-							url : "<?= site_url("erp/training/training_list") ?>",
+							url : "<?= site_url("erp/training-list") ?>",
 							type : 'GET'
 						},
 						"language": {
@@ -240,7 +227,7 @@ $(document).ready(function(){
 						toastr.success(JSON.result);
 					}, true);
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
-					$('.edit-modal-data').modal('toggle');
+					$('.view-modal-data').modal('toggle');
 					Ladda.stopAll();
 				}
 			},

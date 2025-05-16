@@ -229,7 +229,7 @@ function floatchart() {
 	$(function () {
 
 		$.ajax({
-			url: main_url + 'invoices/invoice_status_chart',
+			url: main_url + 'invoice-status-chart',
 			contentType: "application/json; charset=utf-8",
 			dataType: "json",
 			success: function (response) {

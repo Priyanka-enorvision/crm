@@ -52,6 +52,7 @@ if (!empty($monthly_planning_data)) {
     $currentMonth = (int)date('n');
     $monthNames = ['january'=>1,'february'=>2,'march'=>3,'april'=>4,'may'=>5,'june'=>6,'july'=>7,'august'=>8,'september'=>9,'october'=>10,'november'=>11,'december'=>12];
     $entityCache = [];
+    $i=0;
 
     foreach ($monthly_planning_data as $r) {
         $recordMonthName = strtolower(explode('-', $r['month'])[0]);
@@ -66,15 +67,15 @@ if (!empty($monthly_planning_data)) {
         // Generate action buttons
         $actions = '';
         if (in_array('monthly_planning4', staff_role_resource()) || $user_info['user_type'] == 'company') {
-            $actions .= '<button type="button" class="btn btn-sm btn-light-danger delete-monthly-planning" data-toggle="modal" data-target=".delete-modal" data-record-id="'.uencode($r['id']).'" title="Delete"><i class="feather icon-trash-2"></i></button>';
+            $actions .= '<button type="button" class="btn btn-sm btn-light-danger delete-monthly-planning" data-toggle="modal" data-target=".delete-modal" data-record-id="'.$r['id'].'" title="Delete"><i class="feather icon-trash-2"></i></button>';
         }
         if (in_array('monthly_planning3', staff_role_resource()) || $user_info['user_type'] == 'company') {
             $actions .= $isEditable 
-                ? '<a href="'.site_url('erp/monthly-planning-detail/'.uencode($r['id'])).'" class="btn btn-sm btn-light-primary" title="Edit"><i class="feather icon-edit"></i></a>'
+                ? '<a href="'.site_url('erp/monthly-planning-detail/'.$r['id']).'" class="btn btn-sm btn-light-primary" title="Edit"><i class="feather icon-edit"></i></a>'
                 : '<button class="btn btn-sm btn-light-secondary" disabled title="Editing Disabled"><i class="feather icon-edit"></i></button>';
         }
         if (in_array('monthly_planning5', staff_role_resource()) || $user_info['user_type'] == 'company') {
-            $actions .= '<a href="'.site_url('erp/monthly-planning-review/'.uencode($r['id'])).'" class="btn btn-sm btn-light-warning" title="Review"><i class="feather icon-eye"></i></a>';
+            $actions .= '<a href="'.site_url('erp/monthly-planning-review/'.$r['id']).'" class="btn btn-sm btn-light-warning" title="Review"><i class="feather icon-eye"></i></a>';
         }
 
         // Cache entity data to reduce queries
@@ -82,9 +83,9 @@ if (!empty($monthly_planning_data)) {
             $entity_data = $PlanningEntityModel->where('id', $r['entities_id'])->first();
             $entityCache[$r['entities_id']] = $entity_data['entity'] ?? 'N/A';
         }
-
+        $i++;
         $record[] = [
-            $r['entities_id'],
+            $i,
             $entityCache[$r['entities_id']],
             ($entityCache[$r['entities_id']] == 'revenue') ? '₹'.$r['entity_value'] : $r['entity_value'],
             $r['year'],
@@ -99,7 +100,7 @@ if (!empty($monthly_planning_data)) {
         $actions .= $isEditable 
             ? '<a href="'.site_url('erp/monthly-planning-detail/'.uencode($entity['id'])).'" class="btn btn-sm btn-light-primary" title="Edit"><i class="feather icon-edit"></i></a>'
             : '<button class="btn btn-sm btn-light-secondary" disabled title="Editing Disabled"><i class="feather icon-edit"></i></button>';
-    }
+      }
   
       $record[] = [
           $entity['id'],
@@ -346,7 +347,7 @@ if (!empty($monthly_planning_data)) {
 
         $.ajax({
           type: 'POST',
-          url: '<?php echo base_url('erp/monthly_plan_submit'); ?>',
+          url: '<?php echo base_url('erp/monthly-plan-submit'); ?>',
           data: formData,
           dataType: 'json',
           encode: true,
@@ -382,7 +383,7 @@ if (!empty($monthly_planning_data)) {
 
     $(document).on("click", ".delete-monthly-planning", function () {
       $('input[name=_token]').val($(this).data('record-id'));
-      $('#delete_record').attr('action', main_url + 'dashboard/delete_monthly_planning');
+      $('#delete_record').attr('action', main_url + 'delete-monthly-planning');
     });
   </script>
 
