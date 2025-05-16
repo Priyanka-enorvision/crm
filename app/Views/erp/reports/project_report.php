@@ -1,7 +1,5 @@
 <?php
-use App\Controllers\BaseController;
-use CodeIgniter\HTTP\RequestInterface;
-use CodeIgniter\HTTP\ResponseInterface;
+
 use App\Models\SystemModel;
 use App\Models\RolesModel;
 use App\Models\UsersModel;
@@ -55,23 +53,6 @@ $ci_erp_settings = $SystemModel->where('setting_id', 1)->first();
 ?>
 <?php
 ?>
-<?php
-/*$date_info = strtotime($req_month_year.'-01');
-$imonth_year = explode('-',$req_month_year);
-$day = date('d', $date_info);
-$month = date($imonth_year[1], $date_info);
-$year = date($imonth_year[0], $date_info);
-
-
-$date = date("F, Y", strtotime($req_month_year.'-01'));//strtotime(date("Y-m-d"),$date_info);
-// total days in month
-$daysInMonth =  date('t');
-//$date = strtotime(date("Y-m-d"));
-$day = date('d', $date_info);
-$month = date('m', $date_info);
-$year = date('Y', $date_info);
-$month_year = date('Y-m');*/
-?>
 
 <div class="row justify-content-md-center"> 
   <!-- [ Attendance view ] start -->
@@ -81,7 +62,7 @@ $month_year = date('Y-m');*/
       <div>
         <div class="card" id="printTable">
           <div class="card-header">
-            <h5><img class="img-fluid" width="171" height="30" src="<?= base_url();?>/public/uploads/logo/other/<?= $ci_erp_settings['other_logo'];?>" alt=""></h5>
+            <h5><img class="img-fluid" width="171" height="30" src="<?= base_url();?>uploads/logo/other/<?= $ci_erp_settings['other_logo'];?>" alt=""></h5>
           </div>
           <div class="card-body pb-0">
             <div class="row invoive-info d-pdrint-inline-flex">
@@ -113,7 +94,7 @@ $month_year = date('Y-m');*/
 						$start_date = set_date_format($_project['start_date']);
 						$end_date = set_date_format($_project['end_date']);
 						$_assigned_to = explode(',',$_project['assigned_to']);
-					  	$multi_users = multi_users_info($_assigned_to);
+					  $multi_users = multi_users_info($_assigned_to);
 						// priority
 						if($_project['priority'] == 1) {
 							$priority = '<span class="text-danger">'.lang('Projects.xin_highest').'</span>';

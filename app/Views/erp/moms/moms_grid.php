@@ -68,7 +68,7 @@ if ($user_info['user_type'] == 'staff') {
         </div>
       </nav>
       <?php if (in_array('mom_2', staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
-        <div id="add_form" class="collapse add-form <?= $get_animate; ?>" data-parent="#accordion" style="">
+        <div id="add_form" class="collapse add-form " data-parent="#accordion" style="">
           <div class="card mb-2">
             <div id="accordion">
               <div class="card-header">
@@ -82,8 +82,8 @@ if ($user_info['user_type'] == 'staff') {
                   </a> </div>
               </div>
               <?php $attributes = array('name' => 'add_mom', 'id' => 'xin-form', 'type' => 'add_record', 'autocomplete' => 'on'); ?>
-              <?php $hidden = array('user_id' => 0); ?>
-              <?php echo form_open('erp/moms/add_mom', $attributes, $hidden); ?>
+              <?php $hidden = array('user_id' => '0'); ?>
+              <?php echo form_open('erp/add-mom', $attributes, $hidden); ?>
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-3">
@@ -215,11 +215,11 @@ if ($user_info['user_type'] == 'staff') {
                   </div>
                   <div class="task-board" style="float: inherit;">
                     <div class="dropdown-secondary dropdown"> <a
-                        href="<?= site_url('erp/mom-detail') . '/' . uencode($r['id']); ?>">
+                        href="<?= site_url('erp/mom-detail') . '/' . $r['id']; ?>">
                         <?= $status ?>
                       </a> </div>
                     <div class="dropdown-secondary dropdown"> <a
-                        href="<?= site_url('erp/mom-detail') . '/' . uencode($r['id']); ?>">
+                        href="<?= site_url('erp/mom-detail') . '/' . $r['id']; ?>">
                         <button class="btn waves-effect waves-light btn-primary btn-sm b-none txt-muted" type="button"><i
                             data-toggle="tooltip" data-placement="top" title="<?= lang('Mom.xin_view_mom'); ?>"
                             class="fas fa-eye m-0"></i></button>
@@ -231,14 +231,14 @@ if ($user_info['user_type'] == 'staff') {
                       <div class="dropdown-menu" aria-labelledby="dropdown3" data-dropdown-in="fadeIn"
                         data-dropdown-out="fadeOut">
                         <?php if (in_array('mom_5', staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
-                          <a class="dropdown-item" href="<?= site_url('erp/mom-detail') . '/' . uencode($r['id']); ?>"> <i
+                          <a class="dropdown-item" href="<?= site_url('erp/mom-detail') . '/' . $r['id']; ?>"> <i
                               class="feather icon-eye"></i>
                             <?= lang('Mom.xin_view_mom'); ?>
                           </a>
                         <?php } ?>
                         <?php if (in_array('mom_3', staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
                           <a class="dropdown-item"
-                            href="<?= site_url('erp/mom-detail') . '/' . uencode($r['id']); ?>?type=edit"> <i
+                            href="<?= site_url('erp/mom-detail') . '/' . $r['id']; ?>?type=edit"> <i
                               class="feather icon-edit"></i>
                             <?= lang('Mom.xin_edit_mom'); ?>
                           </a>
@@ -246,7 +246,7 @@ if ($user_info['user_type'] == 'staff') {
                         <?php if (in_array('mom_4', staff_role_resource()) || $user_info['user_type'] == 'company') { ?>
                           <div class="dropdown-divider"></div>
                           <a href="#!" class="dropdown-item delete" data-toggle="modal" data-target=".delete-modal"
-                            data-record-id="<?= uencode($r['id']); ?>"><i class="feather icon-trash-2"></i>
+                            data-record-id="<?= $r['id']; ?>"><i class="feather icon-trash-2"></i>
                             <?= lang('Mom.xin_remove_mom'); ?>
                           </a>
                         <?php } ?>

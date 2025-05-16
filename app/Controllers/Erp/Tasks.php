@@ -109,7 +109,7 @@ class Tasks extends BaseController
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'customer') {
 			return redirect()->to(site_url('erp/desk'));
@@ -135,7 +135,7 @@ class Tasks extends BaseController
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			return redirect()->to(site_url('erp/desk'));
@@ -174,7 +174,7 @@ class Tasks extends BaseController
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'customer') {
 			return redirect()->to(site_url('erp/desk'));
@@ -192,7 +192,7 @@ class Tasks extends BaseController
 		//$data['progress'] = $task_data['task_progress'];
 		$data['title'] = lang('Projects.xin_task_details') . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'task_details';
-		$data['breadcrumbs'] = lang('Projects.xin_task_details') . $user_id;
+		$data['breadcrumbs'] = lang('Projects.xin_task_details');
 
 		$data['subview'] = view('erp/projects/client_task_details', $data);
 		return view('erp/layout/layout_main', $data); //page load
@@ -207,7 +207,7 @@ class Tasks extends BaseController
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			return redirect()->to(site_url('erp/desk'));
@@ -232,7 +232,7 @@ class Tasks extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -264,7 +264,7 @@ class Tasks extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -293,7 +293,7 @@ class Tasks extends BaseController
 		$usession = $session->get('sup_username');
 
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 
 		$UsersModel = new UsersModel();
@@ -808,7 +808,7 @@ class Tasks extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
@@ -909,13 +909,13 @@ class Tasks extends BaseController
 		exit();
 	}
 	// record list
-	public function client_profile_tasks_list()
+	public function client_profile_tasks_list($client_id)
 	{
 
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$request = \Config\Services::request();
 		$RolesModel = new RolesModel();
@@ -924,7 +924,7 @@ class Tasks extends BaseController
 		$ProjectsModel = new ProjectsModel();
 		$MainModel = new MainModel();
 		$TasksModel = new TasksModel();
-		$client_id = udecode($this->request->getVar('client_id', FILTER_SANITIZE_STRING));
+		// $client_id = udecode($this->request->getVar('client_id', FILTER_SANITIZE_STRING));
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if ($user_info['user_type'] == 'staff') {
 			$company_id = $user_info['company_id'];
@@ -1866,11 +1866,10 @@ class Tasks extends BaseController
 	// update record
 	public function update_task_status()
 	{
-
 		if ($this->request->getVar('xfieldid')) {
 			/* Define return | here result is used to return user data and error for error message */
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-			$session = \Config\Services::session($config);
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
 			$task_id = $this->request->getVar('xfieldid', FILTER_SANITIZE_STRING);
@@ -2045,7 +2044,7 @@ class Tasks extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 
 		$RolesModel = new RolesModel();
@@ -2111,7 +2110,7 @@ class Tasks extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
@@ -2161,7 +2160,7 @@ class Tasks extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
@@ -2201,7 +2200,7 @@ class Tasks extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();

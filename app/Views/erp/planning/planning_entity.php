@@ -61,12 +61,12 @@ function generateActions($entity, $user_info) {
 
     if ($entity['company_id'] != 0 && $entity['user_type'] != '') {
         if ($canDelete) {
-            $actions .= '<button type="button" class="btn btn-sm btn-light-danger delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . uencode($entity['id']) . '">
+            $actions .= '<button type="button" class="btn btn-sm btn-light-danger delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $entity['id'] . '">
                             <i class="feather icon-trash-2"></i>
                         </button>';
         }
         if ($canEdit) {
-            $actions .= '<a href="' . site_url('erp/planning-configuration-detail') . '/' . uencode($entity['id']) . '" class="btn btn-sm btn-light-primary">
+            $actions .= '<a href="' . site_url('erp/planning-configuration-detail') . '/' . $entity['id'] . '" class="btn btn-sm btn-light-primary">
                             <i class="feather icon-edit"></i>
                         </a>';
         }
@@ -113,8 +113,8 @@ function generateActions($entity, $user_info) {
               <div class="modal-body">
                 <?php
                 $attributes = ['name' => 'add_planning_entities', 'id' => 'planningEntitiesForm', 'autocomplete' => 'off'];
-                $hidden = ['user_id' => 0];
-                echo form_open('erp/dashboard/add_planning_entities', $attributes, $hidden);
+                $hidden = ['user_id' => '0'];
+                echo form_open('erp/add-planning-entities', $attributes, $hidden);
                 ?>
                 <div class="card-body">
                   <div class="row">

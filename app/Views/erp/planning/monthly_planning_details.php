@@ -26,8 +26,10 @@ $locale = service('request')->getLocale();
 
 $xin_system = $models['SystemModel']->where('setting_id', 1)->first();
 
-$segment_id = $request->uri->getSegment(3);
-$monthly_planning_id = udecode($segment_id);
+$segment_id = $ifield_id;
+$monthly_planning_id = $ifield_id;
+// $segment_id = $request->uri->getSegment(3);
+// $monthly_planning_id = udecode($segment_id);
 
 $user_info = $models['UsersModel']->where('user_id', $usession['sup_user_id'])->first();
 $company_id = $user_info['user_type'] == 'staff' ? $user_info['company_id'] : $usession['sup_user_id'];
@@ -72,8 +74,8 @@ $monthly_plannings = $models['MonthlyPlanningModel']->where('company_id', $compa
       <br>
       <?php if (in_array('project5', staff_role_resource()) || $user_info['user_type'] == 'company'): ?>
         <?php $attributes = ['name' => 'update_monthly_planning_entity', 'id' => 'update_monthly_planning_entity', 'autocomplete' => 'off']; ?>
-        <?php $hidden = ['user_id' => 0]; ?>
-        <?= form_open('erp/dashboard/update_monthly_planning_entity', $attributes, $hidden); ?>
+        <?php $hidden = ['user_id' => '0']; ?>
+        <?= form_open('erp/update-monthly-planning-entity', $attributes, $hidden); ?>
         <div class="card shadow-sm border-0">
           <div class="card-header bg-primary text-white">
             <h5 class="card-title mb-0">Update Monthly Planning Entity</h5>

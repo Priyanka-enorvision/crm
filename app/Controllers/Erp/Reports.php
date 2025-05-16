@@ -1,15 +1,11 @@
 <?php
 namespace App\Controllers\Erp;
 use App\Controllers\BaseController;
-use CodeIgniter\HTTP\RequestInterface;
-use CodeIgniter\HTTP\ResponseInterface;
-use CodeIgniter\HTTP\Files\UploadedFile;
  
 use App\Models\SystemModel;
 use App\Models\RolesModel;
 use App\Models\UsersModel;
-use App\Models\MainModel;
-use App\Models\StaffdetailsModel;
+
 
 class Reports extends BaseController {
 
@@ -25,7 +21,7 @@ class Reports extends BaseController {
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if(!$session->has('sup_username')){ 
 			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
 			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
@@ -35,7 +31,7 @@ class Reports extends BaseController {
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$data['title'] = lang('Employees.xin_employee_details').' | '.$xin_system['application_name'];
 		$data['path_url'] = 'empty';
-		$data['breadcrumbs'] = lang('Employees.xin_employee_details').$user_id;
+		$data['breadcrumbs'] = lang('Employees.xin_employee_details');
 
 		$data['subview'] = view('erp/reports/attendance_report', $data);
 		return view('erp/layout/pre_layout_main', $data); //page load
@@ -52,7 +48,7 @@ class Reports extends BaseController {
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if(!$session->has('sup_username')){ 
 			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
 			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
@@ -62,7 +58,7 @@ class Reports extends BaseController {
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$data['title'] = lang('Employees.xin_employee_details').' | '.$xin_system['application_name'];
 		$data['path_url'] = 'empty';
-		$data['breadcrumbs'] = lang('Employees.xin_employee_details').$user_id;
+		$data['breadcrumbs'] = lang('Employees.xin_employee_details');
 
 		$data['subview'] = view('erp/reports/payroll_report', $data);
 		return view('erp/layout/pre_layout_main', $data); //page load
@@ -79,7 +75,7 @@ class Reports extends BaseController {
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if(!$session->has('sup_username')){ 
 			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
 			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
@@ -89,7 +85,7 @@ class Reports extends BaseController {
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$data['title'] = lang('Employees.xin_employee_details').' | '.$xin_system['application_name'];
 		$data['path_url'] = 'empty';
-		$data['breadcrumbs'] = lang('Employees.xin_employee_details').$user_id;
+		$data['breadcrumbs'] = lang('Employees.xin_employee_details');
 
 		$data['subview'] = view('erp/reports/project_report', $data);
 		return view('erp/layout/pre_layout_main', $data); //page load
@@ -106,7 +102,7 @@ class Reports extends BaseController {
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if(!$session->has('sup_username')){ 
 			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
 			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
@@ -116,7 +112,7 @@ class Reports extends BaseController {
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$data['title'] = lang('Employees.xin_employee_details').' | '.$xin_system['application_name'];
 		$data['path_url'] = 'empty';
-		$data['breadcrumbs'] = lang('Employees.xin_employee_details').$user_id;
+		$data['breadcrumbs'] = lang('Employees.xin_employee_details');
 
 		$data['subview'] = view('erp/reports/task_report', $data);
 		return view('erp/layout/pre_layout_main', $data); //page load
@@ -133,7 +129,7 @@ class Reports extends BaseController {
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if(!$session->has('sup_username')){ 
 			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
 			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
@@ -143,7 +139,7 @@ class Reports extends BaseController {
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$data['title'] = lang('Employees.xin_employee_details').' | '.$xin_system['application_name'];
 		$data['path_url'] = 'empty';
-		$data['breadcrumbs'] = lang('Employees.xin_employee_details').$user_id;
+		$data['breadcrumbs'] = lang('Employees.xin_employee_details');
 
 		$data['subview'] = view('erp/reports/invoice_report', $data);
 		return view('erp/layout/pre_layout_main', $data); //page load
@@ -160,7 +156,7 @@ class Reports extends BaseController {
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if(!$session->has('sup_username')){ 
 			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
 			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
@@ -170,7 +166,7 @@ class Reports extends BaseController {
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$data['title'] = lang('Employees.xin_employee_details').' | '.$xin_system['application_name'];
 		$data['path_url'] = 'empty';
-		$data['breadcrumbs'] = lang('Employees.xin_employee_details').$user_id;
+		$data['breadcrumbs'] = lang('Employees.xin_employee_details');
 
 		$data['subview'] = view('erp/reports/leave_report', $data);
 		return view('erp/layout/pre_layout_main', $data); //page load
@@ -187,7 +183,7 @@ class Reports extends BaseController {
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if(!$session->has('sup_username')){ 
 			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
 			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
@@ -197,7 +193,7 @@ class Reports extends BaseController {
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$data['title'] = lang('Employees.xin_employee_details').' | '.$xin_system['application_name'];
 		$data['path_url'] = 'empty';
-		$data['breadcrumbs'] = lang('Employees.xin_employee_details').$user_id;
+		$data['breadcrumbs'] = lang('Employees.xin_employee_details');
 
 		$data['subview'] = view('erp/reports/training_report', $data);
 		return view('erp/layout/pre_layout_main', $data); //page load
@@ -214,7 +210,7 @@ class Reports extends BaseController {
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if(!$session->has('sup_username')){ 
 			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
 			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
@@ -224,7 +220,7 @@ class Reports extends BaseController {
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$data['title'] = lang('Employees.xin_employee_details').' | '.$xin_system['application_name'];
 		$data['path_url'] = 'empty';
-		$data['breadcrumbs'] = lang('Employees.xin_employee_details').$user_id;
+		$data['breadcrumbs'] = lang('Employees.xin_employee_details');
 
 		$data['subview'] = view('erp/reports/account_statement', $data);
 		return view('erp/layout/pre_layout_main', $data); //page load

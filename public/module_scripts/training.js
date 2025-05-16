@@ -2,7 +2,7 @@ $(document).ready(function() {
 var xin_table = $('#xin_table').dataTable({
 	"bDestroy": true,
 	"ajax": {
-		url : main_url+"training/training_list",
+		url : main_url+"training-list",
 		type : 'GET'
 	},
 	"language": {
@@ -59,7 +59,7 @@ $('[data-plugin="select_hrm"]').select2({ width:'100%' });
 		var field_id = button.data('field_id');
 		var modal = $(this);
 	$.ajax({
-		url : main_url+"training/read_training",
+		url : main_url+"read-training",
 		type: "GET",
 		data: 'jd=1&data=training&field_id='+field_id,
 		success: function (response) {
@@ -112,5 +112,5 @@ $('[data-plugin="select_hrm"]').select2({ width:'100%' });
 });
 $( document ).on( "click", ".delete", function() {
 	$('input[name=_token]').val($(this).data('record-id'));
-	$('#delete_record').attr('action',main_url+'training/delete_training');
+	$('#delete_record').attr('action',main_url+'delete-training');
 });

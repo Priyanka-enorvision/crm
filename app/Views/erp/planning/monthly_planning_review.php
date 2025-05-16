@@ -25,8 +25,10 @@ $xin_system = $models['SystemModel']->where('setting_id', 1)->first();
 $locale = service('request')->getLocale();
 $request = \Config\Services::request();
 
-$segment_id = $request->uri->getSegment(3);
-$monthly_planning_id = udecode($segment_id);
+// $segment_id = $request->uri->getSegment(3);
+// $monthly_planning_id = udecode($segment_id);
+$segment_id = $ifield_id;
+$monthly_planning_id = $ifield_id;
 
 $user_info = $models['UsersModel']->where('user_id', $usession['sup_user_id'])->first();
 $company_id = $user_info['user_type'] == 'staff' ? $user_info['company_id'] : $usession['sup_user_id'];
@@ -34,7 +36,13 @@ $user_type = $user_info['user_type'];
 
 $monthly_planning_data = $models['MonthlyPlanningModel']->where(['company_id' => $company_id, 'user_type' => $user_type])->where('id', $monthly_planning_id)->first();
 $monthly_achive_data = $models['MonthlyAchivedModel']->where(['company_id' => $company_id, 'user_type' => $user_type,'entities_id'=>$monthly_planning_data['entities_id'],'month'=>$monthly_planning_data['month'],'year'=>$monthly_planning_data['year']])->first();
-$expected_value = $monthly_achive_data['entity_value'];
+if(!empty($monthly_achive_data))
+{
+    $expected_value = $monthly_achive_data['entity_value'];
+}else
+{
+    $expected_value = "";
+}
 
 $planning_entity = $models['PlanningEntityModel']->where('id', $monthly_planning_data['entities_id'])->first();
 $planning_entity_name = $planning_entity['entity'];
@@ -62,8 +70,8 @@ $monthly_planning_review_data = $models['MonthlyPlanReviewModel']->where(['compa
             </div>
             <br>
             <?php $attributes = ['name' => 'review_monthly_planning_entity', 'id' => 'review_monthly_planning_entity', 'autocomplete' => 'off']; ?>
-            <?php $hidden = ['user_id' => 0]; ?>
-            <?= form_open('erp/dashboard/review_monthly_planning_entity', $attributes, $hidden); ?>
+            <?php $hidden = ['user_id' => '0']; ?>
+            <?= form_open('erp/review-monthly-planning-entity', $attributes, $hidden); ?>
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-primary text-white">
                     <h5 class="card-title mb-0">Review Monthly Planning Entity</h5>
@@ -223,23 +231,23 @@ $monthly_planning_review_data = $models['MonthlyPlanReviewModel']->where(['compa
                         toastr.success(response.message || 'Monthly planning processed successfully!');
                         
                         // Auto-reload after 2 seconds
-                        setTimeout(function() {
-                            location.reload();
-                        }, 2000);
+                        // setTimeout(function() {
+                        //     location.reload();
+                        // }, 2000);
                         
                     } else {
                         if (response.errors) {
                             $.each(response.errors, function(field, error) {
                                 toastr.error(error);
                             });
-                            setTimeout(function() {
-                                location.reload();
-                            }, 2000);
+                            // setTimeout(function() {
+                            //     location.reload();
+                            // }, 2000);
                         } else {
                             toastr.warning(response.message || 'Operation completed with warnings');
-                            setTimeout(function() {
-                                location.reload();
-                            }, 2000);
+                            // setTimeout(function() {
+                            //     location.reload();
+                            // }, 2000);
                         }
                     }
                 },
@@ -257,9 +265,9 @@ $monthly_planning_review_data = $models['MonthlyPlanReviewModel']->where(['compa
                     toastr.error(errorMsg);
                     
                     // Auto-reload after 3 seconds for errors
-                    setTimeout(function() {
-                        location.reload();
-                    }, 3000);
+                    // setTimeout(function() {
+                    //     location.reload();
+                    // }, 3000);
                 }
             });
         });

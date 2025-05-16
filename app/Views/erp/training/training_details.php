@@ -24,8 +24,9 @@ $DesignationModel = new DesignationModel();
 $StaffdetailsModel = new StaffdetailsModel();
 $TrainingnotesModel = new TrainingnotesModel();
 $get_animate = '';
-$segment_id = $request->uri->getSegment(3);
-$ifield_id = udecode($segment_id);
+$segment_id = $ifield_id;
+// $segment_id = $request->uri->getSegment(3);
+// $ifield_id = udecode($segment_id);
 $result = $TrainingModel->where('training_id', $ifield_id)->first();
 $xin_system = erp_company_settings();
 $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
@@ -68,7 +69,7 @@ endif;
       </div>
       <?php $attributes = array('name' => 'update_status', 'id' => 'update_status', 'autocomplete' => 'off');?>
       <?php $hidden = array('token' => $segment_id);?>
-      <?php echo form_open('erp/training/update_training_status', $attributes, $hidden);?>
+      <?php echo form_open('erp/update-training-status', $attributes, $hidden);?>
       <div class="card-body">
         <div class="col-md-12">
           <div class="row">
@@ -161,7 +162,7 @@ endif;
 			$idesignations = $DesignationModel->where('designation_id',$employee_detail['designation_id'])->first();
 			?>
             <p>
-              <?= $idesignations['designation_name'];?>
+              <?= isset($idesignations['designation_name'])?$idesignations['designation_name']:'';?>
             </p>
           </div>
           <div> <a href="#!" class="text-muted"> <i class="icon-options-vertical"></i></a> </div>
@@ -306,7 +307,7 @@ endif;
               </ul>
               <?php $attributes = array('name' => 'add_note', 'id' => 'add_note', 'autocomplete' => 'off');?>
               <?php $hidden = array('token' => $segment_id);?>
-              <?= form_open('erp/training/add_note', $attributes, $hidden);?>
+              <?= form_open('erp/training-add-note', $attributes, $hidden);?>
               <div class="input-group mb-3">
                 <input type="text" name="description" class="form-control" placeholder="<?= lang('Projects.xin_create_note_list');?>">
                 <div class="input-group-append">

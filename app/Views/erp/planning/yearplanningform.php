@@ -41,14 +41,16 @@ $unplanned_entities = array_filter($planning_entities, function($entity) use ($p
 if (!empty($year_planning_data)) {
   $record = [];
 
+  $i=0;
   foreach ($year_planning_data as $r) {
+
 
     $actions = '';
     if (in_array('year_planning4', staff_role_resource()) || $user_info['user_type'] == 'company') {
-      $actions .= '<button type="button" class="btn btn-sm btn-light-danger delete-year-planning" data-toggle="modal" data-target=".delete-modal" data-record-id="' . uencode($r['id']) . '"><i class="feather icon-trash-2"></i></button>';
+      $actions .= '<button type="button" class="btn btn-sm btn-light-danger delete-year-planning" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r['id'] . '"><i class="feather icon-trash-2"></i></button>';
     }
     if (in_array('year_planning3', staff_role_resource()) || $user_info['user_type'] == 'company') {
-      $actions .= '<a href="' . site_url('erp/year-planning-detail') . '/' . uencode($r['id']) . '" class="btn btn-sm btn-light-primary"><i class="feather icon-edit"></i></a>';
+      $actions .= '<a href="' . site_url('erp/year-planning-detail') . '/' . $r['id'] . '" class="btn btn-sm btn-light-primary"><i class="feather icon-edit"></i></a>';
     }
     $entity_id = $r['entities_id'];
     $entity_data = $PlanningEntityModel->where('id', $entity_id)->first();
@@ -59,10 +61,11 @@ if (!empty($year_planning_data)) {
     } else {
       $entity_value = $r['entity_value'];
     }
+    $i++;
 
     $year = $r['year'];
     $record[] = [
-      $entity_id,
+      $i,
       $entity_name,
       $entity_value,
       $year,
@@ -73,7 +76,7 @@ if (!empty($year_planning_data)) {
   foreach ($unplanned_entities as $entity) {
     $actions = '';
     if (in_array('year_planning3', staff_role_resource()) || $user_info['user_type'] == 'company') {
-      $actions .= '<a href="' . site_url('erp/year-planning-detail') . '/' . uencode($entity['id']) . '" class="btn btn-sm btn-light-primary"><i class="feather icon-edit"></i></a>';
+      $actions .= '<a href="' . site_url('erp/year-planning-detail') . '/' . $entity['id'] . '" class="btn btn-sm btn-light-primary"><i class="feather icon-edit"></i></a>';
     }
 
     $record[] = [
@@ -278,7 +281,7 @@ if (!empty($year_planning_data)) {
 
     $(document).on("click", ".delete-year-planning", function () {
       $('input[name=_token]').val($(this).data('record-id'));
-      $('#delete_record').attr('action', main_url + 'dashboard/delete_year_planning');
+      $('#delete_record').attr('action', main_url + 'delete-year-planning');
     });
   </script>
 

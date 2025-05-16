@@ -28,7 +28,7 @@ $(document).ready(function(){
 		$('#option_id_'+field_id).fadeOut();
 		$('.option_id_'+field_id).fadeOut();
 		$.ajax({
-		url : main_url+"training/delete_training_note",
+		url : main_url+"delete-training-note",
 		type: "GET",
 		data: 'jd=1&data=training_note&field_id='+field_id,
 		success: function (response) {

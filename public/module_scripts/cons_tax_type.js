@@ -2,7 +2,7 @@ $(document).ready(function() {
    var xin_table = $('#xin_table').dataTable({
         "bDestroy": true,
 		"ajax": {
-            url : main_url+"types/tax_type_list",
+            url : main_url+"tax-type-list",
             type : 'GET'
         },
 		"language": {
@@ -57,7 +57,7 @@ $(document).ready(function() {
 		var field_id = button.data('field_id');
 		var modal = $(this);
 	$.ajax({
-		url : main_url+"types/read_tax_type",
+		url : main_url+"read-tax-type",
 		type: "GET",
 		data: 'jd=1&data=tax_type&field_id='+field_id,
 		success: function (response) {
@@ -108,5 +108,5 @@ $(document).ready(function() {
 });
 $( document ).on( "click", ".delete", function() {
 	$('input[name=_token]').val($(this).data('record-id'));
-	$('#delete_record').attr('action',main_url+'types/delete_type/'+$(this).data('record-id'));
+	$('#delete_record').attr('action',main_url+'delete-type/'+$(this).data('record-id'));
 });

@@ -21,8 +21,11 @@ $usession = $session->get('sup_username');
 $router = service('router');
 $request = \Config\Services::request();
 ///
-$segment_id = $request->uri->getSegment(3);
-$invoice_id = udecode($segment_id);
+// $segment_id = $request->uri->getSegment(3);
+// $invoice_id = udecode($segment_id);
+
+$segment_id = $ifield_id;
+$invoice_id = $segment_id;
 
 $user = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 
@@ -84,7 +87,7 @@ $xin_system = erp_company_settings();
           <div class="col-md-12">
             <?php $attributes = array('name' => 'update_invoice', 'id' => 'xin-form-update', 'autocomplete' => 'off', 'class' => 'form'); ?>
             <?php $hidden = array('token' => $segment_id); ?>
-            <?php echo form_open('erp/invoices/update_invoice', $attributes, $hidden); ?>
+            <?php echo form_open('erp/update-invoice', $attributes, $hidden); ?>
             <div class="bg-white">
               <div class="box-block">
                 <div class="row">

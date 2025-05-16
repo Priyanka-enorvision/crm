@@ -36,7 +36,7 @@ class Invoices extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -65,7 +65,7 @@ class Invoices extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -140,7 +140,7 @@ class Invoices extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -186,7 +186,7 @@ class Invoices extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -205,7 +205,7 @@ class Invoices extends BaseController
 		$data['subview'] = view('erp/invoices/create_invoice', $data);
 		return view('erp/layout/layout_main', $data); //page load
 	}
-	public function edit_invoice()
+	public function edit_invoice($ifield_id)
 	{
 		$session = \Config\Services::session();
 		$SystemModel = new SystemModel();
@@ -214,7 +214,7 @@ class Invoices extends BaseController
 		$usession = $session->get('sup_username');
 		$InvoicesModel = new InvoicesModel();
 		$request = \Config\Services::request();
-		$ifield_id = udecode($request->uri->getSegment(3));
+		// $ifield_id = udecode($request->uri->getSegment(3));
 		$isegment_val = $InvoicesModel->where('invoice_id', $ifield_id)->first();
 		if (!$isegment_val) {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -224,7 +224,7 @@ class Invoices extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -239,11 +239,12 @@ class Invoices extends BaseController
 		$data['title'] = lang('Invoices.xin_edit_invoice') . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'create_invoice';
 		$data['breadcrumbs'] = lang('Invoices.xin_edit_invoice');
+		$data['ifield_id'] = $ifield_id;
 
 		$data['subview'] = view('erp/invoices/edit_invoice', $data);
 		return view('erp/layout/layout_main', $data); //page load
 	}
-	public function invoice_details()
+	public function invoice_details($ifield_id)
 	{
 		$session = \Config\Services::session();
 		$SystemModel = new SystemModel();
@@ -252,7 +253,7 @@ class Invoices extends BaseController
 		$usession = $session->get('sup_username');
 		$InvoicesModel = new InvoicesModel();
 		$request = \Config\Services::request();
-		$ifield_id = udecode($request->getUri()->getSegment(3));
+		// $ifield_id = udecode($request->getUri()->getSegment(3));
 		$isegment_val = $InvoicesModel->where('invoice_id', $ifield_id)->first();
 		if (!$isegment_val) {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -262,7 +263,7 @@ class Invoices extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff' && $user_info['user_type'] != 'customer') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -277,11 +278,12 @@ class Invoices extends BaseController
 		$data['title'] = lang('Invoices.xin_view_invoice') . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'invoice_details';
 		$data['breadcrumbs'] = lang('Invoices.xin_view_invoice');
+		$data['ifield_id'] = $ifield_id;
 
 		$data['subview'] = view('erp/invoices/project_billing_details', $data);
 		return view('erp/layout/layout_main', $data); //page load
 	}
-	public function view_project_invoice()
+	public function view_project_invoice($ifield_id)
 	{
 		$session = \Config\Services::session();
 		$SystemModel = new SystemModel();
@@ -290,7 +292,7 @@ class Invoices extends BaseController
 		$usession = $session->get('sup_username');
 		$InvoicesModel = new InvoicesModel();
 		$request = \Config\Services::request();
-		$ifield_id = udecode($request->uri->getSegment(3));
+		// $ifield_id = udecode($request->uri->getSegment(3));
 		$isegment_val = $InvoicesModel->where('invoice_id', $ifield_id)->first();
 		if (!$isegment_val) {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -300,6 +302,7 @@ class Invoices extends BaseController
 		$data['title'] = lang('Invoices.xin_view_invoice') . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'invoice_details';
 		$data['breadcrumbs'] = lang('Invoices.xin_view_invoice');
+		$data['ifield_id'] = $ifield_id;
 
 		$data['subview'] = view('erp/invoices/view_project_invoice', $data);
 		return view('erp/layout/pre_layout_main', $data); //page load
@@ -423,7 +426,7 @@ class Invoices extends BaseController
 		exit();
 	}
 	// list
-	public function client_profile_invoices_list()
+	public function client_profile_invoices_list($client_id)
 	{
 
 		$session = \Config\Services::session();
@@ -433,7 +436,7 @@ class Invoices extends BaseController
 		$SystemModel = new SystemModel();
 		$UsersModel = new UsersModel();
 		$ProjectsModel = new ProjectsModel();
-		$client_id = udecode($this->request->getVar('client_id', FILTER_SANITIZE_STRING));
+		// $client_id = udecode($this->request->getVar('client_id', FILTER_SANITIZE_STRING));
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if ($user_info['user_type'] == 'staff') {
 			$company_id = $user_info['company_id'];
@@ -469,7 +472,7 @@ class Invoices extends BaseController
 			';
 			$data[] = array(
 				$links,
-				$project['title'],
+				isset($project['title'])?$project['title']:'---',
 				$invoice_date,
 				$invoice_total,
 				$status,
@@ -511,7 +514,7 @@ class Invoices extends BaseController
 
 			$invoice_date = set_date_format($r['invoice_date']);
 			$invoice_due_date = set_date_format($r['invoice_due_date']);
-			$invoice_id = '<a href="' . site_url('erp/invoice-detail') . '/' . uencode($r['invoice_id']) . '"><span>' . $r['invoice_number'] . '</span></a>';
+			$invoice_id = '<a href="' . site_url('erp/invoice-detail') . '/' . $r['invoice_id']. '"><span>' . $r['invoice_number'] . '</span></a>';
 			if ($r['status'] == 0) {
 				$status = '<span class="badge badge-light-danger">' . lang('Invoices.xin_unpaid') . '</span>';
 			} else if ($r['status'] == 1) {
@@ -523,12 +526,12 @@ class Invoices extends BaseController
 			$links = '
 				' . $invoice_id . '
 				<div class="overlay-edit">
-					<a href="' . site_url('erp/invoice-detail/') . uencode($r['invoice_id']) . '"><button type="button" class="btn btn-sm btn-icon btn-light-success"><i class="feather icon-eye"></i></button></a> <a href="' . site_url('erp/print-invoice/') . uencode($r['invoice_id']) . '"><button type="button" class="btn btn-sm btn-icon btn-light-primary"><i class="feather icon-download"></i></button></a>
+					<a href="' . site_url('erp/invoice-detail/') . $r['invoice_id'] . '"><button type="button" class="btn btn-sm btn-icon btn-light-success"><i class="feather icon-eye"></i></button></a> <a href="' . site_url('erp/print-invoice/') . $r['invoice_id'] . '"><button type="button" class="btn btn-sm btn-icon btn-light-primary"><i class="feather icon-download"></i></button></a>
 				</div>
 			';
 			$data[] = array(
 				$links,
-				$project['title'],
+				isset($project['title'])?$project['title']:'',
 				$invoice_date,
 				$invoice_total,
 				$_payment_method['category_name'],
@@ -658,8 +661,7 @@ class Invoices extends BaseController
 
 	public function create_new_invoice()
 	{
-
-		$validation = Services::validation();
+		
 		$session = Services::session();
 		$request = Services::request();
 		$usession = $session->get('sup_username');
@@ -722,7 +724,7 @@ class Invoices extends BaseController
 
 			if (empty($item_names) || count($item_names) !== count($qtys) || count($qtys) !== count($unit_prices) || count($unit_prices) !== count($sub_total_items)) {
 				$return['error'] = 'Item details are incomplete or mismatched.';
-				return $this->output($return);
+				return $this->response->setJSON($return);
 			}
 
 			$items_sub_total = filter_var($request->getPost('items_sub_total'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
@@ -773,7 +775,7 @@ class Invoices extends BaseController
 			if ($invoiceInsertResult === false) {
 				$dbError = $db->error();
 				log_message('error', 'Database error: ' . $dbError['message']);
-				return $this->output($return);
+				return $this->response->setJSON($return);
 			}
 
 			$invoice_id = $InvoicesModel->insertID();
@@ -992,7 +994,7 @@ class Invoices extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 
 		$UsersModel = new UsersModel();
@@ -1014,8 +1016,7 @@ class Invoices extends BaseController
 		// paid
 		$Return['paid'] = lang('Invoices.xin_paid');
 		$Return['paid_count'] = $paid_count;
-		$this->output($Return);
-		exit;
+		return $this->response->setJSON($Return);
 	}
 
 	public function invoice_amount_chart()
@@ -1023,7 +1024,7 @@ class Invoices extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 
 		$UsersModel = new UsersModel();
@@ -1066,7 +1067,7 @@ class Invoices extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$UsersModel = new UsersModel();
 
@@ -1342,7 +1343,7 @@ class Invoices extends BaseController
 	{
 		$session = \Config\Services::session();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 
 		$UsersModel = new UsersModel();
@@ -1523,7 +1524,7 @@ class Invoices extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
@@ -1600,13 +1601,13 @@ class Invoices extends BaseController
 		// Validate the input data
 		if (!$this->validate($rules)) {
 			$Return['error'] = reset($validation->getErrors());
-			return $this->output($Return);
+			return $this->response->setJSON($Return);
 		}
 
 		// Sanitize and process input data
 		$payment_method = (int) $this->request->getPost('payment_method');
 		$status = (int) $this->request->getPost('status');
-		$id = udecode($this->request->getPost('token'));
+		$id = $this->request->getPost('token');
 
 		log_message('info', 'Decoded ID: ' . $id);
 
@@ -1617,7 +1618,7 @@ class Invoices extends BaseController
 		$invoice = $InvoicesModel->find($id);
 		if (!$invoice) {
 			$Return['error'] = 'Invoice not found.';
-			return $this->output($Return);
+			return $this->response->setJSON($Return);
 		}
 
 		// Prepare data for update
@@ -1644,36 +1645,32 @@ class Invoices extends BaseController
 			$Return['error'] = 'Database error: ' . $e->getMessage();
 		}
 
-		return $this->output($Return);
+		return $this->response->setJSON($Return);
 	}
 
 	// delete record
-	public function delete_invoice()
+	public function delete_invoice($id)
 	{
-
-		if ($this->request->getPost('type') == 'delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-			$session = \Config\Services::session();
-			$request = \Config\Services::request();
-			$usession = $session->get('sup_username');
-			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
-			$Return['csrf_hash'] = csrf_hash();
-			$InvoicesModel = new InvoicesModel();
-			$UsersModel = new UsersModel();
-			$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-			if ($user_info['user_type'] == 'staff') {
-				$company_id = $user_info['company_id'];
-			} else {
-				$company_id = $usession['sup_user_id'];
-			}
-			$result = $InvoicesModel->where('invoice_id', $id)->where('company_id', $company_id)->delete($id);
-			if ($result == TRUE) {
-				$Return['result'] = lang('Success.ci_invoice_deleted_msg');
-			} else {
-				$Return['error'] = lang('Main.xin_error_msg');
-			}
-			$this->output($Return);
+		$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+		$session = \Config\Services::session();
+		$request = \Config\Services::request();
+		$usession = $session->get('sup_username');
+		// $id = $this->request->getVar('_token', FILTER_SANITIZE_STRING);
+		$Return['csrf_hash'] = csrf_hash();
+		$InvoicesModel = new InvoicesModel();
+		$UsersModel = new UsersModel();
+		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+		if ($user_info['user_type'] == 'staff') {
+			$company_id = $user_info['company_id'];
+		} else {
+			$company_id = $usession['sup_user_id'];
 		}
+		$result = $InvoicesModel->where('invoice_id', $id)->where('company_id', $company_id)->delete($id);
+		if ($result == TRUE) {
+			$Return['result'] = lang('Success.ci_invoice_deleted_msg');
+		} else {
+			$Return['error'] = lang('Main.xin_error_msg');
+		}
+		return $this->response->setJSON($Return);
 	}
 }

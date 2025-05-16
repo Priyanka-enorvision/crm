@@ -29,5 +29,5 @@ $(document).ready(function () {
 });
 $(document).on("click", ".delete", function () {
 	$('input[name=_token]').val($(this).data('record-id'));
-	$('#delete_record').attr('action', main_url + 'moms/moms_delete');
+	$('#delete_record').attr('action', main_url + 'moms-delete');
 });

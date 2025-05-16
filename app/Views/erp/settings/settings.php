@@ -217,10 +217,10 @@ $tax_duration = $TaxDurationModel->where('company_id', $user_company_id)->first(
                                 <label class="custom-file-label"><?= lang('Main.xin_choose_file'); ?></label>
                                 <div class="mt-3">
                                   <?php if ($xin_system['logo'] != '' && $xin_system['logo'] != 'no file') { ?>
-                                    <img src="<?= base_url() . '/public/uploads/logo/' . $xin_system['logo']; ?>" width="70px"
+                                    <img src="<?= base_url() . 'uploads/logo/' . $xin_system['logo']; ?>" width="70px"
                                       style="margin-left:30px;" id="u_file_1">
                                   <?php } else { ?>
-                                    <img src="<?= base_url() . '/public/uploads/logo/no_logo.png'; ?>" width="70px"
+                                    <img src="<?= base_url() . 'uploads/logo/no_logo.png'; ?>" width="70px"
                                       style="margin-left:30px;" id="u_file_1">
                                   <?php } ?>
                                 </div>
@@ -255,10 +255,10 @@ $tax_duration = $TaxDurationModel->where('company_id', $user_company_id)->first(
                                 <label class="custom-file-label"><?= lang('Main.xin_choose_file'); ?></label>
                                 <div class="mt-3">
                                   <?php if ($xin_system['favicon'] != '' && $xin_system['favicon'] != 'no file') { ?>
-                                    <img src="<?= base_url() . '/public/uploads/logo/favicon/' . $xin_system['favicon']; ?>"
+                                    <img src="<?= base_url() . 'uploads/logo/favicon/' . $xin_system['favicon']; ?>"
                                       width="16px" style="margin-left:30px;" id="favicon1">
                                   <?php } else { ?>
-                                    <img src="<?= base_url() . '/public/uploads/logo/no_logo.png'; ?>" width="16px"
+                                    <img src="<?= base_url() . 'uploads/logo/no_logo.png'; ?>" width="16px"
                                       style="margin-left:30px;" id="favicon1">
                                   <?php } ?>
                                 </div>
@@ -298,12 +298,14 @@ $tax_duration = $TaxDurationModel->where('company_id', $user_company_id)->first(
                                 <input type="file" class="custom-file-input" name="other_logo">
                                 <label class="custom-file-label"><?= lang('Main.xin_choose_file'); ?></label>
                                 <div class="mt-3">
-                                  <?php if ($logo_details['other_logo'] != '' && $logo_details['other_logo'] != 'no file') { ?>
-                                    <img src="<?= base_url() . '/public/uploads/logo/other/' . $logo_details['other_logo']; ?>"
-                                      width="70px" style="margin-left:30px;" id="u_file3">
-                                  <?php } else { ?>
-                                    <img src="<?= base_url() . '/public/uploads/logo/no_logo.png'; ?>" width="70px"
-                                      style="margin-left:30px;" id="u_file3">
+                                    <?php if (!empty($logo_details)) { ?>
+                                    <?php if ($logo_details['other_logo'] != '' && $logo_details['other_logo'] != 'no file') { ?>
+                                      <img src="<?= base_url() . 'uploads/logo/other/' . $logo_details['other_logo']; ?>"
+                                        width="70px" style="margin-left:30px;" id="u_file3">
+                                    <?php } else { ?>
+                                      <img src="<?= base_url() . 'uploads/logo/no_logo.png'; ?>" width="70px"
+                                        style="margin-left:30px;" id="u_file3">
+                                    <?php } ?>
                                   <?php } ?>
                                 </div>
                                 <div class="mt-3"> <small>-
@@ -575,8 +577,8 @@ $tax_duration = $TaxDurationModel->where('company_id', $user_company_id)->first(
               </h5>
             </div>
             <?php $attributes = array('name' => 'planning_configuration', 'id' => 'planning_configuration', 'autocomplete' => 'off'); ?>
-            <?php $hidden = array('user_id' => 0); ?>
-            <?= form_open('erp/settings/planning_configuration', $attributes, $hidden); ?>
+            <?php $hidden = array('user_id' => '0'); ?>
+            <?= form_open('erp/planning-configuration', $attributes, $hidden); ?>
             <div class="card-body">
               <div class="row">
                 <!-- Financial Year Selection -->
@@ -711,7 +713,7 @@ $tax_duration = $TaxDurationModel->where('company_id', $user_company_id)->first(
                               <span data-toggle="tooltip" title="Delete Planning Configuration">
                                 <button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete"
                                   data-toggle="modal" data-target="#deleteModal"
-                                  data-record-id="">
+                                  data-record-id="<?php $data['id']; ?>">
                                   <i class="feather icon-trash-2"></i>
                                 </button>
                               </span>
@@ -784,9 +786,9 @@ $tax_duration = $TaxDurationModel->where('company_id', $user_company_id)->first(
                               <td><?php echo $data['category_name']; ?></td>
                               <td>
                                 <?php if ($data['status'] == 1) : ?>
-                                  <a href="<?= base_url('erp/settings/update_status/' . base64_encode($data['id']) . '/0') ?>" class="btn btn-success">Active</a>
+                                  <a href="<?= base_url('erp/settings/update_status/' . $data['id'] . '/0') ?>" class="btn btn-success">Active</a>
                                 <?php else : ?>
-                                  <a href="<?= base_url('erp/settings/update_status/' . base64_encode($data['id']) . '/1') ?>" class="btn btn-danger">Inactive</a>
+                                  <a href="<?= base_url('erp/settings/update_status/' . $data['id'] . '/1') ?>" class="btn btn-danger">Inactive</a>
                                 <?php endif; ?>
                               </td>
                               <td>
@@ -798,7 +800,7 @@ $tax_duration = $TaxDurationModel->where('company_id', $user_company_id)->first(
                                   </button>
                                 </span>
                                 <span data-toggle="tooltip" title="Delete Category">
-                                  <a href="<?= base_url('erp/settings/delete_category/' . base64_encode($data['id'])) ?>" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light edit-category"
+                                  <a href="<?= base_url('erp/settings/delete_category/' . $data['id']) ?>" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete-category"
                                     onclick="return confirm('Are you sure you want to delete this item?');">
                                     <i class="feather icon-trash-2"></i>
                                   </a>
@@ -927,7 +929,7 @@ $tax_duration = $TaxDurationModel->where('company_id', $user_company_id)->first(
               document.getElementById("category_name").value = categoryName;
 
               const form = document.querySelector("form[action*='save_category']");
-              form.setAttribute("action", `<?= base_url('erp/settings/save_category') ?>/${categoryId}`);
+              form.setAttribute("action", `<?= base_url('erp/settings/edit_category') ?>/${categoryId}`);
             });
           });
         });
@@ -986,7 +988,7 @@ $tax_duration = $TaxDurationModel->where('company_id', $user_company_id)->first(
           // Handle delete confirmation
           $('#confirmDeleteBtn').on('click', function() {
             var recordId = $(this).data('record-id');
-            var URL = '<?= base_url('erp/Settings/delete_planning_configuration') ?>';
+            var URL = '<?= base_url('erp/delete-planning-configuration') ?>';
 
             $(this).prop('disabled', true);
 

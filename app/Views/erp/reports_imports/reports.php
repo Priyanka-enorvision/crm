@@ -97,7 +97,7 @@ if($user_info['user_type'] == 'staff'){
                     <div class="col-md-6">
                       <div class="form-group">
                         <h6 class="m-b-15 text-primary"><?= lang('Dashboard.dashboard_employee');?></h6>
-                        <?php if($user['user_type'] == 'staff'){?>
+                        <?php if($user_info['user_type'] == 'staff'){?>
                         <select id="S" class="form-control" data-plugin="select_hrm" data-placeholder="<?= lang('Dashboard.dashboard_employee');?>" name="S">
                           <?php foreach($staff_info as $_user) {?>
                           <?php if($usession['sup_user_id']== $_user['user_id']):?>
@@ -147,7 +147,7 @@ if($user_info['user_type'] == 'staff'){
                     <div class="col-md-6">
                       <div class="form-group">
                         <h6 class="m-b-15 text-primary"><?= lang('Dashboard.dashboard_employee');?></h6>
-                        <?php if($user['user_type'] == 'staff'){?>
+                        <?php if($user_info['user_type'] == 'staff'){?>
                         <select class="form-control" data-plugin="select_hrm" data-placeholder="<?= lang('Dashboard.dashboard_employee');?>" name="S">
 						  <?php foreach($staff_info as $_user) {?>
                           <?php if($usession['sup_user_id']== $_user['user_id']):?>
@@ -159,8 +159,8 @@ if($user_info['user_type'] == 'staff'){
                         </select>
                         <?php } else {?>
                         <select class="form-control" data-plugin="select_hrm" data-placeholder="<?= lang('Dashboard.dashboard_employee');?>" name="S">
+                            <option value="all_employees"><?= lang('Main.xin_all_employees');?></option>
                           <?php foreach($staff_info as $_user) {?>
-                          <option value="all_employees"><?= lang('Main.xin_all_employees');?></option>
                           <option value="<?= uencode($_user['user_id'])?>">
                           <?= $_user['first_name'].' '.$_user['last_name'];?>
                           </option>

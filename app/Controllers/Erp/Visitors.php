@@ -28,7 +28,7 @@ class Visitors extends BaseController {
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if(!$session->has('sup_username')){ 
 			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
 			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
@@ -43,7 +43,7 @@ class Visitors extends BaseController {
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$data['title'] = lang('Main.xin_visitors').' | '.$xin_system['application_name'];
 		$data['path_url'] = 'visitors';
-		$data['breadcrumbs'] = lang('Main.xin_visitors').$user_id;
+		$data['breadcrumbs'] = lang('Main.xin_visitors');
 
 		$data['subview'] = view('erp/visitors/key_visitors', $data);
 		return view('erp/layout/layout_main', $data); //page load
@@ -54,7 +54,7 @@ class Visitors extends BaseController {
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if(!$session->has('sup_username')){ 
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}		
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
@@ -386,10 +386,10 @@ class Visitors extends BaseController {
 	// read record
 	public function read_visitor()
 	{
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		if(!$session->has('sup_username')){ 
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$id = $request->getGet('field_id');
 		$data = [
@@ -398,7 +398,7 @@ class Visitors extends BaseController {
 		if($session->has('sup_username')){
 			return view('erp/visitors/dialog_visitor', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
 	// delete record
@@ -407,7 +407,7 @@ class Visitors extends BaseController {
 		if($this->request->getPost('type')=='delete_record') {
 			/* Define return | here result is used to return user data and error for error message */
 			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$session = \Config\Services::session($config);
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
 			$id = udecode($this->request->getPost('_token',FILTER_SANITIZE_STRING));

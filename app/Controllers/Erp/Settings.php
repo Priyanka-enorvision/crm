@@ -30,7 +30,7 @@ class Settings extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company') {
 			if (!in_array('settings1', staff_role_resource())) {
@@ -52,12 +52,12 @@ class Settings extends BaseController
 		$SystemModel = new SystemModel();
 		$UsersModel = new UsersModel();
 		$RolesModel = new RolesModel();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company') {
 			if (!in_array('settings2', staff_role_resource())) {
@@ -78,12 +78,12 @@ class Settings extends BaseController
 	{
 		$SystemModel = new SystemModel();
 		$UsersModel = new UsersModel();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company') {
 			if (!in_array('settings5', staff_role_resource())) {
@@ -104,12 +104,12 @@ class Settings extends BaseController
 	{
 		$SystemModel = new SystemModel();
 		$UsersModel = new UsersModel();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company') {
 			if (!in_array('settings3', staff_role_resource())) {
@@ -130,12 +130,12 @@ class Settings extends BaseController
 	{
 		$SystemModel = new SystemModel();
 		$UsersModel = new UsersModel();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company') {
 			if (!in_array('settings6', staff_role_resource())) {
@@ -158,7 +158,7 @@ class Settings extends BaseController
 	{
 
 		$validation = \Config\Services::validation();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		$SystemModel = new SystemModel();
@@ -183,7 +183,7 @@ class Settings extends BaseController
 				$Return['error'] = $validation->getError('application_name');
 			}
 			if ($Return['error'] != '') {
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 			}
 		}
 		$application_name = $this->request->getPost('application_name', FILTER_SANITIZE_STRING);
@@ -205,8 +205,7 @@ class Settings extends BaseController
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 		}
-		$this->output($Return);
-		exit;
+		return $this->response->setJSON($Return);
 	}
 	// set logo
 	public function add_logo()
@@ -214,13 +213,13 @@ class Settings extends BaseController
 
 		$UsersModel = new UsersModel();
 		$validation = \Config\Services::validation();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company') {
 			if (!in_array('settings1', staff_role_resource())) {
@@ -244,10 +243,10 @@ class Settings extends BaseController
 			} else {
 				$avatar = $this->request->getFile('logo_file');
 				$file_name = $avatar->getName();
-				$avatar->move('public/uploads/logo/');
+				$avatar->move('uploads/logo/');
 			}
 			if ($Return['error'] != '') {
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 			}
 			$id = 1;
 			// $id = $user_info['user_id'];
@@ -264,12 +263,10 @@ class Settings extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// set favicon
@@ -277,7 +274,7 @@ class Settings extends BaseController
 	{
 
 		$validation = \Config\Services::validation();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		if ($this->request->getPost('type') === 'favicon') {
@@ -296,10 +293,10 @@ class Settings extends BaseController
 			} else {
 				$avatar = $this->request->getFile('favicon');
 				$file_name = $avatar->getName();
-				$avatar->move('public/uploads/logo/favicon/');
+				$avatar->move('uploads/logo/favicon/');
 			}
 			if ($Return['error'] != '') {
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 			}
 			$id = 1;
 			$data = [
@@ -313,12 +310,10 @@ class Settings extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// set sign in page logo
@@ -326,7 +321,7 @@ class Settings extends BaseController
 	{
 
 		$validation = \Config\Services::validation();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		if ($this->request->getPost('type') === 'frontend_logo') {
@@ -345,10 +340,10 @@ class Settings extends BaseController
 			} else {
 				$avatar = $this->request->getFile('frontend_logo');
 				$file_name = $avatar->getName();
-				$avatar->move('public/uploads/logo/frontend/');
+				$avatar->move('uploads/logo/frontend/');
 			}
 			if ($Return['error'] != '') {
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 			}
 			$id = 1;
 			$data = [
@@ -362,64 +357,13 @@ class Settings extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
-	// set invoice/payslip logo
-	// public function add_other_logo()
-	// {
-
-	// 	$validation = \Config\Services::validation();
-	// 	$session = \Config\Services::session($config);
-	// 	$request = \Config\Services::request();
-	// 	$usession = $session->get('sup_username');
-	// 	if ($this->request->getPost('type') === 'other_logo') {
-	// 		$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-	// 		$Return['csrf_hash'] = csrf_hash();
-	// 		// set rules
-	// 		$validated = $this->validate([
-	// 			'other_logo' => [
-	// 				'uploaded[other_logo]',
-	// 				'mime_in[other_logo,image/jpg,image/jpeg,image/gif,image/png,image/svg]',
-	// 				'max_size[other_logo,4096]',
-	// 			],
-	// 		]);
-	// 		if (!$validated) {
-	// 			$Return['error'] = lang('Main.xin_error_select_field_logo');
-	// 		} else {
-	// 			$avatar = $this->request->getFile('other_logo');
-	// 			$file_name = $avatar->getName();
-	// 			$avatar->move('public/uploads/logo/other/');
-	// 		}
-	// 		if ($Return['error'] != '') {
-	// 			$this->output($Return);
-	// 		}
-	// 		$id = 1;
-	// 		$data = [
-	// 			'other_logo' => $file_name
-	// 		];
-	// 		$SystemModel = new SystemModel();
-	// 		$result = $SystemModel->update($id, $data);
-	// 		$Return['csrf_hash'] = csrf_hash();
-	// 		if ($result == TRUE) {
-	// 			$Return['result'] = lang('Main.xin_success_invoice_payslip_logo_updated');
-	// 		} else {
-	// 			$Return['error'] = lang('Main.xin_error_msg');
-	// 		}
-	// 		$this->output($Return);
-	// 		exit;
-	// 	} else {
-	// 		$Return['error'] = lang('Main.xin_error_msg');
-	// 		$this->output($Return);
-	// 		exit;
-	// 	}
-	// }
-
+	
 	public function add_other_logo()
 	{
 		$validation = \Config\Services::validation();
@@ -443,13 +387,12 @@ class Settings extends BaseController
 
 			if (!$validated) {
 				$Return['error'] = lang('Main.xin_error_select_field_logo');
-				$this->output($Return);
-				exit;
+				return $this->response->setJSON($Return);
 			}
 
 			$avatar = $this->request->getFile('other_logo');
 			$file_name = $avatar->getName();
-			$avatar->move('public/uploads/logo/other/');
+			$avatar->move('uploads/logo/other/');
 
 			$setting_id = $this->request->getPost('company_id');
 			$SystemModel = new SystemModel();
@@ -479,8 +422,7 @@ class Settings extends BaseController
 			return redirect()->to(site_url('erp/system-settings'));
 		} else {
 			$Return = array('result' => '', 'error' => lang('Main.xin_error_msg'), 'csrf_hash' => csrf_hash());
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 
@@ -490,7 +432,7 @@ class Settings extends BaseController
 	{
 
 		$validation = \Config\Services::validation();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		$SystemModel = new SystemModel();
@@ -527,7 +469,7 @@ class Settings extends BaseController
 				$Return['error'] = $validation->getError('stripe_publishable_key');
 			}
 			if ($Return['error'] != '') {
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 			}
 		}
 		$paypal_email = $this->request->getPost('paypal_email', FILTER_SANITIZE_STRING);
@@ -552,15 +494,14 @@ class Settings extends BaseController
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 		}
-		$this->output($Return);
-		exit;
+		return $this->response->setJSON($Return);
 	}
 	// Validate and update info in database
 	public function email_info()
 	{
 
 		$validation = \Config\Services::validation();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		$SystemModel = new SystemModel();
@@ -585,7 +526,7 @@ class Settings extends BaseController
 				$Return['error'] = $validation->getError('email_type');
 			}
 			if ($Return['error'] != '') {
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 			}
 		}
 		$email_type = $this->request->getPost('email_type', FILTER_SANITIZE_STRING);
@@ -605,15 +546,14 @@ class Settings extends BaseController
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 		}
-		$this->output($Return);
-		exit;
+		return $this->response->setJSON($Return);
 	}
 	// Validate and update info in database
 	public function update_currency()
 	{
 
 		$validation = \Config\Services::validation();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		$SystemModel = new SystemModel();
@@ -644,7 +584,7 @@ class Settings extends BaseController
 	{
 
 		$validation = \Config\Services::validation();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		$SystemModel = new SystemModel();
@@ -669,7 +609,7 @@ class Settings extends BaseController
 				$Return['error'] = $validation->getError('notification_position');
 			}
 			if ($Return['error'] != '') {
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 			}
 		}
 		$notification_position = $this->request->getPost('notification_position', FILTER_SANITIZE_STRING);
@@ -694,8 +634,7 @@ class Settings extends BaseController
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 		}
-		$this->output($Return);
-		exit;
+		return $this->response->setJSON($Return);
 	}
 
 	// Constants///
@@ -703,7 +642,7 @@ class Settings extends BaseController
 	public function currency_type_list()
 	{
 
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		$ConstantsModel = new ConstantsModel();
 		$currency = $ConstantsModel->where('type', 'currency_type')->orderBy('constants_id', 'ASC')->findAll();
@@ -739,7 +678,7 @@ class Settings extends BaseController
 	public function company_type_list()
 	{
 
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		$ConstantsModel = new ConstantsModel();
 		$ctype = $ConstantsModel->where('type', 'company_type')->orderBy('constants_id', 'ASC')->findAll();
@@ -773,7 +712,7 @@ class Settings extends BaseController
 	public function religion_list()
 	{
 
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		$ConstantsModel = new ConstantsModel();
 		$ctype = $ConstantsModel->where('type', 'religion')->orderBy('constants_id', 'ASC')->findAll();
@@ -808,7 +747,7 @@ class Settings extends BaseController
 	{
 
 		$validation = \Config\Services::validation();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		$ConstantsModel = new ConstantsModel();
@@ -874,7 +813,7 @@ class Settings extends BaseController
 	{
 
 		$validation = \Config\Services::validation();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		$ConstantsModel = new ConstantsModel();
@@ -938,7 +877,7 @@ class Settings extends BaseController
 	{
 
 		$validation = \Config\Services::validation();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		$ConstantsModel = new ConstantsModel();
@@ -1004,7 +943,7 @@ class Settings extends BaseController
 	{
 
 		$validation = \Config\Services::validation();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		$ConstantsModel = new ConstantsModel();
@@ -1070,7 +1009,7 @@ class Settings extends BaseController
 	{
 
 		$validation = \Config\Services::validation();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		$ConstantsModel = new ConstantsModel();
@@ -1116,7 +1055,7 @@ class Settings extends BaseController
 	{
 
 		$validation = \Config\Services::validation();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		$ConstantsModel = new ConstantsModel();
@@ -1160,7 +1099,7 @@ class Settings extends BaseController
 	// read and view all constants data > modal form
 	public function constants_read()
 	{
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$id = $request->getGet('field_id');
 		//$result = $this->Membership_model->read_membership_info($id);
@@ -1170,7 +1109,7 @@ class Settings extends BaseController
 		if ($session->has('sup_username')) {
 			return view('erp/settings/dialog_constants', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
 	// delete record
@@ -1180,7 +1119,7 @@ class Settings extends BaseController
 		if ($this->request->getPost('type') == 'delete_record') {
 			/* Define return | here result is used to return user data and error for error message */
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-			$session = \Config\Services::session($config);
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
 			$Return['csrf_hash'] = csrf_hash();
@@ -1201,7 +1140,7 @@ class Settings extends BaseController
 		if ($this->request->getPost('type') == 'delete_record') {
 			/* Define return | here result is used to return user data and error for error message */
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-			$session = \Config\Services::session($config);
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
 			$Return['csrf_hash'] = csrf_hash();
@@ -1222,7 +1161,7 @@ class Settings extends BaseController
 		if ($this->request->getPost('type') == 'delete_record') {
 			/* Define return | here result is used to return user data and error for error message */
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-			$session = \Config\Services::session($config);
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
 			$Return['csrf_hash'] = csrf_hash();
@@ -1241,7 +1180,7 @@ class Settings extends BaseController
 	public function database_backup_list()
 	{
 
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		$DatabasebackupModel = new DatabasebackupModel();
 		$backup = $DatabasebackupModel->orderBy('backup_id', 'ASC')->findAll();
@@ -1270,7 +1209,7 @@ class Settings extends BaseController
 
 	public function create_database_backup()
 	{
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if ($this->request->getMethod() === 'post') {
 
@@ -1285,7 +1224,7 @@ class Settings extends BaseController
 			$password = $db->password;
 			$database = $db->database;
 
-			$dir = base_url() . '/public/uploads/dbbackup/'; // directory files
+			$dir = base_url() . '/uploads/dbbackup/'; // directory files
 			$name = 'timehrm_backup_' . date('d-m-Y') . '_' . time(); // name sql backup
 
 			$newImport = new Backup_erp($hostname, $database, $username, $password);
@@ -1313,7 +1252,7 @@ class Settings extends BaseController
 	{
 		if ($this->request->getPost('type') == 'delete_old_backup') {
 
-			$session = \Config\Services::session($config);
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			/* Define return | here result is used to return user data and error for error message */
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
@@ -1324,7 +1263,7 @@ class Settings extends BaseController
 			$result = $DatabasebackupModel->emptyTable();
 
 			if ($result) {
-				delete_files('./public/uploads/dbbackup/');
+				delete_files('./uploads/dbbackup/');
 				$Return['result'] = lang('Main.xin_success_database_old_backup_deleted');
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
@@ -1340,13 +1279,13 @@ class Settings extends BaseController
 		if ($this->request->getPost('is_ajax') == 2) {
 			/* Define return | here result is used to return user data and error for error message */
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-			$session = \Config\Services::session($config);
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
 			$Return['csrf_hash'] = csrf_hash();
 			$DatabasebackupModel = new DatabasebackupModel();
 			$row = $DatabasebackupModel->where('backup_id', $id)->first();
-			unlink('./public/uploads/dbbackup/' . $row['backup_file']);
+			unlink('./uploads/dbbackup/' . $row['backup_file']);
 			$result = $DatabasebackupModel->where('backup_id', $id)->delete($id);
 			if ($result) {
 
@@ -1362,7 +1301,7 @@ class Settings extends BaseController
 	public function email_template_list()
 	{
 
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		$EmailtemplatesModel = new EmailtemplatesModel();
 		$emailtemplates = $EmailtemplatesModel->where('template_type', 'super_admin')->orderBy('template_id', 'ASC')->findAll();
@@ -1399,7 +1338,7 @@ class Settings extends BaseController
 	}
 	public function read_tempalte()
 	{
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$id = $request->getGet('field_id');
 		$data = [
@@ -1408,7 +1347,7 @@ class Settings extends BaseController
 		if ($session->has('sup_username')) {
 			return view('erp/settings/dialog_email_template', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
 
@@ -1417,7 +1356,7 @@ class Settings extends BaseController
 	{
 
 		$validation = \Config\Services::validation();
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		$EmailtemplatesModel = new EmailtemplatesModel();
@@ -1812,9 +1751,9 @@ class Settings extends BaseController
 	}
 
 
-	public function update_status($enc_id, $status)
+	public function update_status($category_id, $status)
 	{
-		$category_id = base64_decode($enc_id);
+		// $category_id = base64_decode($enc_id);
 
 		if (!$category_id) {
 			session()->setFlashdata('error', 'Invalid category ID.');
@@ -1835,9 +1774,9 @@ class Settings extends BaseController
 		return redirect()->to(site_url('erp/system-settings'));
 	}
 
-	public function delete_category($enc_id)
+	public function delete_category($id)
 	{
-		$id = base64_decode($enc_id);
+		// $id = base64_decode($enc_id);
 		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 

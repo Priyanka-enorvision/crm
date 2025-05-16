@@ -26,7 +26,7 @@ class Trainers extends BaseController {
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if(!$session->has('sup_username')){ 
 			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
 			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
@@ -51,7 +51,7 @@ class Trainers extends BaseController {
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if(!$session->has('sup_username')){ 
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}		
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
@@ -69,12 +69,12 @@ class Trainers extends BaseController {
           foreach($get_data as $r) {
 			  
 			if(in_array('trainer3',staff_role_resource()) || $user_info['user_type'] == 'company') { //edit
-				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="'.lang('Main.xin_edit').'"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="'. uencode($r['trainer_id']) . '"><i class="feather icon-edit"></i></button></span>';
+				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="'.lang('Main.xin_edit').'"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="'. $r['trainer_id'] . '"><i class="feather icon-edit"></i></button></span>';
 			} else {
 				$edit = '';
 			}
 			if(in_array('trainer4',staff_role_resource()) || $user_info['user_type'] == 'company') { //delete
-				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="'.lang('Main.xin_delete').'"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. uencode($r['trainer_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
+				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="'.lang('Main.xin_delete').'"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r['trainer_id'] . '"><i class="feather icon-trash-2"></i></button></span>';
 			} else {
 				$delete = '';
 			}
@@ -161,7 +161,7 @@ class Trainers extends BaseController {
 				foreach($ruleErrors as $err){
 					$Return['error'] = $err;
 					if($Return['error']!=''){
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -196,13 +196,11 @@ class Trainers extends BaseController {
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
-				exit;
+				return $this->response->setJSON($Return);
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	 // |||add record|||
@@ -259,7 +257,7 @@ class Trainers extends BaseController {
 				foreach($ruleErrors as $err){
 					$Return['error'] = $err;
 					if($Return['error']!=''){
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -269,7 +267,7 @@ class Trainers extends BaseController {
 				$email = $this->request->getPost('email',FILTER_SANITIZE_STRING);
 				$expertise = $this->request->getPost('expertise',FILTER_SANITIZE_STRING);
 				$address = $this->request->getPost('address',FILTER_SANITIZE_STRING);
-				$id = udecode($this->request->getPost('token',FILTER_SANITIZE_STRING));
+				$id = $this->request->getPost('token',FILTER_SANITIZE_STRING);
 				$UsersModel = new UsersModel();
 				$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 				if($user_info['user_type'] == 'staff'){
@@ -294,22 +292,20 @@ class Trainers extends BaseController {
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
-				exit;
+				return $this->response->setJSON($Return);
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// read record
 	public function read_trainer()
 	{
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		if(!$session->has('sup_username')){ 
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$id = $request->getGet('field_id');
 		$data = [
@@ -318,19 +314,18 @@ class Trainers extends BaseController {
 		if($session->has('sup_username')){
 			return view('erp/training/dialog_trainer', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
 	// delete record
 	public function delete_trainer() {
 		
 		if($this->request->getPost('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
 			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$session = \Config\Services::session($config);
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
-			$id = udecode($this->request->getPost('_token',FILTER_SANITIZE_STRING));
+			$id = $this->request->getPost('_token',FILTER_SANITIZE_STRING);
 			$Return['csrf_hash'] = csrf_hash();
 			$TrainersModel = new TrainersModel();
 			$result = $TrainersModel->where('trainer_id', $id)->delete($id);
@@ -339,7 +334,7 @@ class Trainers extends BaseController {
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 		}
 	}
 }

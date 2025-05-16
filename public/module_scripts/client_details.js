@@ -2,7 +2,7 @@ $(document).ready(function() {
 	var xin_projects_table = $('#xin_projects_table').dataTable({
 		"bDestroy": true,
 		"ajax": {
-			url : main_url+"projects/client_profile_projects_list?client_id="+$('#client_id').val(),
+			url: main_url + "client-profile-projects-list/" + $('#client_id').val(),
 			type : 'GET'
 		},
 		"language": {
@@ -26,7 +26,7 @@ $(document).ready(function() {
 	var xin_invoices_table = $('#xin_invoices_table').dataTable({
 		"bDestroy": true,
 		"ajax": {
-			url : main_url+"invoices/client_profile_invoices_list?client_id="+$('#client_id').val(),
+			url: main_url + "client-profile-invoices-list/" + $('#client_id').val(),
 			type : 'GET'
 		},
 		"language": {
@@ -50,7 +50,7 @@ $(document).ready(function() {
 	var xin_tasks_table = $('#xin_tasks_table').dataTable({
 		"bDestroy": true,
 		"ajax": {
-			url : main_url+"tasks/client_profile_tasks_list?client_id="+$('#client_id').val(),
+			url: main_url + "client-profile-tasks-list/" + $('#client_id').val(),
 			type : 'GET'
 		},
 		"language": {
