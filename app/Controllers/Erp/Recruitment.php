@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Controllers\Erp;
+
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\HTTP\Files\UploadedFile;
- 
+
 use App\Models\SystemModel;
 use App\Models\RolesModel;
 use App\Models\UsersModel;
@@ -15,10 +17,11 @@ use App\Models\JobcandidatesModel;
 use App\Models\JobinterviewsModel;
 use App\Models\EmailtemplatesModel;
 
-class Recruitment extends BaseController {
+class Recruitment extends BaseController
+{
 
 	public function create_job()
-	{		
+	{
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
 		$SystemModel = new SystemModel();
@@ -26,22 +29,17 @@ class Recruitment extends BaseController {
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		if(!$session->has('sup_username')){ 
-			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+		if (!$session->has('sup_username')) {
+			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
+			return redirect()->to(site_url('/'));
 		}
-		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
-			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
+		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
+			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
 			return redirect()->to(site_url('erp/desk'));
 		}
-		if($user_info['user_type'] != 'company'){
-			if(!in_array('ats3',staff_role_resource())) {
-				$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
-				return redirect()->to(site_url('erp/desk'));
-			}
-		}
+
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
-		$data['title'] = lang('Recruitment.xin_add_new_job').' | '.$xin_system['application_name'];
+		$data['title'] = lang('Recruitment.xin_add_new_job') . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'job_create';
 		$data['breadcrumbs'] = lang('Recruitment.xin_add_new_job');
 
@@ -49,7 +47,7 @@ class Recruitment extends BaseController {
 		return view('erp/layout/layout_main', $data); //page load
 	}
 	public function edit_job()
-	{		
+	{
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
 		$SystemModel = new SystemModel();
@@ -58,29 +56,17 @@ class Recruitment extends BaseController {
 		$usession = $session->get('sup_username');
 		$JobsModel = new JobsModel();
 		$request = \Config\Services::request();
-		$ifield_id = udecode($request->uri->getSegment(3));
+		$ifield_id = udecode($request->getUri()->getSegment(3));
 		$isegment_val = $JobsModel->where('job_id', $ifield_id)->first();
-		if(!$isegment_val){
-			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
-			return redirect()->to(site_url('erp/desk'));
-		}
+
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		if(!$session->has('sup_username')){ 
-			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+		if (!$session->has('sup_username')) {
+			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
+			return redirect()->to(site_url('/'));
 		}
-		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
-			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
-			return redirect()->to(site_url('erp/desk'));
-		}
-		if($user_info['user_type'] != 'company'){
-			if(!in_array('ats4',staff_role_resource())) {
-				$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
-				return redirect()->to(site_url('erp/desk'));
-			}
-		}
+
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
-		$data['title'] = lang('Recruitment.xin_edit_job').' | '.$xin_system['application_name'];
+		$data['title'] = lang('Recruitment.xin_edit_job') . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'job_create';
 		$data['breadcrumbs'] = lang('Recruitment.xin_edit_job');
 
@@ -88,7 +74,7 @@ class Recruitment extends BaseController {
 		return view('erp/layout/layout_main', $data); //page load
 	}
 	public function jobs()
-	{		
+	{
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
 		$SystemModel = new SystemModel();
@@ -96,22 +82,22 @@ class Recruitment extends BaseController {
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		if(!$session->has('sup_username')){ 
-			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+		if (!$session->has('sup_username')) {
+			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
+			return redirect()->to(site_url('/'));
 		}
-		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
-			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
+		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
+			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
 			return redirect()->to(site_url('erp/desk'));
 		}
-		if($user_info['user_type'] != 'company'){
-			if(!in_array('ats2',staff_role_resource())) {
-				$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
+		if ($user_info['user_type'] != 'company') {
+			if (!in_array('ats2', staff_role_resource())) {
+				$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
 				return redirect()->to(site_url('erp/desk'));
 			}
 		}
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
-		$data['title'] = lang('Recruitment.xin_new_opening').' | '.$xin_system['application_name'];
+		$data['title'] = lang('Recruitment.xin_new_opening') . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'jobs';
 		$data['breadcrumbs'] = lang('Recruitment.xin_new_opening');
 
@@ -119,7 +105,7 @@ class Recruitment extends BaseController {
 		return view('erp/layout/layout_main', $data); //page load
 	}
 	public function job_details()
-	{		
+	{
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
 		$SystemModel = new SystemModel();
@@ -128,22 +114,19 @@ class Recruitment extends BaseController {
 		$usession = $session->get('sup_username');
 		$JobsModel = new JobsModel();
 		$request = \Config\Services::request();
-		$ifield_id = udecode($request->uri->getSegment(3));
+		$ifield_id = udecode($request->getUri()->getSegment(3));
 		$isegment_val = $JobsModel->where('job_id', $ifield_id)->first();
-		if(!$isegment_val){
-			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
-			return redirect()->to(site_url('erp/desk'));
-		}
+
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		if(!$session->has('sup_username')){ 
-			return redirect()->to(site_url('erp/login'));
+		if (!$session->has('sup_username')) {
+			return redirect()->to(site_url('/'));
 		}
-		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
+		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			return redirect()->to(site_url('erp/desk'));
 		}
 		$usession = $session->get('sup_username');
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
-		$data['title'] = lang('Recruitment.xin_job_details').' | '.$xin_system['application_name'];
+		$data['title'] = lang('Recruitment.xin_job_details') . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'job_details';
 		$data['breadcrumbs'] = lang('Recruitment.xin_job_details');
 
@@ -151,7 +134,7 @@ class Recruitment extends BaseController {
 		return view('erp/layout/layout_main', $data); //page load
 	}
 	public function candidates()
-	{		
+	{
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
 		$SystemModel = new SystemModel();
@@ -159,22 +142,16 @@ class Recruitment extends BaseController {
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		if(!$session->has('sup_username')){ 
-			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+		if (!$session->has('sup_username')) {
+			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
+			return redirect()->to(site_url('/'));
 		}
-		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
-			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
+		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
+			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
 			return redirect()->to(site_url('erp/desk'));
 		}
-		if($user_info['user_type'] != 'company'){
-			if(!in_array('candidate',staff_role_resource())) {
-				$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
-				return redirect()->to(site_url('erp/desk'));
-			}
-		}
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
-		$data['title'] = lang('Recruitment.xin_candidates').' | '.$xin_system['application_name'];
+		$data['title'] = lang('Recruitment.xin_candidates') . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'job_candidates';
 		$data['breadcrumbs'] = lang('Recruitment.xin_candidates');
 
@@ -183,7 +160,7 @@ class Recruitment extends BaseController {
 	}
 
 	public function rejected()
-	{		
+	{
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
 		$SystemModel = new SystemModel();
@@ -191,22 +168,16 @@ class Recruitment extends BaseController {
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		if(!$session->has('sup_username')){ 
-			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+		if (!$session->has('sup_username')) {
+			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
+			return redirect()->to(site_url('/'));
 		}
-		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
-			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
+		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
+			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
 			return redirect()->to(site_url('erp/desk'));
 		}
-		if($user_info['user_type'] != 'company'){
-			if(!in_array('candidate',staff_role_resource())) {
-				$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
-				return redirect()->to(site_url('erp/desk'));
-			}
-		}
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
-		$data['title'] = 'Rejected Candidates'.' | '.$xin_system['application_name'];
+		$data['title'] = 'Rejected Candidates' . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'reject_candidates';
 		$data['breadcrumbs'] = "Rejected";
 
@@ -214,7 +185,7 @@ class Recruitment extends BaseController {
 		return view('erp/layout/layout_main', $data); //page load
 	}
 	public function interviews()
-	{		
+	{
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
 		$SystemModel = new SystemModel();
@@ -222,22 +193,16 @@ class Recruitment extends BaseController {
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		if(!$session->has('sup_username')){ 
-			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+		if (!$session->has('sup_username')) {
+			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
+			return redirect()->to(site_url('/'));
 		}
-		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
-			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
+		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
+			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
 			return redirect()->to(site_url('erp/desk'));
 		}
-		if($user_info['user_type'] != 'company'){
-			if(!in_array('interview',staff_role_resource())) {
-				$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
-				return redirect()->to(site_url('erp/desk'));
-			}
-		}
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
-		$data['title'] = lang('Recruitment.xin_interviews').' | '.$xin_system['application_name'];
+		$data['title'] = lang('Recruitment.xin_interviews') . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'job_interviews';
 		$data['breadcrumbs'] = lang('Recruitment.xin_interviews');
 
@@ -245,7 +210,7 @@ class Recruitment extends BaseController {
 		return view('erp/layout/layout_main', $data); //page load
 	}
 	public function promotions()
-	{		
+	{
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
 		$SystemModel = new SystemModel();
@@ -253,72 +218,67 @@ class Recruitment extends BaseController {
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		if(!$session->has('sup_username')){ 
-			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+		if (!$session->has('sup_username')) {
+			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
+			return redirect()->to(site_url('/'));
 		}
-		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
-			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
+		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
+			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
 			return redirect()->to(site_url('erp/desk'));
 		}
-		if($user_info['user_type'] != 'company'){
-			if(!in_array('promotion',staff_role_resource())) {
-				$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
-				return redirect()->to(site_url('erp/desk'));
-			}
-		}
+
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
-		$data['title'] = lang('Dashboard.left_promotions').' | '.$xin_system['application_name'];
+		$data['title'] = lang('Dashboard.left_promotions') . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'job_promotions';
 		$data['breadcrumbs'] = lang('Dashboard.left_promotions');
 
 		$data['subview'] = view('erp/recruitment/key_job_promotions', $data);
 		return view('erp/layout/layout_main', $data); //page load
 	}
-	
+
 	// record list
-	public function jobs_list() {
+	public function jobs_list()
+	{
 
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
-		if(!$session->has('sup_username')){ 
-			return redirect()->to(site_url('erp/login'));
-		}		
+		if (!$session->has('sup_username')) {
+			return redirect()->to(site_url('/'));
+		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
 		$SystemModel = new SystemModel();
 		$JobsModel = new JobsModel();
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		if($user_info['user_type'] == 'staff'){
-			$get_data = $JobsModel->where('company_id',$user_info['company_id'])->orderBy('job_id', 'ASC')->findAll();
+		if ($user_info['user_type'] == 'staff') {
+			$get_data = $JobsModel->where('company_id', $user_info['company_id'])->orderBy('job_id', 'ASC')->findAll();
 		} else {
-			$get_data = $JobsModel->where('company_id',$usession['sup_user_id'])->orderBy('job_id', 'ASC')->findAll();
+			$get_data = $JobsModel->where('company_id', $usession['sup_user_id'])->orderBy('job_id', 'ASC')->findAll();
 		}
 		$data = array();
-		
-          foreach($get_data as $r) {
-			  
-			if(in_array('erp9',staff_role_resource()) || $user_info['user_type'] == 'company') { //edit
-				$view = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="'.lang('xin_view_details').'"><a href="'.site_url().'erp/view-job/'.uencode($r['job_id']).'"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light"><span class="fa fa-arrow-circle-right"></span></button></a></span>';
+
+		foreach ($get_data as $r) {
+
+			if (in_array('erp9', staff_role_resource()) || $user_info['user_type'] == 'company') { //edit
+				$view = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('xin_view_details') . '"><a href="' . site_url() . 'erp/view-job/' . uencode($r['job_id']) . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light"><span class="fa fa-arrow-circle-right"></span></button></a></span>';
 			} else {
 				$view = '';
 			}
-			if(in_array('erp10',staff_role_resource()) || $user_info['user_type'] == 'company') { //edit
-				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="'.lang('Main.xin_delete').'"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. uencode($r['job_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
+			if (in_array('erp10', staff_role_resource()) || $user_info['user_type'] == 'company') { //edit
+				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . uencode($r['job_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
 			} else {
 				$delete = '';
 			}
-			
+
 			$created_at = set_date_format($r['created_at']);
 			$date_of_closing = set_date_format($r['date_of_closing']);
-			$combhr = $view.$delete;
-			if(in_array('erp9',staff_role_resource()) || in_array('erp10',staff_role_resource()) || $user_info['user_type'] == 'company') {
+			$combhr = $view . $delete;
+			if (in_array('erp9', staff_role_resource()) || in_array('erp10', staff_role_resource()) || $user_info['user_type'] == 'company') {
 				$job_title = '
-				'.$r['job_title'].'
+				' . $r['job_title'] . '
 				<div class="overlay-edit">
-					'.$combhr.'
+					' . $combhr . '
 				</div>';
-					 			  				
 			} else {
 				$job_title = $r['job_title'];
 			}
@@ -327,227 +287,227 @@ class Recruitment extends BaseController {
 				$r['designation_id'],
 				$created_at,
 				$date_of_closing
-			);	
-			
+			);
 		}
-          $output = array(
-               //"draw" => $draw,
-			   "data" => $data
-            );
-          echo json_encode($output);
-          exit();
-     }
-	 
-	 // record list
-	public function candidates_list() {
+		$output = array(
+			//"draw" => $draw,
+			"data" => $data
+		);
+		echo json_encode($output);
+		exit();
+	}
 
-		$session = \Config\Services::session();
-		$usession = $session->get('sup_username');
-		if(!$session->has('sup_username')){ 
-			return redirect()->to(site_url('erp/login'));
-		}		
-		$RolesModel = new RolesModel();
-		$UsersModel = new UsersModel();
-		$SystemModel = new SystemModel();
-		$JobsModel = new JobsModel();
-		$JobcandidatesModel = new JobcandidatesModel();
-		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		if($user_info['user_type'] == 'staff'){
-			$get_data = $JobcandidatesModel->where('company_id',$user_info['company_id'])->where('staff_id!=',$usession['sup_user_id'])->orderBy('candidate_id', 'ASC')->findAll();
-		} else {
-			$get_data = $JobcandidatesModel->where('company_id',$usession['sup_user_id'])->where('application_status',0)->orderBy('candidate_id', 'ASC')->findAll();
-		}
-		$data = array();
-		
-          foreach($get_data as $r) {
-			  
-			$download = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="'.lang('Main.xin_download').'"><a href="'.site_url().'download?type=candidates&filename='.uencode($r['job_resume']).'"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light"><span class="fas fa-cloud-download-alt"></span></button></a></span>';
-			$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="'.lang('Main.xin_delete').'"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. uencode($r['candidate_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
-			$status_opt = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="'.lang('Main.dashboard_xin_status').'"><button type="button" class="btn icon-btn btn-sm btn-light-success waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="'. uencode($r['candidate_id']) . '"><i class="feather icon-edit"></i></button></span>';
-			
-			
-			$created_at = set_date_format($r['created_at']);
-		//	$date_of_closing = set_date_format($r['date_of_closing']);
-			$job_title = $JobsModel->where('job_id', $r['job_id'])->first();
-			$staff_info = $UsersModel->where('user_id', $r['staff_id'])->first();
-			// applicant status
-			if($r['application_status'] == 0){
-				$status = '<span class="badge badge-light-warning">'.lang('Main.xin_pending').'</span>';
-			} else if($r['application_status'] == 1){
-				$status = '<span class="badge badge-light-success">'.lang('Recruitment.xin_call_for_interview').'</span>';
-			} elseif($r['application_status'] == 3){
-				$status = '<span class="badge badge-light-danger">'.lang('Main.xin_rejected').'</span>';
-			}
-			$cover_letter = '<a><button class="btn icon-btn btn-sm btn-outline-secondary waves-effect waves-light" data-toggle="modal" data-target=".payroll-modal-data" data-application_id="'. uencode($r['candidate_id']) . '">'.lang('Main.xin_view').' '.lang('Recruitment.xin_cover_letter').'</button></a>';
-			if($r['application_status'] == 1 || $r['application_status'] == 3){
-				$combhr = $download.$delete;
-			} else {
-				$combhr = $status_opt.$download.$delete;
-			}
-			
-			$ijob_title = '
-				'.$job_title['job_title'].'
-				<div class="overlay-edit">
-					'.$combhr.'
-				</div>';
-			$data[] = array(
-				$ijob_title,
-				$staff_info['first_name'].' '.$staff_info['last_name'],
-				$staff_info['email'],
-				$status,
-				$cover_letter,
-				$created_at
-			);	
-			
-		}
-          $output = array(
-               //"draw" => $draw,
-			   "data" => $data
-            );
-          echo json_encode($output);
-          exit();
-     }
-
-
-	 public function reject_candidates_list() {
-
-		$session = \Config\Services::session();
-		$usession = $session->get('sup_username');
-		if(!$session->has('sup_username')){ 
-			return redirect()->to(site_url('erp/login'));
-		}		
-		$RolesModel = new RolesModel();
-		$UsersModel = new UsersModel();
-		$SystemModel = new SystemModel();
-		$JobsModel = new JobsModel();
-		$JobcandidatesModel = new JobcandidatesModel();
-		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		if($user_info['user_type'] == 'staff'){
-			$get_data = $JobcandidatesModel->where('company_id',$user_info['company_id'])->where('staff_id!=',$usession['sup_user_id'])->orderBy('candidate_id', 'ASC')->findAll();
-		} else {
-			$get_data = $JobcandidatesModel->where('company_id',$usession['sup_user_id'])->where('application_status',3)->orderBy('candidate_id', 'ASC')->findAll();
-		}
-		$data = array();
-		
-          foreach($get_data as $r) {
-			$download = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="'.lang('Main.xin_download').'"><a href="'.site_url().'download?type=candidates&filename='.uencode($r['job_resume']).'"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light"><span class="fas fa-cloud-download-alt"></span></button></a></span>';
-			$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="'.lang('Main.xin_delete').'"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. uencode($r['candidate_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
-			$status_opt = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="'.lang('Main.dashboard_xin_status').'"><button type="button" class="btn icon-btn btn-sm btn-light-success waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="'. uencode($r['candidate_id']) . '"><i class="feather icon-edit"></i></button></span>';
-			
-			$created_at = set_date_format($r['created_at']);
-		//	$date_of_closing = set_date_format($r['date_of_closing']);
-			$job_title = $JobsModel->where('job_id', $r['job_id'])->first();
-			$staff_info = $UsersModel->where('user_id', $r['staff_id'])->first();
-			// applicant status
-			if($r['application_status'] == 0){
-				$status = '<span class="badge badge-light-warning">'.lang('Main.xin_pending').'</span>';
-			} else if($r['application_status'] == 1){
-				$status = '<span class="badge badge-light-success">'.lang('Recruitment.xin_call_for_interview').'</span>';
-			} elseif($r['application_status'] == 3){
-				$status = '<span class="badge badge-light-danger">'.lang('Main.xin_rejected').'</span>';
-			}
-			$cover_letter = '<a><button class="btn icon-btn btn-sm btn-outline-secondary waves-effect waves-light" data-toggle="modal" data-target=".payroll-modal-data" data-application_id="'. uencode($r['candidate_id']) . '">'.lang('Main.xin_view').' '.lang('Recruitment.xin_cover_letter').'</button></a>';
-			if($r['application_status'] == 1){
-				$combhr = $download.$delete;
-			} else {
-				$combhr = $status_opt.$download.$delete;
-			}
-			
-			$ijob_title = '
-				'.$job_title['job_title'].'
-				<div class="overlay-edit">
-					'.$combhr.'
-				</div>';
-			$data[] = array(
-				$ijob_title,
-				$staff_info['first_name'].' '.$staff_info['last_name'],
-				$staff_info['email'],
-				$status,
-				$cover_letter,
-				$created_at
-			);	
-			
-		}
-          $output = array(
-               //"draw" => $draw,
-			   "data" => $data
-            );
-          echo json_encode($output);
-          exit();
-     }
 	// record list
-	public function interview_list() {
+	public function candidates_list()
+	{
 
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
-		if(!$session->has('sup_username')){ 
+		if (!$session->has('sup_username')) {
+			return redirect()->to(site_url('/'));
+		}
+		$RolesModel = new RolesModel();
+		$UsersModel = new UsersModel();
+		$SystemModel = new SystemModel();
+		$JobsModel = new JobsModel();
+		$JobcandidatesModel = new JobcandidatesModel();
+		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+		if ($user_info['user_type'] == 'staff') {
+			$get_data = $JobcandidatesModel->where('company_id', $user_info['company_id'])->where('staff_id!=', $usession['sup_user_id'])->orderBy('candidate_id', 'ASC')->findAll();
+		} else {
+			$get_data = $JobcandidatesModel->where('company_id', $usession['sup_user_id'])->where('application_status', 0)->orderBy('candidate_id', 'ASC')->findAll();
+		}
+		$data = array();
+
+		foreach ($get_data as $r) {
+
+			$download = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_download') . '"><a href="' . site_url() . 'download?type=candidates&filename=' . uencode($r['job_resume']) . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light"><span class="fas fa-cloud-download-alt"></span></button></a></span>';
+			$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . uencode($r['candidate_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
+			$status_opt = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.dashboard_xin_status') . '"><button type="button" class="btn icon-btn btn-sm btn-light-success waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="' . uencode($r['candidate_id']) . '"><i class="feather icon-edit"></i></button></span>';
+
+
+			$created_at = set_date_format($r['created_at']);
+			//	$date_of_closing = set_date_format($r['date_of_closing']);
+			$job_title = $JobsModel->where('job_id', $r['job_id'])->first();
+			$staff_info = $UsersModel->where('user_id', $r['staff_id'])->first();
+			// applicant status
+			if ($r['application_status'] == 0) {
+				$status = '<span class="badge badge-light-warning">' . lang('Main.xin_pending') . '</span>';
+			} else if ($r['application_status'] == 1) {
+				$status = '<span class="badge badge-light-success">' . lang('Recruitment.xin_call_for_interview') . '</span>';
+			} elseif ($r['application_status'] == 3) {
+				$status = '<span class="badge badge-light-danger">' . lang('Main.xin_rejected') . '</span>';
+			}
+			$cover_letter = '<a><button class="btn icon-btn btn-sm btn-outline-secondary waves-effect waves-light" data-toggle="modal" data-target=".payroll-modal-data" data-application_id="' . uencode($r['candidate_id']) . '">' . lang('Main.xin_view') . ' ' . lang('Recruitment.xin_cover_letter') . '</button></a>';
+			if ($r['application_status'] == 1 || $r['application_status'] == 3) {
+				$combhr = $download . $delete;
+			} else {
+				$combhr = $status_opt . $download . $delete;
+			}
+
+			$ijob_title = '
+				' . $job_title['job_title'] . '
+				<div class="overlay-edit">
+					' . $combhr . '
+				</div>';
+			$data[] = array(
+				$ijob_title,
+				$staff_info['first_name'] . ' ' . $staff_info['last_name'],
+				$staff_info['email'],
+				$status,
+				$cover_letter,
+				$created_at
+			);
+		}
+		$output = array(
+			//"draw" => $draw,
+			"data" => $data
+		);
+		echo json_encode($output);
+		exit();
+	}
+
+
+	public function reject_candidates_list()
+	{
+
+		$session = \Config\Services::session();
+		$usession = $session->get('sup_username');
+		if (!$session->has('sup_username')) {
+			return redirect()->to(site_url('/'));
+		}
+		$RolesModel = new RolesModel();
+		$UsersModel = new UsersModel();
+		$SystemModel = new SystemModel();
+		$JobsModel = new JobsModel();
+		$JobcandidatesModel = new JobcandidatesModel();
+		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+		if ($user_info['user_type'] == 'staff') {
+			$get_data = $JobcandidatesModel->where('company_id', $user_info['company_id'])->where('staff_id!=', $usession['sup_user_id'])->orderBy('candidate_id', 'ASC')->findAll();
+		} else {
+			$get_data = $JobcandidatesModel->where('company_id', $usession['sup_user_id'])->where('application_status', 3)->orderBy('candidate_id', 'ASC')->findAll();
+		}
+		$data = array();
+
+		foreach ($get_data as $r) {
+			$download = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_download') . '"><a href="' . site_url() . 'download?type=candidates&filename=' . uencode($r['job_resume']) . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light"><span class="fas fa-cloud-download-alt"></span></button></a></span>';
+			$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . uencode($r['candidate_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
+			$status_opt = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.dashboard_xin_status') . '"><button type="button" class="btn icon-btn btn-sm btn-light-success waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="' . uencode($r['candidate_id']) . '"><i class="feather icon-edit"></i></button></span>';
+
+			$created_at = set_date_format($r['created_at']);
+			//	$date_of_closing = set_date_format($r['date_of_closing']);
+			$job_title = $JobsModel->where('job_id', $r['job_id'])->first();
+			$staff_info = $UsersModel->where('user_id', $r['staff_id'])->first();
+			// applicant status
+			if ($r['application_status'] == 0) {
+				$status = '<span class="badge badge-light-warning">' . lang('Main.xin_pending') . '</span>';
+			} else if ($r['application_status'] == 1) {
+				$status = '<span class="badge badge-light-success">' . lang('Recruitment.xin_call_for_interview') . '</span>';
+			} elseif ($r['application_status'] == 3) {
+				$status = '<span class="badge badge-light-danger">' . lang('Main.xin_rejected') . '</span>';
+			}
+			$cover_letter = '<a><button class="btn icon-btn btn-sm btn-outline-secondary waves-effect waves-light" data-toggle="modal" data-target=".payroll-modal-data" data-application_id="' . uencode($r['candidate_id']) . '">' . lang('Main.xin_view') . ' ' . lang('Recruitment.xin_cover_letter') . '</button></a>';
+			if ($r['application_status'] == 1) {
+				$combhr = $download . $delete;
+			} else {
+				$combhr = $status_opt . $download . $delete;
+			}
+
+			$ijob_title = '
+				' . $job_title['job_title'] . '
+				<div class="overlay-edit">
+					' . $combhr . '
+				</div>';
+			$data[] = array(
+				$ijob_title,
+				$staff_info['first_name'] . ' ' . $staff_info['last_name'],
+				$staff_info['email'],
+				$status,
+				$cover_letter,
+				$created_at
+			);
+		}
+		$output = array(
+			//"draw" => $draw,
+			"data" => $data
+		);
+		echo json_encode($output);
+		exit();
+	}
+	// record list
+	public function interview_list()
+	{
+
+		$session = \Config\Services::session();
+		$usession = $session->get('sup_username');
+		if (!$session->has('sup_username')) {
 			return redirect()->to(site_url('erp/login'));
-		}		
+		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
 		$JobsModel = new JobsModel();
 		$SystemModel = new SystemModel();
 		$JobinterviewsModel = new JobinterviewsModel();
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		if($user_info['user_type'] == 'staff'){
-			$get_data = $JobinterviewsModel->where('company_id',$user_info['company_id'])->where('interviewer_id',$usession['sup_user_id'])->orderBy('job_interview_id', 'ASC')->findAll();
+		if ($user_info['user_type'] == 'staff') {
+			$get_data = $JobinterviewsModel->where('company_id', $user_info['company_id'])->where('interviewer_id', $usession['sup_user_id'])->orderBy('job_interview_id', 'ASC')->findAll();
 		} else {
-			$get_data = $JobinterviewsModel->where('company_id',$usession['sup_user_id'])->orderBy('job_interview_id', 'ASC')->findAll();
+			$get_data = $JobinterviewsModel->where('company_id', $usession['sup_user_id'])->orderBy('job_interview_id', 'ASC')->findAll();
 		}
 		$data = array();
-		
-          foreach($get_data as $r) {
-						
+
+		foreach ($get_data as $r) {
+
 			$created_at = set_date_format($r['created_at']);
-			$status_opt = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="'.lang('Recruitment.xin_update_status').'"><button type="button" class="btn icon-btn btn-sm btn-light-success waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="'. uencode($r['job_interview_id']) . '"><i class="feather icon-edit"></i></button></span>';
+			$status_opt = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Recruitment.xin_update_status') . '"><button type="button" class="btn icon-btn btn-sm btn-light-success waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="' . uencode($r['job_interview_id']) . '"><i class="feather icon-edit"></i></button></span>';
 			$combhr = $status_opt;
 			// applicant status
-			if($r['status'] == 1){
-				$status = '<span class="badge badge-light-warning">'.lang('Projects.xin_not_started').'</span>';
-			} else if($r['status'] == 2){
-				$status = '<span class="badge badge-light-primary">'.lang('Recruitment.xin_passed_interview').'</span>';
-			} elseif($r['status'] == 3){
-				$status = '<span class="badge badge-light-danger">'.lang('Main.xin_rejected').'</span>';
+			if ($r['status'] == 1) {
+				$status = '<span class="badge badge-light-warning">' . lang('Projects.xin_not_started') . '</span>';
+			} else if ($r['status'] == 2) {
+				$status = '<span class="badge badge-light-primary">' . lang('Recruitment.xin_passed_interview') . '</span>';
+			} elseif ($r['status'] == 3) {
+				$status = '<span class="badge badge-light-danger">' . lang('Main.xin_rejected') . '</span>';
 			}
 			$job_title = $JobsModel->where('job_id', $r['job_id'])->first();
 			$staff_info = $UsersModel->where('user_id', $r['staff_id'])->first();
 			$interviewer = $UsersModel->where('user_id', $r['interviewer_id'])->first();
-			
-			if($r['status'] == 2 || $r['status'] == 3){
-					$ijob_title = $job_title['job_title'];
-				} else {
-					$ijob_title = '
-					'.$job_title['job_title'].'
+
+			if ($r['status'] == 2 || $r['status'] == 3) {
+				$ijob_title = $job_title['job_title'];
+			} else {
+				$ijob_title = '
+					' . $job_title['job_title'] . '
 					<div class="overlay-edit">
-						'.$combhr.'
+						' . $combhr . '
 					</div>';
-				}
+			}
 			$data[] = array(
 				$ijob_title,
-				$staff_info['first_name'].' '.$staff_info['last_name'],
+				$staff_info['first_name'] . ' ' . $staff_info['last_name'],
 				$r['interview_place'],
-				$r['interview_date'].' '.$r['interview_time'],
-				$interviewer['first_name'].' '.$interviewer['last_name'],
+				$r['interview_date'] . ' ' . $r['interview_time'],
+				$interviewer['first_name'] . ' ' . $interviewer['last_name'],
 				$status,
 				$created_at
-			);	
-			
+			);
 		}
-          $output = array(
-               //"draw" => $draw,
-			   "data" => $data
-            );
-          echo json_encode($output);
-          exit();
-    }
+		$output = array(
+			//"draw" => $draw,
+			"data" => $data
+		);
+		echo json_encode($output);
+		exit();
+	}
 	// record list
-	public function promotion_list() {
+	public function promotion_list()
+	{
 
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
-		if(!$session->has('sup_username')){ 
+		if (!$session->has('sup_username')) {
 			return redirect()->to(site_url('erp/login'));
-		}		
+		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
 		$JobsModel = new JobsModel();
@@ -555,60 +515,198 @@ class Recruitment extends BaseController {
 		$DesignationModel = new DesignationModel();
 		$JobinterviewsModel = new JobinterviewsModel();
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		if($user_info['user_type'] == 'staff'){
-			$get_data = $JobinterviewsModel->where('company_id',$user_info['company_id'])->where('status',2)->where('staff_id',$usession['sup_user_id'])->orderBy('job_interview_id', 'ASC')->findAll();
+		if ($user_info['user_type'] == 'staff') {
+			$get_data = $JobinterviewsModel->where('company_id', $user_info['company_id'])->where('status', 2)->where('staff_id', $usession['sup_user_id'])->orderBy('job_interview_id', 'ASC')->findAll();
 		} else {
-			$get_data = $JobinterviewsModel->where('company_id',$usession['sup_user_id'])->where('status',2)->orderBy('job_interview_id', 'ASC')->findAll();
+			$get_data = $JobinterviewsModel->where('company_id', $usession['sup_user_id'])->where('status', 2)->orderBy('job_interview_id', 'ASC')->findAll();
 		}
 		$data = array();
-		
-          foreach($get_data as $r) {
-						
+
+		foreach ($get_data as $r) {
+
 			$created_at = set_date_format($r['created_at']);
 			$job_title = $JobsModel->where('job_id', $r['job_id'])->first();
 			$staff_info = $UsersModel->where('user_id', $r['staff_id'])->first();
 			$interviewer = $UsersModel->where('user_id', $r['interviewer_id'])->first();
 			// employee
-			$idesignations = $DesignationModel->where('designation_id',$r['designation_id'])->first();
-			$employee_name = $staff_info['first_name'].' '.$staff_info['last_name'];
+			$idesignations = $DesignationModel->where('designation_id', $r['designation_id'])->first();
+			$employee_name = $staff_info['first_name'] . ' ' . $staff_info['last_name'];
 			// remarks
-			$remarks = '<a><button class="btn icon-btn btn-sm btn-outline-secondary waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-interview_id="'. uencode($r['job_interview_id']) . '">'.lang('Main.xin_view').' '.lang('Recruitment.xin_remarks').'</button></a>';
-			
+			$remarks = '<a><button class="btn icon-btn btn-sm btn-outline-secondary waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-interview_id="' . uencode($r['job_interview_id']) . '">' . lang('Main.xin_view') . ' ' . lang('Recruitment.xin_remarks') . '</button></a>';
+
 			$uname = '<div class="d-inline-block align-middle">
-				<img src="'.base_url().'/public/uploads/users/thumb/'.$staff_info['profile_photo'].'" alt="user image" class="img-radius align-top m-r-15" style="width:40px;">
+				<img src="' . base_url() . '/public/uploads/users/thumb/' . $staff_info['profile_photo'] . '" alt="user image" class="img-radius align-top m-r-15" style="width:40px;">
 				<div class="d-inline-block">
-					<h6 class="m-b-0">'.$employee_name.'</h6>
-					<p class="m-b-0">'.$staff_info['email'].'</p>
+					<h6 class="m-b-0">' . $employee_name . '</h6>
+					<p class="m-b-0">' . $staff_info['email'] . '</p>
 				</div>
 			</div>';
 
 			$data[] = array(
 				$uname,
 				$idesignations['designation_name'],
-				$interviewer['first_name'].' '.$interviewer['last_name'],
+				$interviewer['first_name'] . ' ' . $interviewer['last_name'],
 				$created_at,
-				$remarks				
-			);	
-			
+				$remarks
+			);
 		}
-          $output = array(
-               //"draw" => $draw,
-			   "data" => $data
-            );
-          echo json_encode($output);
-          exit();
-    }
+		$output = array(
+			//"draw" => $draw,
+			"data" => $data
+		);
+		echo json_encode($output);
+		exit();
+	}
 	// |||add record|||
-	public function add_job() {
-			
-		$validation =  \Config\Services::validation();
+	// public function add_job()
+	// {
+	// 	$validation =  \Config\Services::validation();
+	// 	$session = \Config\Services::session();
+	// 	$request = \Config\Services::request();
+	// 	$usession = $session->get('sup_username');
+	// 	if ($this->request->getPost()) {
+	// 		$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+	// 		$Return['csrf_hash'] = csrf_hash();
+	// 		// set rules
+	// 		$rules = [
+	// 			'job_title' => [
+	// 				'rules'  => 'required',
+	// 				'errors' => [
+	// 					'required' => lang('Main.xin_error_field_text')
+	// 				]
+	// 			],
+	// 			'job_type' => [
+	// 				'rules'  => 'required',
+	// 				'errors' => [
+	// 					'required' => lang('Main.xin_error_field_text')
+	// 				]
+	// 			],
+	// 			'designation_id' => [
+	// 				'rules'  => 'required',
+	// 				'errors' => [
+	// 					'required' => lang('Employees.xin_employee_error_designation')
+	// 				]
+	// 			],
+	// 			'vacancy' => [
+	// 				'rules'  => 'required',
+	// 				'errors' => [
+	// 					'required' => lang('Main.xin_error_field_text')
+	// 				]
+	// 			],
+	// 			'date_of_closing' => [
+	// 				'rules'  => 'required',
+	// 				'errors' => [
+	// 					'required' => lang('Main.xin_error_field_text')
+	// 				]
+	// 			],
+	// 			'short_description' => [
+	// 				'rules'  => 'required',
+	// 				'errors' => [
+	// 					'required' => lang('Main.xin_error_field_text')
+	// 				]
+	// 			],
+	// 			'long_description' => [
+	// 				'rules'  => 'required',
+	// 				'errors' => [
+	// 					'required' => lang('Main.xin_error_field_text')
+	// 				]
+	// 			]
+	// 		];
+	// 		if (!$this->validate($rules)) {
+	// 			$ruleErrors = [
+	// 				"job_title" => $validation->getError('job_title'),
+	// 				"job_type" => $validation->getError('job_type'),
+	// 				"designation_id" => $validation->getError('designation_id'),
+	// 				"vacancy" => $validation->getError('vacancy'),
+	// 				"date_of_closing" => $validation->getError('date_of_closing'),
+	// 				"short_description" => $validation->getError('short_description'),
+	// 				"long_description" => $validation->getError('long_description')
+	// 			];
+	// 			foreach ($ruleErrors as $err) {
+	// 				$Return['error'] = $err;
+	// 				if ($Return['error'] != '') {
+	// 					$this->output($Return);
+	// 				}
+	// 			}
+	// 		} else {
+	// 			$job_title = $this->request->getPost('job_title', FILTER_SANITIZE_STRING);
+	// 			$job_type = $this->request->getPost('job_type', FILTER_SANITIZE_STRING);
+	// 			$designation_id = $this->request->getPost('designation_id', FILTER_SANITIZE_STRING);
+	// 			$vacancy = $this->request->getPost('vacancy', FILTER_SANITIZE_STRING);
+	// 			$date_of_closing = $this->request->getPost('date_of_closing', FILTER_SANITIZE_STRING);
+	// 			$short_description = $this->request->getPost('short_description', FILTER_SANITIZE_STRING);
+	// 			$long_description = $this->request->getPost('long_description', FILTER_SANITIZE_STRING);
+	// 			$status = $this->request->getPost('status', FILTER_SANITIZE_STRING);
+	// 			$gender = $this->request->getPost('gender', FILTER_SANITIZE_STRING);
+	// 			$experience = $this->request->getPost('experience', FILTER_SANITIZE_STRING);
+
+	// 			$UsersModel = new UsersModel();
+	// 			$SystemModel = new SystemModel();
+	// 			$EmailtemplatesModel = new EmailtemplatesModel();
+	// 			$xin_system = $SystemModel->where('setting_id', 1)->first();
+	// 			$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+	// 			if ($user_info['user_type'] == 'staff') {
+	// 				$company_id = $user_info['company_id'];
+	// 				$company_info = $UsersModel->where('company_id', $company_id)->first();
+	// 				$staff = $UsersModel->where('company_id', $user_info['company_id'])->where('user_type', 'staff')->orderBy('user_id', 'ASC')->findAll();
+	// 			} else {
+	// 				$company_id = $usession['sup_user_id'];
+	// 				$company_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+	// 				$staff = $UsersModel->where('company_id', $usession['sup_user_id'])->where('user_type', 'staff')->orderBy('user_id', 'ASC')->findAll();
+	// 			}
+	// 			$data = [
+	// 				'company_id'  => $company_id,
+	// 				'job_title' => $job_title,
+	// 				'designation_id'  => $designation_id,
+	// 				'job_type'  => $job_type,
+	// 				'job_vacancy'  => $vacancy,
+	// 				'gender'  => $gender,
+	// 				'minimum_experience'  => $experience,
+	// 				'date_of_closing'  => $date_of_closing,
+	// 				'short_description'  => $short_description,
+	// 				'long_description'  => $long_description,
+	// 				'status'  => $status,
+	// 				'created_at' => date('d-m-Y h:i:s')
+	// 			];
+	// 			$JobsModel = new JobsModel();
+	// 			$result = $JobsModel->insert($data);
+	// 			$Return['csrf_hash'] = csrf_hash();
+	// 			if ($result == TRUE) {
+	// 				$Return['result'] = lang('Success.employee_set_job_success');
+	// 				if ($xin_system['enable_email_notification'] == 1) {
+	// 					// Send mail start
+	// 					$itemplate = $EmailtemplatesModel->where('template_id', 16)->first();
+	// 					$isubject = $itemplate['subject'];
+	// 					$ibody = html_entity_decode($itemplate['message']);
+	// 					$fbody = str_replace(array("{site_name}", "{job_title}", "{closing_date}"), array($company_info['company_name'], $job_title, $date_of_closing), $ibody);
+	// 					foreach ($staff as $_staff_id) {
+	// 						//$staff_info = $UsersModel->where('user_id', $_staff_id)->first();
+	// 						timehrm_mail_data($company_info['email'], $company_info['company_name'], $_staff_id['email'], $isubject, $fbody);
+	// 					}
+	// 					// Send mail end
+	// 				}
+	// 			} else {
+	// 				$Return['error'] = lang('Main.xin_error_msg');
+	// 			}
+	// 			return $this->response->setJSON($Return);
+	// 			exit;
+	// 		}
+	// 	} else {
+	// 		$Return['error'] = lang('Main.xin_error_msg');
+	// 		return $this->response->setJSON($Return);
+	// 		exit;
+	// 	}
+	// }
+
+	public function add_job()
+	{
+		$validation = \Config\Services::validation();
 		$session = \Config\Services::session();
-		$request = \Config\Services::request();
-		$usession = $session->get('sup_username');	
-		if ($this->request->getPost('type') === 'add_record') {
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$Return['csrf_hash'] = csrf_hash();
-			// set rules
+		$usession = $session->get('sup_username');
+
+		if ($this->request->getPost()) {
+			$Return = ['result' => '', 'error' => '', 'csrf_hash' => csrf_hash()];
+
 			$rules = [
 				'job_title' => [
 					'rules'  => 'required',
@@ -653,47 +751,37 @@ class Recruitment extends BaseController {
 					]
 				]
 			];
-			if(!$this->validate($rules)){
-				$ruleErrors = [
-                    "job_title" => $validation->getError('job_title'),
-					"job_type" => $validation->getError('job_type'),
-					"designation_id" => $validation->getError('designation_id'),
-					"vacancy" => $validation->getError('vacancy'),
-					"date_of_closing" => $validation->getError('date_of_closing'),
-					"short_description" => $validation->getError('short_description'),
-					"long_description" => $validation->getError('long_description')
-                ];
-				foreach($ruleErrors as $err){
-					$Return['error'] = $err;
-					if($Return['error']!=''){
-						$this->output($Return);
-					}
-				}
-			} else {
-				$job_title = $this->request->getPost('job_title',FILTER_SANITIZE_STRING);
-				$job_type = $this->request->getPost('job_type',FILTER_SANITIZE_STRING);
-				$designation_id = $this->request->getPost('designation_id',FILTER_SANITIZE_STRING);
-				$vacancy = $this->request->getPost('vacancy',FILTER_SANITIZE_STRING);
-				$date_of_closing = $this->request->getPost('date_of_closing',FILTER_SANITIZE_STRING);
-				$short_description = $this->request->getPost('short_description',FILTER_SANITIZE_STRING);
-				$long_description = $this->request->getPost('long_description',FILTER_SANITIZE_STRING);
-				$status = $this->request->getPost('status',FILTER_SANITIZE_STRING);
-				$gender = $this->request->getPost('gender',FILTER_SANITIZE_STRING);
-				$experience = $this->request->getPost('experience',FILTER_SANITIZE_STRING);
-							
+
+			if (!$this->validate($rules)) {
+				$Return['error'] = $validation->getErrors();
+				return $this->response->setJSON($Return);
+			}
+
+			try {
+				$job_title = $this->request->getPost('job_title', FILTER_SANITIZE_STRING);
+				$job_type = $this->request->getPost('job_type', FILTER_SANITIZE_STRING);
+				$designation_id = $this->request->getPost('designation_id', FILTER_SANITIZE_STRING);
+				$vacancy = $this->request->getPost('vacancy', FILTER_SANITIZE_STRING);
+				$date_of_closing = $this->request->getPost('date_of_closing', FILTER_SANITIZE_STRING);
+				$short_description = $this->request->getPost('short_description', FILTER_SANITIZE_STRING);
+				$long_description = $this->request->getPost('long_description', FILTER_SANITIZE_STRING);
+				$status = $this->request->getPost('status', FILTER_SANITIZE_STRING);
+				$gender = $this->request->getPost('gender', FILTER_SANITIZE_STRING);
+				$experience = $this->request->getPost('experience', FILTER_SANITIZE_STRING);
+
 				$UsersModel = new UsersModel();
 				$SystemModel = new SystemModel();
 				$EmailtemplatesModel = new EmailtemplatesModel();
 				$xin_system = $SystemModel->where('setting_id', 1)->first();
 				$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-				if($user_info['user_type'] == 'staff'){
+				if ($user_info['user_type'] == 'staff') {
 					$company_id = $user_info['company_id'];
 					$company_info = $UsersModel->where('company_id', $company_id)->first();
-					$staff = $UsersModel->where('company_id',$user_info['company_id'])->where('user_type','staff')->orderBy('user_id', 'ASC')->findAll();
+					$staff = $UsersModel->where('company_id', $user_info['company_id'])->where('user_type', 'staff')->orderBy('user_id', 'ASC')->findAll();
 				} else {
 					$company_id = $usession['sup_user_id'];
 					$company_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-					$staff = $UsersModel->where('company_id',$usession['sup_user_id'])->where('user_type','staff')->orderBy('user_id', 'ASC')->findAll();
+					$staff = $UsersModel->where('company_id', $usession['sup_user_id'])->where('user_type', 'staff')->orderBy('user_id', 'ASC')->findAll();
 				}
 				$data = [
 					'company_id'  => $company_id,
@@ -709,44 +797,37 @@ class Recruitment extends BaseController {
 					'status'  => $status,
 					'created_at' => date('d-m-Y h:i:s')
 				];
+
 				$JobsModel = new JobsModel();
-				$result = $JobsModel->insert($data);	
-				$Return['csrf_hash'] = csrf_hash();	
-				if ($result == TRUE) {
+				$result = $JobsModel->insert($data);
+
+				if ($result) {
 					$Return['result'] = lang('Success.employee_set_job_success');
-					if($xin_system['enable_email_notification'] == 1){
-						// Send mail start
-						$itemplate = $EmailtemplatesModel->where('template_id', 16)->first();
-						$isubject = $itemplate['subject'];
-						$ibody = html_entity_decode($itemplate['message']);
-						$fbody = str_replace(array("{site_name}","{job_title}","{closing_date}"),array($company_info['company_name'],$job_title,$date_of_closing),$ibody);
-						foreach($staff as $_staff_id){
-							//$staff_info = $UsersModel->where('user_id', $_staff_id)->first();
-							timehrm_mail_data($company_info['email'],$company_info['company_name'],$_staff_id['email'],$isubject,$fbody);
-						}
-						// Send mail end
-					}
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
-				exit;
+			} catch (\Exception $e) {
+				$Return['error'] = $e->getMessage();
 			}
-		} else {
-			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+
+			$Return['csrf_hash'] = csrf_hash();
+			return $this->response->setJSON($Return);
 		}
+
+		$Return['error'] = lang('Main.xin_error_msg');
+		return $this->response->setJSON($Return);
 	}
+
 	// |||add record|||
-	public function update_job() {
-			
+	public function update_job()
+	{
+
 		$validation =  \Config\Services::validation();
 		$session = \Config\Services::session();
 		$request = \Config\Services::request();
-		$usession = $session->get('sup_username');	
-		if ($this->request->getPost('type') === 'add_record') {
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
+		$usession = $session->get('sup_username');
+		if ($this->request->getPost()) {
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$Return['csrf_hash'] = csrf_hash();
 			// set rules
 			$rules = [
@@ -793,38 +874,38 @@ class Recruitment extends BaseController {
 					]
 				]
 			];
-			if(!$this->validate($rules)){
+			if (!$this->validate($rules)) {
 				$ruleErrors = [
-                    "job_title" => $validation->getError('job_title'),
+					"job_title" => $validation->getError('job_title'),
 					"job_type" => $validation->getError('job_type'),
 					"designation_id" => $validation->getError('designation_id'),
 					"vacancy" => $validation->getError('vacancy'),
 					"date_of_closing" => $validation->getError('date_of_closing'),
 					"short_description" => $validation->getError('short_description'),
 					"long_description" => $validation->getError('long_description')
-                ];
-				foreach($ruleErrors as $err){
+				];
+				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
-					if($Return['error']!=''){
+					if ($Return['error'] != '') {
 						$this->output($Return);
 					}
 				}
 			} else {
-				$job_title = $this->request->getPost('job_title',FILTER_SANITIZE_STRING);
-				$job_type = $this->request->getPost('job_type',FILTER_SANITIZE_STRING);
-				$designation_id = $this->request->getPost('designation_id',FILTER_SANITIZE_STRING);
-				$vacancy = $this->request->getPost('vacancy',FILTER_SANITIZE_STRING);
-				$date_of_closing = $this->request->getPost('date_of_closing',FILTER_SANITIZE_STRING);
-				$short_description = $this->request->getPost('short_description',FILTER_SANITIZE_STRING);
-				$long_description = $this->request->getPost('long_description',FILTER_SANITIZE_STRING);
-				$status = $this->request->getPost('status',FILTER_SANITIZE_STRING);
-				$gender = $this->request->getPost('gender',FILTER_SANITIZE_STRING);
-				$experience = $this->request->getPost('experience',FILTER_SANITIZE_STRING);
-				$id = udecode($this->request->getPost('token',FILTER_SANITIZE_STRING));
-							
+				$job_title = $this->request->getPost('job_title', FILTER_SANITIZE_STRING);
+				$job_type = $this->request->getPost('job_type', FILTER_SANITIZE_STRING);
+				$designation_id = $this->request->getPost('designation_id', FILTER_SANITIZE_STRING);
+				$vacancy = $this->request->getPost('vacancy', FILTER_SANITIZE_STRING);
+				$date_of_closing = $this->request->getPost('date_of_closing', FILTER_SANITIZE_STRING);
+				$short_description = $this->request->getPost('short_description', FILTER_SANITIZE_STRING);
+				$long_description = $this->request->getPost('long_description', FILTER_SANITIZE_STRING);
+				$status = $this->request->getPost('status', FILTER_SANITIZE_STRING);
+				$gender = $this->request->getPost('gender', FILTER_SANITIZE_STRING);
+				$experience = $this->request->getPost('experience', FILTER_SANITIZE_STRING);
+				$id = $this->request->getPost('token');
+
 				$UsersModel = new UsersModel();
 				$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-				if($user_info['user_type'] == 'staff'){
+				if ($user_info['user_type'] == 'staff') {
 					$company_id = $user_info['company_id'];
 				} else {
 					$company_id = $usession['sup_user_id'];
@@ -842,52 +923,53 @@ class Recruitment extends BaseController {
 					'status'  => $status
 				];
 				$JobsModel = new JobsModel();
-				$result = $JobsModel->update($id,$data);	
-				$Return['csrf_hash'] = csrf_hash();	
+				$result = $JobsModel->update($id, $data);
+				$Return['csrf_hash'] = csrf_hash();
 				if ($result == TRUE) {
 					$Return['result'] = lang('Success.employee_update_jobt_success');
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 				exit;
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 			exit;
 		}
 	}
 	// |||update record|||
 
-	
-	
-	
-	public function update_candidate_status() {
-			
+
+
+
+	public function update_candidate_status()
+	{
+
 		$validation =  \Config\Services::validation();
 		$session = \Config\Services::session();
 		$request = \Config\Services::request();
-		$usession = $session->get('sup_username');	
+		$usession = $session->get('sup_username');
 		if ($this->request->getPost('type') === 'edit_record') {
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$Return['csrf_hash'] = csrf_hash();
-			if($this->request->getPost('status') == 3){
-				$status = $this->request->getPost('status',FILTER_SANITIZE_STRING);		
-				$id = udecode($this->request->getPost('token',FILTER_SANITIZE_STRING));
-							
-				$Return['csrf_hash'] = csrf_hash();	
-					$data2 = [
+			if ($this->request->getPost('status') == 3) {
+				$status = $this->request->getPost('status', FILTER_SANITIZE_STRING);
+				$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
+
+				$Return['csrf_hash'] = csrf_hash();
+				$data2 = [
 					'application_status'  => $status,
-					];
+				];
 				$JobcandidatesModel = new JobcandidatesModel();
-				$result = $JobcandidatesModel->update($id,$data2);
+				$result = $JobcandidatesModel->update($id, $data2);
 				if ($result == TRUE) {
 					$Return['result'] = lang('Success.ci_candidate_updated_msg');
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 				exit;
 			} else {
 				// set rules
@@ -929,7 +1011,7 @@ class Recruitment extends BaseController {
 						]
 					]
 				];
-				if(!$this->validate($rules)){
+				if (!$this->validate($rules)) {
 					$ruleErrors = [
 						"status" => $validation->getError('status'),
 						"interview_date" => $validation->getError('interview_date'),
@@ -938,26 +1020,26 @@ class Recruitment extends BaseController {
 						"interviewer_id" => $validation->getError('interviewer_id'),
 						"description" => $validation->getError('description')
 					];
-					foreach($ruleErrors as $err){
+					foreach ($ruleErrors as $err) {
 						$Return['error'] = $err;
-						if($Return['error']!=''){
-							$this->output($Return);
+						if ($Return['error'] != '') {
+							return $this->response->setJSON($Return);
 						}
 					}
 				} else {
-					$interview_date = $this->request->getPost('interview_date',FILTER_SANITIZE_STRING);
-					$interview_time = $this->request->getPost('interview_time',FILTER_SANITIZE_STRING);
-					$interview_place = $this->request->getPost('interview_place',FILTER_SANITIZE_STRING);
-					$interviewer_id = $this->request->getPost('interviewer_id',FILTER_SANITIZE_STRING);
-					$description = $this->request->getPost('description',FILTER_SANITIZE_STRING);
-					$status = $this->request->getPost('status',FILTER_SANITIZE_STRING);		
-					$id = udecode($this->request->getPost('token',FILTER_SANITIZE_STRING));
-						
+					$interview_date = $this->request->getPost('interview_date', FILTER_SANITIZE_STRING);
+					$interview_time = $this->request->getPost('interview_time', FILTER_SANITIZE_STRING);
+					$interview_place = $this->request->getPost('interview_place', FILTER_SANITIZE_STRING);
+					$interviewer_id = $this->request->getPost('interviewer_id', FILTER_SANITIZE_STRING);
+					$description = $this->request->getPost('description', FILTER_SANITIZE_STRING);
+					$status = $this->request->getPost('status', FILTER_SANITIZE_STRING);
+					$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
+
 					$UsersModel = new UsersModel();
 					$JobsModel = new JobsModel();
 					$JobcandidatesModel = new JobcandidatesModel();
 					$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-					if($user_info['user_type'] == 'staff'){
+					if ($user_info['user_type'] == 'staff') {
 						$company_id = $user_info['company_id'];
 					} else {
 						$company_id = $usession['sup_user_id'];
@@ -979,36 +1061,37 @@ class Recruitment extends BaseController {
 					];
 					$JobinterviewsModel = new JobinterviewsModel();
 					$result = $JobinterviewsModel->insert($data);
-					$Return['csrf_hash'] = csrf_hash();	
+					$Return['csrf_hash'] = csrf_hash();
 					if ($result == TRUE) {
 						$data2 = [
-						'application_status'  => $status,
-					];
-					$JobcandidatesModel = new JobcandidatesModel();
-					$result = $JobcandidatesModel->update($id,$data2);
+							'application_status'  => $status,
+						];
+						$JobcandidatesModel = new JobcandidatesModel();
+						$result = $JobcandidatesModel->update($id, $data2);
 						$Return['result'] = lang('Success.ci_candidate_updated_msg');
 					} else {
 						$Return['error'] = lang('Main.xin_error_msg');
 					}
 				}
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 				exit;
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 			exit;
 		}
 	}
 	// |||update record|||
-	public function update_interview_status() {
-			
+	public function update_interview_status()
+	{
+
 		$validation =  \Config\Services::validation();
 		$session = \Config\Services::session();
 		$request = \Config\Services::request();
-		$usession = $session->get('sup_username');	
+		$usession = $session->get('sup_username');
 		if ($this->request->getPost('type') === 'edit_record') {
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$Return['csrf_hash'] = csrf_hash();
 			// set rules
 			$rules = [
@@ -1025,26 +1108,26 @@ class Recruitment extends BaseController {
 					]
 				]
 			];
-			if(!$this->validate($rules)){
+			if (!$this->validate($rules)) {
 				$ruleErrors = [
-                    "status" => $validation->getError('status'),
+					"status" => $validation->getError('status'),
 					"description" => $validation->getError('description')
-                ];
-				foreach($ruleErrors as $err){
+				];
+				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
-					if($Return['error']!=''){
+					if ($Return['error'] != '') {
 						$this->output($Return);
 					}
 				}
 			} else {
-				$description = $this->request->getPost('description',FILTER_SANITIZE_STRING);
-				$status = $this->request->getPost('status',FILTER_SANITIZE_STRING);		
-				$id = udecode($this->request->getPost('token',FILTER_SANITIZE_STRING));
-					
+				$description = $this->request->getPost('description', FILTER_SANITIZE_STRING);
+				$status = $this->request->getPost('status', FILTER_SANITIZE_STRING);
+				$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
+
 				$UsersModel = new UsersModel();
 				$JobcandidatesModel = new JobcandidatesModel();
 				$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-				if($user_info['user_type'] == 'staff'){
+				if ($user_info['user_type'] == 'staff') {
 					$company_id = $user_info['company_id'];
 				} else {
 					$company_id = $usession['sup_user_id'];
@@ -1055,47 +1138,48 @@ class Recruitment extends BaseController {
 				];
 				$JobinterviewsModel = new JobinterviewsModel();
 				$job_int = $JobinterviewsModel->where('job_interview_id', $id)->first();
-				$result = $JobinterviewsModel->update($id,$data);
-				$Return['csrf_hash'] = csrf_hash();	
+				$result = $JobinterviewsModel->update($id, $data);
+				$Return['csrf_hash'] = csrf_hash();
 				if ($result == TRUE) {
 					// employee details
-					if($status == 2){
+					if ($status == 2) {
 						$data2 = [
 							'designation_id' => $job_int['designation_id'],
 						];
 						$MainModel = new MainModel();
-						$MainModel->update_employee_record($data2,$job_int['staff_id']);
+						$MainModel->update_employee_record($data2, $job_int['staff_id']);
 					}
 					$Return['result'] = lang('Success.ci_interview_updated_msg');
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 				exit;
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 			exit;
 		}
 	}
-	 // |||add record|||
-	public function apply_job() {
-			
+	// |||add record|||
+	public function apply_job()
+	{
+
 		$validation =  \Config\Services::validation();
 		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
-		if(!$session->has('sup_username')){ 
-			return redirect()->to(site_url('erp/login'));
-		}	
-		if ($this->request->getPost('type') === 'add_record') {
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
+		if (!$session->has('sup_username')) {
+			return redirect()->to(site_url('/'));
+		}
+		if ($this->request->getPost()) {
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$Return['csrf_hash'] = csrf_hash();
 			// set rules
 			$rules = [
 				'cover_letter' => [
-					'rules'  => 'required|min_length[240]|max_length[400]',
+					'rules'  => 'required',
 					'errors' => [
 						'required'    => lang('Main.xin_error_field_text'),
 						'min_length'  => 'The cover letter must be at least 240 words.',
@@ -1110,14 +1194,14 @@ class Recruitment extends BaseController {
 					]
 				]
 			];
-			if(!$this->validate($rules)){
+			if (!$this->validate($rules)) {
 				$ruleErrors = [
-                    "cover_letter" => $validation->getError('cover_letter'),
+					"cover_letter" => $validation->getError('cover_letter'),
 					"file_cv" => $validation->getError('file_cv')
-                ];
-				foreach($ruleErrors as $err){
+				];
+				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
-					if($Return['error']!=''){
+					if ($Return['error'] != '') {
 						$this->output($Return);
 					}
 				}
@@ -1125,22 +1209,22 @@ class Recruitment extends BaseController {
 				// upload file
 				$file_cv = $this->request->getFile('file_cv');
 				$file_name = $file_cv->getName();
-				$file_cv->move('public/uploads/candidates/');
-				
-				$cover_letter = $this->request->getPost('cover_letter',FILTER_SANITIZE_STRING);
-				$id = udecode($this->request->getPost('token',FILTER_SANITIZE_STRING));
-				
+				$file_cv->move('uploads/candidates/');
+
+				$cover_letter = $this->request->getPost('cover_letter', FILTER_SANITIZE_STRING);
+				$id = $this->request->getPost('token');
+
 				$JobsModel = new JobsModel();
 				$UsersModel = new UsersModel();
 				$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-				if($user_info['user_type'] == 'staff'){
+				if ($user_info['user_type'] == 'staff') {
 					$staff_id = $usession['sup_user_id'];
 					$company_id = $user_info['company_id'];
 				} else {
 					$staff_id = $usession['sup_user_id'];
 					$company_id = $usession['sup_user_id'];
 				}
-				$job_info = $JobsModel->where('company_id',$company_id)->where('job_id', $id)->first();
+				$job_info = $JobsModel->where('company_id', $company_id)->where('job_id', $id)->first();
 				$data = [
 					'company_id' => $company_id,
 					'job_id'  => $id,
@@ -1153,63 +1237,64 @@ class Recruitment extends BaseController {
 					'created_at' => date('d-m-Y h:i:s')
 				];
 				$JobcandidatesModel = new JobcandidatesModel();
-				$result = $JobcandidatesModel->insert($data);	
-				$Return['csrf_hash'] = csrf_hash();	
+				$result = $JobcandidatesModel->insert($data);
+				$Return['csrf_hash'] = csrf_hash();
 				if ($result == TRUE) {
 					$Return['result'] = lang('Success.ci_job_apply_success_msg');
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 				exit;
-			}			
+			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 			exit;
 		}
 	}
 	// read record
 	public function read_candidate()
 	{
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
-		if(!$session->has('sup_username')){ 
-			return redirect()->to(site_url('erp/login'));
+		if (!$session->has('sup_username')) {
+			return redirect()->to(site_url('/'));
 		}
 		$id = $request->getGet('field_id');
 		$data = [
-				'field_id' => $id,
-			];
-		if($session->has('sup_username')){
+			'field_id' => $id,
+		];
+		if ($session->has('sup_username')) {
 			return view('erp/recruitment/dialog_candidate', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
-	public function jobs_status_chart() {
-		
+	public function jobs_status_chart()
+	{
+
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
-		if(!$session->has('sup_username')){ 
-			return redirect()->to(site_url('erp/login'));
-		}		
+		if (!$session->has('sup_username')) {
+			return redirect()->to(site_url('/'));
+		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
 		$SystemModel = new SystemModel();
 		//$ConstantsModel = new ConstantsModel();
 		$JobsModel = new JobsModel();
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		if($user_info['user_type'] == 'staff'){
-			$open = $JobsModel->where('company_id',$user_info['company_id'])->where('status', 1)->countAllResults();
-			$closed = $JobsModel->where('company_id',$user_info['company_id'])->where('status', 2)->countAllResults();
+		if ($user_info['user_type'] == 'staff') {
+			$open = $JobsModel->where('company_id', $user_info['company_id'])->where('status', 1)->countAllResults();
+			$closed = $JobsModel->where('company_id', $user_info['company_id'])->where('status', 2)->countAllResults();
 		} else {
-			$open = $JobsModel->where('company_id',$usession['sup_user_id'])->where('status', 1)->countAllResults();
-			$closed = $JobsModel->where('company_id',$usession['sup_user_id'])->where('status', 2)->countAllResults();
+			$open = $JobsModel->where('company_id', $usession['sup_user_id'])->where('status', 1)->countAllResults();
+			$closed = $JobsModel->where('company_id', $usession['sup_user_id'])->where('status', 2)->countAllResults();
 		}
 		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('open_count'=>'', 'open_label'=>'','closed'=>'', 'closed_label'=>'');
-		
+		$Return = array('open_count' => '', 'open_label' => '', 'closed' => '', 'closed_label' => '');
+
 		// closed
 		$Return['closed_label'] = lang('Recruitment.xin_unpublished');
 		$Return['closed'] = $closed;
@@ -1219,33 +1304,34 @@ class Recruitment extends BaseController {
 		$this->output($Return);
 		exit;
 	}
-	public function jobs_type_chart() {
-		
+	public function jobs_type_chart()
+	{
+
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
-		if(!$session->has('sup_username')){ 
-			return redirect()->to(site_url('erp/login'));
-		}		
+		if (!$session->has('sup_username')) {
+			return redirect()->to(site_url('/'));
+		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
 		$SystemModel = new SystemModel();
 		//$ConstantsModel = new ConstantsModel();
 		$JobsModel = new JobsModel();
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		if($user_info['user_type'] == 'staff'){
-			$full_time = $JobsModel->where('company_id',$user_info['company_id'])->where('job_type', 1)->countAllResults();
-			$part_time = $JobsModel->where('company_id',$user_info['company_id'])->where('job_type', 2)->countAllResults();
-			$internship = $JobsModel->where('company_id',$user_info['company_id'])->where('job_type', 3)->countAllResults();
-			$freelance = $JobsModel->where('company_id',$user_info['company_id'])->where('job_type', 4)->countAllResults();
+		if ($user_info['user_type'] == 'staff') {
+			$full_time = $JobsModel->where('company_id', $user_info['company_id'])->where('job_type', 1)->countAllResults();
+			$part_time = $JobsModel->where('company_id', $user_info['company_id'])->where('job_type', 2)->countAllResults();
+			$internship = $JobsModel->where('company_id', $user_info['company_id'])->where('job_type', 3)->countAllResults();
+			$freelance = $JobsModel->where('company_id', $user_info['company_id'])->where('job_type', 4)->countAllResults();
 		} else {
-			$full_time = $JobsModel->where('company_id',$usession['sup_user_id'])->where('job_type', 1)->countAllResults();
-			$part_time = $JobsModel->where('company_id',$usession['sup_user_id'])->where('job_type', 2)->countAllResults();
-			$internship = $JobsModel->where('company_id',$usession['sup_user_id'])->where('job_type', 3)->countAllResults();
-			$freelance = $JobsModel->where('company_id',$usession['sup_user_id'])->where('job_type', 4)->countAllResults();
+			$full_time = $JobsModel->where('company_id', $usession['sup_user_id'])->where('job_type', 1)->countAllResults();
+			$part_time = $JobsModel->where('company_id', $usession['sup_user_id'])->where('job_type', 2)->countAllResults();
+			$internship = $JobsModel->where('company_id', $usession['sup_user_id'])->where('job_type', 3)->countAllResults();
+			$freelance = $JobsModel->where('company_id', $usession['sup_user_id'])->where('job_type', 4)->countAllResults();
 		}
 		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('full_time'=>'', 'part_time'=>'','internship'=>'', 'freelance'=>'','full_time_lb'=>'', 'part_time_lb'=>'','internship_lb'=>'', 'freelance_lb'=>'');
-		
+		$Return = array('full_time' => '', 'part_time' => '', 'internship' => '', 'freelance' => '', 'full_time_lb' => '', 'part_time_lb' => '', 'internship_lb' => '', 'freelance_lb' => '');
+
 		// full_time
 		$Return['full_time_lb'] = lang('Recruitment.xin_full_time');
 		$Return['full_time'] = $full_time;
@@ -1261,56 +1347,57 @@ class Recruitment extends BaseController {
 		$this->output($Return);
 		exit;
 	}
-	public function job_by_designation_chart() {
+	public function job_by_designation_chart()
+	{
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
-		if(!$session->has('sup_username')){ 
-			return redirect()->to(site_url('erp/login'));
-		}		
+		if (!$session->has('sup_username')) {
+			return redirect()->to(site_url('/'));
+		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
 		$SystemModel = new SystemModel();
 		$JobsModel = new JobsModel();
 		$DesignationModel = new DesignationModel();
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-		if($user_info['user_type'] == 'staff'){
-			$get_designation = $DesignationModel->where('company_id',$user_info['company_id'])->orderBy('designation_id', 'ASC')->findAll();
+		if ($user_info['user_type'] == 'staff') {
+			$get_designation = $DesignationModel->where('company_id', $user_info['company_id'])->orderBy('designation_id', 'ASC')->findAll();
 		} else {
-			$get_designation = $DesignationModel->where('company_id',$usession['sup_user_id'])->orderBy('designation_id', 'ASC')->findAll();
+			$get_designation = $DesignationModel->where('company_id', $usession['sup_user_id'])->orderBy('designation_id', 'ASC')->findAll();
 		}
 		$data = array();
-		$Return = array('iseries'=>'', 'ilabels'=>'');
+		$Return = array('iseries' => '', 'ilabels' => '');
 		$title_info = array();
 		$series_info = array();
-		foreach($get_designation as $r){
-			$job_info = $JobsModel->where('designation_id',$r['designation_id'])->first();
-			$job_count = $JobsModel->where('designation_id',$r['designation_id'])->countAllResults();
-			if($job_count > 0){
+		foreach ($get_designation as $r) {
+			$job_info = $JobsModel->where('designation_id', $r['designation_id'])->first();
+			$job_count = $JobsModel->where('designation_id', $r['designation_id'])->countAllResults();
+			if ($job_count > 0) {
 				$title_info[] = $r['designation_name'];
 				$series_info[] = $job_count;
 			}
-			
-		}				  
+		}
 		$Return['iseries'] = $series_info;
 		$Return['ilabels'] = $title_info;
 		$this->output($Return);
 		exit;
 	}
 	// delete record
-	public function delete_job() {
-		
-		if($this->request->getPost('type')=='delete_record') {
+	public function delete_job()
+	{
+
+		if ($this->request->getPost('type') == 'delete_record') {
 			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$session = \Config\Services::session($config);
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
-			$id = udecode($this->request->getPost('_token',FILTER_SANITIZE_STRING));
+			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
 			$Return['csrf_hash'] = csrf_hash();
 			$JobsModel = new JobsModel();
 			$UsersModel = new UsersModel();
 			$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-			if($user_info['user_type'] == 'staff'){
+			if ($user_info['user_type'] == 'staff') {
 				$company_id = $user_info['company_id'];
 			} else {
 				$company_id = $usession['sup_user_id'];
@@ -1321,7 +1408,7 @@ class Recruitment extends BaseController {
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 		}
 	}
 }

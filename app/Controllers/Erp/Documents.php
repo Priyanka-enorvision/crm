@@ -747,6 +747,7 @@ class Documents extends BaseController
 
 		$data['title'] = ' Documents';
 		$data['breadcrumbs'] = ' Documents';
+		$data['path_url'] = ' ';
 
 		$data['subview'] = view('erp/document/document_list', $data);
 		return view('erp/layout/layout_main', $data); //page load
@@ -770,7 +771,7 @@ class Documents extends BaseController
 			'docu_image' => 'uploaded[docu_image]|ext_in[docu_image,jpg,jpeg,png,pdf,docx,doc]',
 		]);
 
-		if ($this->request->getMethod() === 'post' && $validation->withRequest($this->request)->run()) {
+		if ($this->request->getMethod()) {
 			$employee_id = $this->request->getPost('employee_id');
 			$category_id = $this->request->getPost('category_id');
 			$docu_names = $this->request->getPost('docu_name');
@@ -797,7 +798,7 @@ class Documents extends BaseController
 					$docu_image = $docu_images[$index];
 					if ($docu_image->isValid() && !$docu_image->hasMoved()) {
 						$newName = $docu_image->getRandomName();
-						$docu_image->move('public/uploads/employe_document/', $newName);
+						$docu_image->move('uploads/employe_document/', $newName);
 
 						// Prepare document data for JSON
 						$documents[] = [
@@ -838,10 +839,10 @@ class Documents extends BaseController
 		return redirect()->back()->withInput();
 	}
 
-	public function view_document($enc_id)
+	public function view_document($document_id)
 	{
 
-		$document_id = base64_decode($enc_id);
+		// $document_id = base64_decode($enc_id);
 		$session = \Config\Services::session();
 		$SystemModel = new SystemModel();
 
@@ -851,6 +852,7 @@ class Documents extends BaseController
 
 		$data['title'] = 'View Documents';
 		$data['breadcrumbs'] = 'View Documents';
+		$data['path_url'] = '';
 		$data['document_id'] = $document_id;
 
 
@@ -887,7 +889,7 @@ class Documents extends BaseController
 				if (isset($docu_images[$index]) && $docu_images[$index]->isValid() && !$docu_images[$index]->hasMoved()) {
 					$docu_image = $docu_images[$index];
 					$new_image_name = $docu_image->getRandomName();
-					$docu_image->move('public/uploads/employe_document/', $new_image_name);
+					$docu_image->move('uploads/employe_document/', $new_image_name);
 				}
 
 				$documents[] = [

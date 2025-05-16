@@ -169,6 +169,8 @@ $routes->post('erp/update-projectTask/(:num)', 'Tasks::taskUpdate/$1', ['namespa
 
 // Documention
 $routes->get('erp/documentation', 'Documents::upload_document', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/save-document', 'Documents::save_document', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/documentfiles-updates', 'Documents::documentfiles_updates', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('view/employe-document/(:any)', 'Documents::view_document/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 //employee
@@ -245,7 +247,7 @@ $routes->post('erp/opportunity-update/(:any)', 'Opportunity::update/$1', ['names
 $routes->match(['get', 'post'], 'erp/opportunity-delete/(:any)', 'Opportunity::delete/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
 
 // leads
-$routes->get('erp/leads-list/','Clients::leads_index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/leads-list/', 'Clients::leads_index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/clients-insert-lead/', 'Clients::insertLead', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/web-leads-list/', 'Clients::web_leads_index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
@@ -400,6 +402,10 @@ $routes->post('erp/update-leave-type', 'types::update_leave_type', ['namespace' 
 
 
 $routes->get('erp/award-type/', 'Types::award_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/award-type-Datalist', 'Types::award_type_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-award-type', 'Types::add_award_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/read-award-type', 'Types::read_award_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
 $routes->get('erp/arrangement-type/', 'Types::arrangement_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/arrangement-type-dataList', 'types::arrangement_type_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/add-arrangement-type', 'types::add_arrangement_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -417,7 +423,6 @@ $routes->get('erp/income-type/', 'Types::income_type', ['namespace' => 'App\Cont
 $routes->get('erp/income-type-list', 'types::income_type_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/add-income-type', 'types::add_income_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/read-income-type', 'types::read_income_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-// $routes->post('erp/update-constants-type', 'types::update_constants_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 
 $routes->get('erp/expense-type/', 'Types::expense_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -429,10 +434,13 @@ $routes->get('erp/competencies/', 'Types::competencies', ['namespace' => 'App\Co
 $routes->get('erp/competencies-Datalist', 'Types::competencies_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/add-competencies', 'Types::add_competencies', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/read-competencies', 'Types::read_competencies', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->post('erp/update-constants-type', 'Types::update_constants_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 
 $routes->get('erp/goal-type/', 'Types::goal_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/goal-type-list', 'Types::goal_type_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-goal-type', 'Types::add_goal_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/read-goal-type', 'Types::read_goal_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
 $routes->get('erp/training-skills/', 'Types::training_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/case-type/', 'Types::case_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/tax-type/', 'Types::tax_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -483,7 +491,12 @@ $routes->get('erp/applied-expert-data/(:num)', 'HireExpert::applied_expert_data/
 
 // awards
 $routes->get('erp/awards-list/', 'Awards::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/awards-dataList', 'Awards::awards_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/award-view/(:segment)', 'Awards::award_view', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-awards', 'Awards::add_awards', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/delete-award', 'Awards::delete_award', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-award', 'Awards::update_award', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
 // travel
 $routes->get('erp/business-travel/', 'Travel::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/travel-dataList', 'Travel::travel_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -554,9 +567,23 @@ $routes->get('erp/read-warning', 'warning::read_warning', ['namespace' => 'App\C
 $routes->post('erp/update-warning', 'warning::update_warning', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // tickets
 $routes->get('erp/support-tickets/', 'Tickets::tickets_page', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/tickets-priority-chart', 'Tickets::tickets_priority_chart', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/tickets-status-chart', 'Tickets::tickets_status_chart', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-ticket', 'Tickets::add_ticket', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/get-employeeBy-department/(:num)', 'Tickets::is_department/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
 $routes->get('erp/create-ticket/', 'Tickets::create_ticket', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/helpdesk-dashboard/', 'Tickets::helpdesk_dashboard', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/ticket-view/(:segment)', 'Tickets::ticket_details', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-ticket-status', 'Tickets::update_ticket_status', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-ticket-reply', 'Tickets::add_ticket_reply', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/tickets-add-note', 'Tickets::add_note', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/delete-ticket-note', 'Tickets::delete_ticket_note', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/tickets-add-attachment', 'Tickets::add_attachment', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/delete-ticket-file', 'Tickets::delete_ticket_file', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/delete-ticket', 'Tickets::delete_ticket', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/read-ticket', 'Tickets::read_ticket', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-ticket', 'Tickets::update_ticket', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // training
 $routes->get('erp/training-sessions/', 'Training::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/training-details/(:segment)', 'Training::training_details', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -566,6 +593,12 @@ $routes->get('erp/trainers-list/', 'Trainers::index', ['namespace' => 'App\Contr
 
 // events
 $routes->get('erp/events-list/', 'Events::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/events-dataList', 'Events::events_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-event', 'Events::add_event', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/read-event-record', 'Events::read_event_record', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/delete-event', 'Events::delete_event', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-event', 'Events::update_event', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
 $routes->get('erp/events-calendar/', 'Events::events_calendar', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // meetings
 $routes->get('erp/meeting-list/', 'Conference::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -703,10 +736,17 @@ $routes->post('erp/invoices/getTasksByProject', 'Invoices::getTasksByProject', [
 // estimates || Staff
 $routes->get('erp/estimates-list/', 'Estimates::project_estimates', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/create-new-estimate/', 'Estimates::create_estimate', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/save-estimate', 'Estimates::create_new_estimate', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/delete-estimate', 'Estimates::delete_estimate', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
+
 $routes->get('erp/estimates-calendar/', 'Estimates::estimates_calendar', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->get('erp/estimate-detail/(:segment)', 'Estimates::estimate_details', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/estimate-detail/(:any)', 'Estimates::estimate_details/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/edit-estimate/(:segment)', 'Estimates::edit_estimate', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-estimate', 'Estimates::update_estimate', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
 $routes->get('erp/print-estimate/(:segment)', 'Estimates::view_project_estimate', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/estimate-to-invoice', 'Estimates::read_estimate_data', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // invoices || Clients
 $routes->get('erp/my-invoices-list/', 'Invoices::invoices_client', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/my-invoice-payments-list/', 'Invoices::client_invoice_payment', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -789,11 +829,34 @@ $routes->get('erp/company-constants/', 'Application::company_constants', ['names
 $routes->get('erp/jobs-dashboard/', 'Recruitment::recruitment_dashboard', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/jobs-list/', 'Recruitment::jobs', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/view-job/(:segment)', 'Recruitment::job_details', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/apply-job', 'Recruitment::apply_job', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
+
 $routes->get('erp/candidates-list/', 'Recruitment::candidates', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/candidates-DataList', 'Recruitment::candidates_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/read-candidate', 'Recruitment::read_candidate', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-candidate-status', 'Recruitment::update_candidate_status', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-interview-status', 'Recruitment::update_interview_status', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
 $routes->get('erp/jobs-interviews/', 'Recruitment::interviews', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/interview-Datalist', 'Recruitment::interview_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
+$routes->get('erp/rejected-list', 'Recruitment::rejected', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/reject-candidates-list', 'Recruitment::reject_candidates_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
 $routes->get('erp/promotion-list/', 'Recruitment::promotions', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/promotion-dataList', 'Recruitment::promotion_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
 $routes->get('erp/create-new-job/', 'Recruitment::create_job', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-job', 'Recruitment::add_job', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
 $routes->get('erp/edit-a-job/(:segment)', 'Recruitment::edit_job', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/update-job', 'Recruitment::update_job', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/delete-job', 'Recruitment::delete_job', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/jobs-data-list', 'Recruitment::jobs_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/jobs-status-chart', 'Recruitment::jobs_status_chart', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/jobs-type-chart', 'Recruitment::jobs_type_chart', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/jobBy-designation-chart', 'Recruitment::job_by_designation_chart', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 
 $routes->post('erp/save-summary', 'UserDetails::save_summary', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -832,7 +895,7 @@ $routes->post('erp/add-allowance', 'employees::add_allowance', ['namespace' => '
 
 
 
-$routes->get('erp/dialog-user-data', 'employees::dialog_user_data', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+// $routes->get('erp/dialog-user-data', 'employees::dialog_user_data', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/update-allowance', 'employees::update_allowance', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 $routes->get('erp/commissions-list/(:num)', 'employees::commissions_list/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -841,7 +904,6 @@ $routes->get('erp/caseType-data-list', 'types::case_type_list', ['namespace' => 
 $routes->post('erp/add-case-type', 'types::add_case_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // $routes->delete('erp/delete-type/(:any)', 'types::delete_type/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/read-case-type', 'types::read_case_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->post('erp/update-constants-type', 'types::update_constants_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 
 /***************************************************************************************************************/

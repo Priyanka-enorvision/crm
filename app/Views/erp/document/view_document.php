@@ -446,7 +446,7 @@ foreach ($category_list as $category) {
 
                                 </div>
                                 <div class="modal-body">
-                                    <form action="<?= base_url('erp/documents/documentfiles_updates'); ?>" method="POST" enctype="multipart/form-data">
+                                    <form action="<?= base_url('erp/documentfiles-updates'); ?>" method="POST" enctype="multipart/form-data">
                                         <div class="row">
                                             <div class="col-6">
                                                 <div class="form-group">
@@ -544,7 +544,7 @@ foreach ($category_list as $category) {
 
     <script>
         const documentOptionItem = <?= json_encode($documentoption_item); ?>;
-        const basePath = '<?= base_url() ?>' + '/public/uploads/employe_document/';
+        const basePath = '<?= base_url() ?>' + 'uploads/employe_document/';
 
         function loadCategoryData(categoryId) {
             const contentDiv = document.getElementById('dynamic-content');
@@ -606,7 +606,7 @@ foreach ($category_list as $category) {
 
     <script>
         const documentOptionItems = <?= json_encode($documentoption_item); ?>;
-        const basePaths = '<?= base_url() ?>' + '/public/uploads/employe_document/';
+        const basePaths = '<?= base_url() ?>' + 'uploads/employe_document/';
 
         function showDocumentData(categoryId) {
             console.log('showDocumentData function called with categoryId:', categoryId);

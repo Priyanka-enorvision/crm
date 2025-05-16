@@ -1,49 +1,34 @@
-$(document).ready(function(){			
+$(document).ready(function () {
 	/*Form Submit*/
-	$("#apply_job").submit(function(e){
+	$("#apply_job").submit(function (e) {
 		var fd = new FormData(this);
 		var obj = $(this), action = obj.attr('name');
 		fd.append("is_ajax", 1);
 		fd.append("type", 'add_record');
 		fd.append("form", action);
-		e.preventDefault();		
+		e.preventDefault();
 		$.ajax({
 			url: e.target.action,
 			type: "POST",
-			data:  fd,
+			data: fd,
 			contentType: false,
 			cache: false,
-			processData:false,
-			success: function(JSON)
-			{
+			processData: false,
+			success: function (JSON) {
 				if (JSON.error != '') {
 					toastr.error(JSON.error);
-					$('input[name="csrf_token"]').val(JSON.csrf_hash);
-					// Ladda.stopAll();
-					setTimeout(function() {
-						location.reload(); 
-					}, 3000);
-				
 				} else {
 					toastr.success(JSON.result);
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
-					$('#apply_job')[0].reset(); // To reset form fields
-					$('.apply-form').removeClass('show');
-					// Ladda.stopAll();
-					setTimeout(function() {
-						location.reload(); 
-					}, 3000);
+					window.location.href = main_url + 'jobs-list';
 				}
 			},
-			error: function() 
-			{
-				toastr.error(JSON.error);
-				$('input[name="csrf_token"]').val(JSON.csrf_hash);
-				// Ladda.stopAll();
-				setTimeout(function() {
-					location.reload(); 
-				}, 3000);
-			} 	        
-	   });
-	}); 
+			error: function (xhr, status, error) {
+				toastr.error('Something went wrong. Please try again.');
+				if (xhr.responseJSON && xhr.responseJSON.csrf_hash) {
+					$('input[name="csrf_token"]').val(xhr.responseJSON.csrf_hash);
+				}
+			}
+		});
+	});
 });

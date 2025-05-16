@@ -361,10 +361,7 @@ if (!empty($expertDataList)) {
                     <p class="mt-0 mb-0 text-muted" style="font-size: 13px; font-weight: 400;">by <?= htmlspecialchars($value['organisationName']); ?></p>
                     <span class="mt-0 mb-0 text-muted" style="font-size: 13px; font-weight: 400;">on <?= $formattedAwardDate; ?></span>
                 </div>
-                <!-- <div class="col-md-4 text-right honors-image">
-                    <img src="<?= htmlspecialchars('https://ekartrent.s3.amazonaws.com/gpsServices/' . $expertData['award1']); ?>"
-                        alt="Award Image" class="img-fluid" style="max-height: 80px; object-fit: cover;">
-                </div> -->
+
             </div>
         <?php } ?>
 
@@ -384,7 +381,7 @@ if (!empty($expertDataList)) {
                             <img src="<?= 'https://ekartrent.s3.amazonaws.com/gpsServices/' . $expert['profilePic']; ?>" alt="Profile Image" class="rounded-circle" width="100" height="100">
                             <h5 class="mt-3"><?= htmlspecialchars($expert['firstName'] . ' ' . $expert['lastName']); ?></h5>
                             <p class="mb-0"><?= htmlspecialchars($expert['designation'] ?? 'No designation'); ?></p>
-                            <p><?= $expert['description']  . ',' . $expert['categoryName'] ?></p>
+                            <p><?= ($expert['description'] ?? '') . ',' . ($expert['categoryName'] ?? '') ?></p>
                             <a href="<?= site_url('erp/expert-details/' . intval($expert['id'])); ?>" class="btn"
                                 style="padding: 3px 30px; border-radius: 25px;  color: #007bff; border: 2px solid #007bff;  background-color: aliceblue;">View</a>
                         </div>

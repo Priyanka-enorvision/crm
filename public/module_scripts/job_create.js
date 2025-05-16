@@ -1,38 +1,49 @@
-$(document).ready(function() {
-	/* Add data */ /*Form Submit*/
-	$("#xin-form").submit(function(e){
-		var fd = new FormData(this);
-		var obj = $(this), action = obj.attr('name');
-		fd.append("is_ajax", 1);
-		fd.append("type", 'add_record');
-		fd.append("form", action);
-		e.preventDefault();		
+$(document).ready(function () {
+	$("#xin-form").submit(function (e) {
+		e.preventDefault();
+		var form = $(this);
+		var formData = new FormData(this);
+
 		$.ajax({
-			url: e.target.action,
+			url: form.attr('action'),
 			type: "POST",
-			data:  fd,
+			data: formData,
 			contentType: false,
 			cache: false,
-			processData:false,
-			success: function(JSON)
-			{
-				if (JSON.error != '') {
-					toastr.error(JSON.error);
-					$('input[name="csrf_token"]').val(JSON.csrf_hash);
-					Ladda.stopAll();
-				} else {
-					toastr.success(JSON.result);
-					$('input[name="csrf_token"]').val(JSON.csrf_hash);
-					Ladda.stopAll();
-					window.location = main_url+'/jobs-list';
+			processData: false,
+			dataType: 'json',
+			success: function (response) {
+				// Update CSRF token
+				if (response.csrf_hash) {
+					$('input[name="csrf_token"]').val(response.csrf_hash);
+				}
+
+				if (response.error) {
+					// Handle validation errors
+					if (typeof response.error === 'object') {
+						// Multiple errors
+						$.each(response.error, function (key, value) {
+							toastr.error(value);
+						});
+					} else {
+						// Single error
+						toastr.error(response.error);
+					}
+				} else if (response.result) {
+					toastr.success(response.result);
+
+					// Redirect after 1.5 seconds to allow toastr to show
+					setTimeout(function () {
+						window.location.href = main_url + 'jobs-list';
+					}, 1500);
 				}
 			},
-			error: function() 
-			{
-				toastr.error(JSON.error);
-				$('input[name="csrf_token"]').val(JSON.csrf_hash);
-					Ladda.stopAll();
-			} 	        
-	   });
+			error: function (xhr) {
+				toastr.error('Something went wrong. Please try again.');
+				if (xhr.responseJSON && xhr.responseJSON.csrf_hash) {
+					$('input[name="csrf_token"]').val(xhr.responseJSON.csrf_hash);
+				}
+			}
+		});
 	});
 });

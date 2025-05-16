@@ -99,17 +99,7 @@ class HireExpert extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
-		}
-		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
-			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
-			return redirect()->to(site_url('erp/desk'));
-		}
-		if ($user_info['user_type'] != 'company') {
-			if (!in_array('staff2', staff_role_resource())) {
-				$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
-				return redirect()->to(site_url('erp/desk'));
-			}
+			return redirect()->to(site_url('/'));
 		}
 
 		$expert_id = $id;
@@ -171,23 +161,12 @@ class HireExpert extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
-		}
-		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
-			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
-			return redirect()->to(site_url('erp/desk'));
-		}
-		if ($user_info['user_type'] != 'company') {
-			if (!in_array('staff2', staff_role_resource())) {
-				$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
-				return redirect()->to(site_url('erp/desk'));
-			}
+			return redirect()->to(site_url('/'));
 		}
 
 		$apply_expert_id = $id;
 
 		$user_id = $usession['sup_user_id'];
-
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$data['title'] = lang('Dashboard.dashboard_hire_expert') . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'expert-apply';

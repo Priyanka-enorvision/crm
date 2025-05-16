@@ -554,9 +554,9 @@ function floatchart() {
 	// [ ticket-status-chart ] start
 	$(function () {
 		$.ajax({
-			url: main_url + 'tickets/tickets_status_chart',
-			contentType: "application/json; charset=utf-8",
-			dataType: "json",
+			url: main_url + 'tickets-status-chart',
+			type: 'GET',
+			dataType: 'json',
 			success: function (response) {
 				var status_colors = ['rgba(0, 227, 150, 0.85)', 'rgba(254, 176, 25, 0.85)'];
 				var options = {
@@ -615,9 +615,9 @@ function floatchart() {
 	// [ ticket-priority-chart ] start
 	$(function () {
 		$.ajax({
-			url: main_url + 'tickets/tickets_priority_chart',
-			contentType: "application/json; charset=utf-8",
-			dataType: "json",
+			url: main_url + 'tickets-priority-chart',
+			type: 'GET',
+			dataType: 'json',
 			success: function (response) {
 				///start
 				var options = {
@@ -665,10 +665,15 @@ function floatchart() {
 	// [ ticket-priority-chart ] end
 	// [ jobs-status-chart ] start
 	$(function () {
+
 		$.ajax({
-			url: main_url + 'recruitment/jobs_status_chart',
+			url: main_url + 'jobs-status-chart',
 			contentType: "application/json; charset=utf-8",
 			dataType: "json",
+			headers: {
+				'X-Requested-With': 'XMLHttpRequest',
+				'X-CSRF-TOKEN': csrfToken
+			},
 			success: function (response) {
 				var status_colors = ['rgba(0, 227, 150, 0.85)', 'rgba(254, 176, 25, 0.85)'];
 				var options = {
@@ -740,9 +745,13 @@ function floatchart() {
 	// [ jobs-type-chart ] start
 	$(function () {
 		$.ajax({
-			url: main_url + 'recruitment/jobs_type_chart',
+			url: main_url + '/jobs-type-chart',
 			contentType: "application/json; charset=utf-8",
 			dataType: "json",
+			headers: {
+				'X-Requested-With': 'XMLHttpRequest',
+				'X-CSRF-TOKEN': csrfToken
+			},
 			success: function (response) {
 				var options = {
 					chart: {
@@ -800,9 +809,13 @@ function floatchart() {
 	// [ job-by-designation-chart ] start
 	$(function () {
 		$.ajax({
-			url: main_url + 'recruitment/job_by_designation_chart',
+			url: main_url + 'jobBy-designation-chart',
 			contentType: "application/json; charset=utf-8",
-			dataType: "json",
+			dataType: 'json',
+			headers: {
+				'X-Requested-With': 'XMLHttpRequest',
+				'X-CSRF-TOKEN': csrfToken
+			},
 			success: function (response) {
 				var options = {
 					chart: {

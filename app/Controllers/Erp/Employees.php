@@ -207,12 +207,10 @@ class Employees extends BaseController
 			}
 			$role_name = $role['role_name'];
 			$country_info = $CountryModel->where('country_id', $r['country'])->first();
-			if(!empty($country_info))
-			{
-				$country_name=$country_info['country_name'];
-			}else
-			{
-				$country_name='---';
+			if (!empty($country_info)) {
+				$country_name = $country_info['country_name'];
+			} else {
+				$country_name = '---';
 			}
 			$name = $r['first_name'] . ' ' . $r['last_name'];
 			// Designation
@@ -220,44 +218,40 @@ class Employees extends BaseController
 			$employee_id = $employee_detail['employee_id'];
 
 			$idesignations = $DesignationModel->where('designation_id', $employee_detail['designation_id'])->first();
-			if(!empty($idesignations))
-			{
-				$designation_name=$idesignations['designation_name'];
-			}
-			else
-			{
-				$designation_name='---';
-				
+			if (!empty($idesignations)) {
+				$designation_name = $idesignations['designation_name'];
+			} else {
+				$designation_name = '---';
 			}
 
 			$profile_photos = [];
 
 			$default_photo = base_url() . 'uploads/users/default/default_profile.jpg';
-		
+
 			foreach ($files as $file) {
 				$url = 'https://grookr.s3.us-west-2.amazonaws.com/' . $file['Key'];
-		
+
 				if (preg_match('/uploads\/(\d+)_/', $url, $matches)) {
 					$numericId = $matches[1];
 				} else {
 					continue;
 				}
-		
+
 				if ($numericId == $employee_id) {
 					$profile_photos[] = $url;
 				}
 			}
-		
+
 			if (empty($profile_photos)) {
 				$profile_photos[] = $default_photo;
 			}
-		
+
 			$uname = '<a href="' . site_url('erp/employee-details') . '/' . uencode($r['user_id']) . '"><div class="d-inline-block align-middle">';
-		
+
 			foreach ($profile_photos as $photo) {
 				$uname .= '<img src="' . $photo . '" alt="user image" class="img-radius align-top m-r-15" style="width:40px;height: 40px;">';
 			}
-		
+
 			$uname .= '<div class="d-inline-block">
 							<h6 class="m-b-0">' . $name . '</h6>
 							<p class="m-b-0">' . $r['email'] . '</p>
@@ -344,7 +338,7 @@ class Employees extends BaseController
 	}
 
 	// record list
-	public function commissions_list($id=null)
+	public function commissions_list($id = null)
 	{
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
@@ -403,7 +397,7 @@ class Employees extends BaseController
 		exit();
 	}
 	// record list
-	public function statutory_list($id=null)
+	public function statutory_list($id = null)
 	{
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
@@ -416,7 +410,7 @@ class Employees extends BaseController
 		$ContractModel = new ContractModel();
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		$get_data = $ContractModel->where('user_id', $id)->where('salay_type', 'statutory')->orderBy('contract_option_id', 'ASC')->findAll();
-	
+
 		$data = [];
 
 		foreach ($get_data as $r) {
@@ -452,7 +446,7 @@ class Employees extends BaseController
 		exit();
 	}
 	// record list
-	public function other_payments_list($id=null)
+	public function other_payments_list($id = null)
 	{
 
 		$session = \Config\Services::session();
@@ -513,7 +507,7 @@ class Employees extends BaseController
 		exit();
 	}
 	// record list
-	public function user_documents_list($id=null)
+	public function user_documents_list($id = null)
 	{
 
 		$session = \Config\Services::session();
@@ -557,7 +551,7 @@ class Employees extends BaseController
 		exit();
 	}
 	// |||add record|||
-	
+
 	public function add_employee()
 	{
 		$validation = \Config\Services::validation();
@@ -671,7 +665,7 @@ class Employees extends BaseController
 
 			$UsersModel = new UsersModel();
 			$StaffdetailsModel = new StaffdetailsModel();
-			
+
 
 			// Check if Email Exists
 			if ($UsersModel->where('company_id', $company_id)->where('user_type', 'staff')->where('email', $email)->first() === null) {
@@ -703,8 +697,7 @@ class Employees extends BaseController
 					$ibody = html_entity_decode($itemplate['message']);
 					$fbody = str_replace(array("{site_name}", "{user_password}", "{user_username}", "{site_url}"), array($user_info['company_name'], $password, $username, site_url()), $ibody);
 					timehrm_mail_data($user_info['email'], $user_info['company_name'], $email, $isubject, $fbody);
-				}
-				else {
+				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				$Return['result'] = lang('Employees.xin_success_add_employee');
@@ -797,7 +790,6 @@ class Employees extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
@@ -811,7 +803,7 @@ class Employees extends BaseController
 		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
-		
+
 		if (!$this->request->isAJAX()) {
 			throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 		}
@@ -825,7 +817,7 @@ class Employees extends BaseController
 				'rules' => 'required',
 				'errors' => [
 					'required' => lang('Main.xin_error_field_text'),
-					
+
 				]
 			],
 			'is_fixed' => [
@@ -1111,12 +1103,10 @@ class Employees extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// |||add record|||
@@ -1266,12 +1256,10 @@ class Employees extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// |||add record|||
@@ -1426,12 +1414,10 @@ class Employees extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// |||edit record|||
@@ -1492,10 +1478,10 @@ class Employees extends BaseController
 			// Handle file upload if present
 			if ($document_file && $document_file->isValid() && !$document_file->hasMoved()) {
 				// Delete old file if exists
-				if ($current_document['document_file'] && file_exists('uploads/documents/'.$current_document['document_file'])) {
-					unlink('uploads/documents/'.$current_document['document_file']);
+				if ($current_document['document_file'] && file_exists('uploads/documents/' . $current_document['document_file'])) {
+					unlink('uploads/documents/' . $current_document['document_file']);
 				}
-				
+
 				// Generate unique filename
 				$newName = $document_file->getRandomName();
 				$document_file->move('uploads/documents/', $newName);
@@ -1657,7 +1643,7 @@ class Employees extends BaseController
 				'blood_group' => $blood_group,
 				'citizenship_id' => $citizenship_id
 			];
-			
+
 			$Return['csrf_hash'] = csrf_hash();
 			if ($result == TRUE) {
 				$MainModel = new MainModel();
@@ -1703,7 +1689,7 @@ class Employees extends BaseController
 						'required' => lang('Main.xin_error_field_text'),
 					]
 				],
-				[   
+				[
 					'reporting_manager' => [
 						'required' => lang('Main.xin_error_field_text'),
 					]
@@ -1740,11 +1726,9 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// |||update record|||
@@ -1786,11 +1770,9 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// |||update record|||
@@ -1885,11 +1867,9 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// |||update record|||
@@ -1953,7 +1933,6 @@ class Employees extends BaseController
 				// Collect all errors
 				$Return['error'] = $validation->getErrors();
 				return $this->response->setJSON($Return);
-				
 			}
 			$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
 			$UsersModel = new UsersModel();
@@ -1974,11 +1953,9 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// |||update record|||
@@ -2145,11 +2122,9 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// |||update record|||
@@ -2256,11 +2231,9 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// |||update record|||
@@ -2322,11 +2295,9 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// update record
@@ -2492,16 +2463,14 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 
 
-	public function is_designation($id=null)
+	public function is_designation($id = null)
 	{
 
 		$session = \Config\Services::session();
@@ -2510,7 +2479,7 @@ class Employees extends BaseController
 			return redirect()->to(site_url('/'));
 		}
 		// $id = $request->getUri()->getSegment(4);
-		$data =[
+		$data = [
 			'department_id' => $id
 		];
 		if ($session->has('sup_username')) {
@@ -2545,7 +2514,7 @@ class Employees extends BaseController
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		if ($this->request->getPost('_method') == 'DELETE') {
-			
+
 			$Return = ['result' => '', 'error' => '', 'csrf_hash' => ''];
 
 			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
@@ -2581,7 +2550,6 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// delete record
@@ -2605,7 +2573,6 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// delete record
@@ -2629,7 +2596,6 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// delete record
@@ -2653,7 +2619,6 @@ class Employees extends BaseController
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// delete record
@@ -2723,6 +2688,4 @@ class Employees extends BaseController
 			return $this->response->setJSON($Return);
 		}
 	}
-
-	
 }

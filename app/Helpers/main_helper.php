@@ -1728,10 +1728,16 @@ if (!function_exists('all_timezones')) {
 		{
 			$staffDetailsModel = new \App\Models\StaffdetailsModel();
 			$DesignationModel = new \App\Models\DesignationModel();
+
 			$user_details = $staffDetailsModel->where('user_id', $user_id)->first();
+
+			if (!$user_details || !isset($user_details['designation_id'])) {
+				return 'Not Found';
+			}
+
 			$Designationdata = $DesignationModel->where('designation_id', $user_details['designation_id'])->first();
 
-			return $user_details ? $Designationdata['designation_name'] : 'Not Found';
+			return $Designationdata['designation_name'] ?? 'Not Found';
 		}
 	}
 

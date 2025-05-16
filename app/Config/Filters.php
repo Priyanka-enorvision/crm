@@ -83,6 +83,8 @@ class Filters extends BaseConfig
 				'erp/timelogs-delete',
 				'erp/timelogs-update/',
 				'delete-project-file',
+				'erp/save-document',
+				'erp/documentfiles-updates',
 			]],
 		],
 		'after'  => [

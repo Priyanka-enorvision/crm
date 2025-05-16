@@ -136,7 +136,7 @@ if ($user_info['user_type'] == 'staff') {
                     <td><?= designation($list['user_id']) ?></td>
                     <td><?= date('d M Y', strtotime($list['created_at'])) ?></td>
                     <td>
-                        <a href="<?= base_url('view/employe-document/' . base64_encode($list['id'])) ?>">
+                        <a href="<?= base_url('view/employe-document/' . $list['id']) ?>">
                             <button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light custom-icon-btn">
                                 <i class="feather icon-edit"></i>
                             </button>
@@ -165,7 +165,7 @@ if ($user_info['user_type'] == 'staff') {
                 </button>
             </div>
             <div class="modal-body">
-                <form action="<?= base_url('erp/documents/save_document'); ?>" method="POST" enctype="multipart/form-data">
+                <form action="<?= base_url('erp/save-document'); ?>" method="POST" enctype="multipart/form-data">
 
                     <div class="row">
                         <div class="col-6">
