@@ -105,39 +105,20 @@ if ($request->getGet('data') === 'designation' && $request->getGet('field_id')) 
 					data: obj.serialize() + "&is_ajax=1&type=edit_record&form=edit_designation",
 					dataType: "json",
 					cache: false,
-					success: function(response) {
-						if (response.error) {
-							toastr.error(response.error);
-							if (response.csrf_hash) {
-								$('input[name="csrf_token"]').val(response.csrf_hash);
-							}
-							l.stop();
-							return;
-						}
-
-						toastr.success(response.result);
-						obj.closest('.modal').modal('hide');
-
-						// First check if DataTable is properly initialized
-						if (typeof xin_table !== 'undefined' && $.fn.dataTable.isDataTable('#xin_table')) {
-							xin_table.api().ajax.reload(null, false); // false keeps current paging
+					success: function(JSON) {
+						if (JSON.error != '') {
+							toastr.error(JSON.error);
 						} else {
-							console.error('DataTable not properly initialized');
-
+							toastr.success(JSON.result);
+							$('input[name="csrf_token"]').val(JSON.csrf_hash);
+							window.location.href = main_url + 'designation-list';
 						}
-
-						l.stop();
 					},
-					error: function(xhr) {
-						var errorMsg = 'An error occurred';
-						try {
-							var json = JSON.parse(xhr.responseText);
-							errorMsg = json.error || errorMsg;
-						} catch (e) {
-							errorMsg = xhr.statusText || 'Request failed';
+					error: function(xhr, status, error) {
+						toastr.error('Something went wrong. Please try again.');
+						if (xhr.responseJSON && xhr.responseJSON.csrf_hash) {
+							$('input[name="csrf_token"]').val(xhr.responseJSON.csrf_hash);
 						}
-						toastr.error(errorMsg);
-						l.stop();
 					}
 				});
 				return false; // Additional prevention

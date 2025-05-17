@@ -55,11 +55,11 @@ class Transfers extends BaseController
 	// |||add record|||
 	public function add_transfer()
 	{
-
-		$validation =  \Config\Services::validation();
+		$validation = \Config\Services::validation();
 		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
+
 		if ($this->request->getPost('type') === 'add_record') {
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$Return['csrf_hash'] = csrf_hash();
@@ -77,7 +77,7 @@ class Transfers extends BaseController
 						'required' => lang('Main.xin_error_field_text')
 					]
 				],
-				'designation' => [
+				'designation_id' => [
 					'rules'  => 'required',
 					'errors' => [
 						'required' => lang('Main.xin_error_field_text')
@@ -96,33 +96,30 @@ class Transfers extends BaseController
 					]
 				]
 			];
+
+
 			if (!$this->validate($rules)) {
-				$ruleErrors = [
-					"employee" => $validation->getError('employee'),
-					"department" => $validation->getError('department'),
-					"designation" => $validation->getError('designation'),
-					"transfer_date" => $validation->getError('transfer_date'),
-					"reason" => $validation->getError('reason')
-				];
-				foreach ($ruleErrors as $err) {
-					$Return['error'] = $err;
-					if ($Return['error'] != '') {
-						$this->output($Return);
-					}
-				}
+
+				$errors = $validation->getErrors();
+				$Return['error'] = implode("\n", $errors);
+				return $this->response->setJSON($Return);
 			} else {
+
 				$staff_id = $this->request->getPost('employee', FILTER_SANITIZE_STRING);
 				$department = $this->request->getPost('department', FILTER_SANITIZE_STRING);
-				$designation = $this->request->getPost('designation', FILTER_SANITIZE_STRING);
+				$designation = $this->request->getPost('designation_id', FILTER_SANITIZE_STRING);
 				$transfer_date = $this->request->getPost('transfer_date', FILTER_SANITIZE_STRING);
 				$reason = $this->request->getPost('reason', FILTER_SANITIZE_STRING);
+
 				$UsersModel = new UsersModel();
 				$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+
 				if ($user_info['user_type'] == 'staff') {
 					$company_id = $user_info['company_id'];
 				} else {
 					$company_id = $usession['sup_user_id'];
 				}
+
 				$data = [
 					'company_id'  => $company_id,
 					'employee_id' => $staff_id,
@@ -134,21 +131,21 @@ class Transfers extends BaseController
 					'status'  => 0,
 					'created_at' => date('d-m-Y h:i:s')
 				];
+
 				$TransfersModel = new TransfersModel();
 				$result = $TransfersModel->insert($data);
 				$Return['csrf_hash'] = csrf_hash();
+
 				if ($result == TRUE) {
 					$Return['result'] = lang('Success.ci_transfer_added_msg');
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
 		}
 	}
 	// |||add record|||
@@ -395,7 +392,7 @@ class Transfers extends BaseController
 		if (!$session->has('sup_username')) {
 			return redirect()->to(site_url('erp/login'));
 		}
-		$id = $request->uri->getSegment(4);
+		$id = $request->getUri()->getSegment(4);
 
 		$data = array(
 			'user_id' => $id
@@ -409,12 +406,12 @@ class Transfers extends BaseController
 	public function is_designationajx()
 	{
 
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
-		$id = $request->uri->getSegment(4);
+		$id = $request->getUri()->getSegment(4);
 
 		$data = array(
 			'department_id' => $id
@@ -422,7 +419,7 @@ class Transfers extends BaseController
 		if ($session->has('sup_username')) {
 			return view('erp/transfers/get_designationsajx', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
 	// delete record

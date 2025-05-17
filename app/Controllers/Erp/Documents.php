@@ -120,7 +120,7 @@ class Documents extends BaseController
 			}
 
 			$combhr = $edit . $delete;
-			$download_link = '<a href="' . site_url() . 'download?type=system_documents&filename=' . uencode($r['document_file']) . '">' . lang('Main.xin_download') . '</a>';
+			$download_link = '<a href="' . site_url() . 'download?type=system_documents&filename=' . urlencode($r['document_file']) . '">' . lang('Main.xin_download') . '</a>';
 			$department = $DepartmentModel->where('department_id', $r['department_id'])->first();
 			if (in_array('file3', staff_role_resource()) || in_array('file4', staff_role_resource()) || $user_info['user_type'] == 'company') {
 				$department_name = '

@@ -34,59 +34,77 @@ $(document).ready(function () {
 
 	/* Add data */ /*Form Submit*/
 	$("#xin-form").submit(function (e) {
-		var fd = new FormData(this);
-		var obj = $(this), action = obj.attr('name');
+		e.preventDefault();
+		var obj = $(this);
 		var user = $('#employee_id').val();
 		var attendance_date = $('#attendance_date').val();
-		fd.append("is_ajax", 1);
-		fd.append("type", 'report_record');
-		fd.append("form", action);
-		e.preventDefault();
+
+		// For GET request, we'll use URL parameters instead of FormData
+		var params = {
+			is_ajax: 1,
+			type: 'report_record',
+			form: obj.attr('name'),
+			user: user,
+			date: attendance_date
+		};
+
+		Ladda.create(document.querySelector('.btn-primary')).start();
+
 		$.ajax({
 			url: e.target.action,
 			type: "GET",
-			data: fd,
-			contentType: false,
-			cache: false,
-			processData: false,
-			success: function (JSON) {
-				var xin_table2 = $('#xin_table').dataTable({
-					"bDestroy": true,
-					"ajax": {
-						url: main_url + "update-attendance-list/" + user + "/" + attendance_date,
-						type: 'GET',
-						dataType: 'JSON',
-						headers: {
-							'X-Requested-With': 'XMLHttpRequest'
-						},
-
-					},
-					"language": {
-						"lengthMenu": dt_lengthMenu,
-						"zeroRecords": dt_zeroRecords,
-						"info": dt_info,
-						"infoEmpty": dt_infoEmpty,
-						"infoFiltered": dt_infoFiltered,
-						"search": dt_search,
-						"paginate": {
-							"first": dt_first,
-							"previous": dt_previous,
-							"next": dt_next,
-							"last": dt_last
-						},
-					},
-					"fnDrawCallback": function (settings) {
-						$('[data-toggle="tooltip"]').tooltip();
+			data: params,
+			dataType: "json",
+			success: function (response) {
+				if (response.error) {
+					toastr.error(response.error);
+				} else {
+					// Initialize or refresh DataTable
+					if ($.fn.DataTable.isDataTable('#xin_table')) {
+						$('#xin_table').DataTable().destroy();
 					}
-				});
-				toastr.success(JSON.result);
-				$('input[name="csrf_token"]').val(JSON.csrf_hash);
-				window.location.href = main_url + 'manual-attendance';
+
+					$('#xin_table').DataTable({
+						data: response.data,
+						columns: [
+							{ title: "Employee" },
+							{ title: "Date" },
+							{ title: "Clock In" },
+							{ title: "Clock Out" },
+							{ title: "Total Work" }
+						],
+						"language": {
+							"lengthMenu": dt_lengthMenu,
+							"zeroRecords": dt_zeroRecords,
+							"info": dt_info,
+							"infoEmpty": dt_infoEmpty,
+							"infoFiltered": dt_infoFiltered,
+							"search": dt_search,
+							"paginate": {
+								"first": dt_first,
+								"previous": dt_previous,
+								"next": dt_next,
+								"last": dt_last
+							}
+						},
+						"fnDrawCallback": function (settings) {
+							$('[data-toggle="tooltip"]').tooltip();
+						}
+					});
+
+					toastr.success("Attendance data loaded successfully");
+				}
+				$('input[name="csrf_token"]').val(response.csrf_hash);
 				Ladda.stopAll();
 			},
-			error: function () {
-				toastr.error(JSON.error);
-				$('input[name="csrf_token"]').val(JSON.csrf_hash);
+			error: function (xhr) {
+				try {
+					var errorResponse = JSON.parse(xhr.responseText);
+					toastr.error(errorResponse.error || 'An error occurred');
+					$('input[name="csrf_token"]').val(errorResponse.csrf_hash);
+				} catch (e) {
+					toastr.error('An error occurred while processing your request');
+				}
 				Ladda.stopAll();
 			}
 		});

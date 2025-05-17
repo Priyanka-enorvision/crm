@@ -88,29 +88,19 @@ if ($request->getGet('data') === 'department' && $request->getGet('field_id')) {
 					dataType: "json",
 					cache: false,
 					success: function(JSON) {
-						if (JSON.error !== '') {
+						if (JSON.error != '') {
 							toastr.error(JSON.error);
 						} else {
 							toastr.success(JSON.result);
-							obj.closest('.modal').modal('hide');
-
-							if (typeof xin_table !== 'undefined' && $.fn.DataTable.isDataTable(xin_table)) {
-								xin_table.ajax.reload(null, false);
-							}
-
-							setTimeout(function() {
-								window.location.href = base_url + 'departments-list';
-							}, 800);
-						}
-						// Update CSRF token if exists
-						if (JSON.csrf_hash) {
 							$('input[name="csrf_token"]').val(JSON.csrf_hash);
+							window.location.href = main_url + 'departments-list';
 						}
-						l.stop();
 					},
 					error: function(xhr, status, error) {
-						toastr.error("Error: " + xhr.responseText);
-						l.stop();
+						toastr.error('Something went wrong. Please try again.');
+						if (xhr.responseJSON && xhr.responseJSON.csrf_hash) {
+							$('input[name="csrf_token"]').val(xhr.responseJSON.csrf_hash);
+						}
 					}
 				});
 			});

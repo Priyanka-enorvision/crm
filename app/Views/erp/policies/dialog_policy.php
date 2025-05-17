@@ -117,29 +117,19 @@ if ($request->getGet('data') === 'policy' && $request->getGet('field_id')) {
 					cache: false,
 					processData: false,
 					success: function(JSON) {
-						if (JSON.error !== '') {
+						if (JSON.error != '') {
 							toastr.error(JSON.error);
 						} else {
 							toastr.success(JSON.result);
-							obj.closest('.modal').modal('hide');
-
-							if (typeof xin_table !== 'undefined' && $.fn.DataTable.isDataTable(xin_table)) {
-								xin_table.ajax.reload(null, false);
-							}
-
-							setTimeout(function() {
-								window.location.href = base_url + 'policies-list';
-							}, 800);
-						}
-						// Update CSRF token if exists
-						if (JSON.csrf_hash) {
 							$('input[name="csrf_token"]').val(JSON.csrf_hash);
+							window.location.href = main_url + 'policies-list';
 						}
-						l.stop();
 					},
 					error: function(xhr, status, error) {
-						toastr.error("Error: " + xhr.responseText);
-						l.stop();
+						toastr.error('Something went wrong. Please try again.');
+						if (xhr.responseJSON && xhr.responseJSON.csrf_hash) {
+							$('input[name="csrf_token"]').val(xhr.responseJSON.csrf_hash);
+						}
 					}
 				});
 			});

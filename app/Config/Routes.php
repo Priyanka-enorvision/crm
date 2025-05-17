@@ -343,7 +343,7 @@ $routes->post('erp/delete-planning-configuration', 'Settings::delete_planning_co
 $routes->post('erp/settings/save_category', 'Settings::save_category', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/settings/update_status/(:any)/(:any)', 'Settings::update_status/$1/$2', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/settings/edit_category/(:any)', 'Settings::save_category/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->delete('erp/settings/delete_category/(:any)', 'Settings::delete_category/$1',['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->delete('erp/settings/delete_category/(:any)', 'Settings::delete_category/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/settings/save_taxduration', 'Settings::save_taxduration', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->match(['get', 'post'], 'erp/settings/system_info/', 'Settings::system_info', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
 $routes->match(['get', 'post'], 'erp/settings/add_logo/', 'Settings::add_logo', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
@@ -698,9 +698,9 @@ $routes->get('erp/clients-overview', 'Clients::overview', ['namespace' => 'App\C
 $routes->post('erp/update-client', 'Clients::update_client', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/update-profile-photo', 'Clients::update_profile_photo', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
- $routes->get('erp/client-profile-projects-list/(:num)', 'Projects::client_profile_projects_list/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
- $routes->get('erp/client-profile-tasks-list/(:num)', 'Tasks::client_profile_tasks_list/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
- $routes->get('erp/client-profile-invoices-list/(:num)', 'Invoices::client_profile_invoices_list/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/client-profile-projects-list/(:num)', 'Projects::client_profile_projects_list/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/client-profile-tasks-list/(:num)', 'Tasks::client_profile_tasks_list/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/client-profile-invoices-list/(:num)', 'Invoices::client_profile_invoices_list/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // performance
 $routes->get('erp/performance-indicator-list', 'Talent::performance_indicator', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/add-indicator', 'Talent::add_indicator', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -805,7 +805,7 @@ $routes->get('erp/get-attendanceList', 'Timesheet::attendance_list', ['namespace
 $routes->get('erp/attendance-info/(:segment)/(:segment)', 'Timesheet::attendance_view', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/manual-attendance/', 'Timesheet::update_attendance', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/attendance-datalist', 'Timesheet::update_attendance_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->get('erp/update-attendance-list/(:any)/(:any)', 'Timesheet::update_attendance_list/$1/$2', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/update-attendance-list', 'Timesheet::update_attendance_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->delete('erp/delete-attendance', 'Timesheet::delete_attendance', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/update-attendance-add', 'Timesheet::update_attendance_add', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/add-attendance', 'Timesheet::add_attendance', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);

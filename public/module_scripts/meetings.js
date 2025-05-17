@@ -40,24 +40,17 @@ $(document).ready(function () {
 			success: function (JSON) {
 				if (JSON.error != '') {
 					toastr.error(JSON.error);
-					$('input[name="csrf_token"]').val(JSON.csrf_hash);
-					Ladda.stopAll();
 				} else {
-					$('.delete-modal').modal('toggle');
+					toastr.success(JSON.result);
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
-					Ladda.stopAll();
-
-					if (typeof xin_table !== "undefined") {
-						xin_table.ajax.reload(function () {
-							toastr.success(JSON.result);
-						}, false); // reload without resetting pagination
-					} else {
-						toastr.success(JSON.result);
-					}
+					window.location.href = main_url + 'meeting-list';
 				}
 			},
-			error: function (xhr, error, thrown) {
-				console.log("AJAX Error: ", xhr.responseText);
+			error: function (xhr, status, error) {
+				toastr.error('Something went wrong. Please try again.');
+				if (xhr.responseJSON && xhr.responseJSON.csrf_hash) {
+					$('input[name="csrf_token"]').val(xhr.responseJSON.csrf_hash);
+				}
 			}
 		});
 	});

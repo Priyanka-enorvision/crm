@@ -1097,7 +1097,8 @@ class Types extends BaseController
 
 			$created_at = set_date_format($r['created_at']);
 			$field_one_value = is_numeric($r['field_one']) ? (float)$r['field_one'] : 0.00;
-    		$field_one = number_to_currency($field_one_value, $xin_system['default_currency'], null, 2);			if ($r['field_two'] == 'fixed') {
+			$field_one = number_to_currency($field_one_value, $xin_system['default_currency'], null, 2);
+			if ($r['field_two'] == 'fixed') {
 				$_type = lang('Employees.xin_title_tax_fixed');
 			} else {
 				$_type = lang('Employees.xin_title_tax_percent');
@@ -1881,12 +1882,10 @@ class Types extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// |||add record|||
@@ -1957,7 +1956,6 @@ class Types extends BaseController
 				if ($existing_leave_type) {
 					$Return['error'] = 'Leave type name already exists for your company.';
 					return $this->response->setJSON($Return);
-					
 				}
 
 				// Insert new leave type
@@ -1980,12 +1978,10 @@ class Types extends BaseController
 				}
 
 				return $this->response->setJSON($Return);
-				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 
@@ -2045,12 +2041,10 @@ class Types extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// |||add record|||
@@ -2109,12 +2103,10 @@ class Types extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// |||add record|||
@@ -2173,12 +2165,10 @@ class Types extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// |||add record|||
@@ -2239,12 +2229,10 @@ class Types extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 	// |||add record|||
@@ -2822,7 +2810,7 @@ class Types extends BaseController
 			} else {
 				// Get sanitized input
 				$name = $this->request->getPost('name', FILTER_SANITIZE_STRING);
-				$id = $this->request->getPost('token', FILTER_SANITIZE_STRING);
+				$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
 				$erp_constant = $this->request->getPost('erp_constant', FILTER_SANITIZE_STRING);
 
 				// Determine company ID
@@ -3028,7 +3016,7 @@ class Types extends BaseController
 			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
-			$id = $Id;
+			$id = udecode($Id);
 			$Return['csrf_hash'] = csrf_hash();
 			$ConstantsModel = new ConstantsModel();
 			$UsersModel = new UsersModel();
