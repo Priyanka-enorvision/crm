@@ -163,14 +163,11 @@ $(document).ready(function () {
 		e.preventDefault(); // Prevent default action
 		var field_id = $(this).data('field');
 
-		$('#discussion_option_id_' + field_id).fadeOut();
-		$('.discussion_option_id_' + field_id).fadeOut();
 
 		$.ajax({
 			url: main_url + "delete-task-discussion", // Make sure this matches your route
-			type: "POST",
+			type: "GET",
 			data: {
-				_method: 'DELETE',
 				jd: 1,
 				data: 'task_discussion',
 				field_id: field_id,

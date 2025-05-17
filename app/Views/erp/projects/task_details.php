@@ -450,7 +450,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
               </ul>
               <?php $attributes = array('name' => 'add_discussion', 'id' => 'add_discussion', 'autocomplete' => 'off'); ?>
               <?php $hidden = array('token' => $segment_id); ?>
-              <?= form_open('erp/add-discussion', $attributes, $hidden); ?>
+              <?= form_open('erp/add-task-discussion', $attributes, $hidden); ?>
               <div class="input-group mb-3">
                 <!-- <textarea class="form-control editor" name="description"><?= lang('Projects.xin_enter_discussion_msg'); ?>...</textarea> -->
                 <!-- <input type="text" class="form-control editor"  name="description" placeholder="<?= lang('Projects.xin_enter_discussion_msg'); ?>..."> -->
@@ -500,7 +500,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
               </ul>
               <?php $attributes = array('name' => 'add_note', 'id' => 'add_note', 'autocomplete' => 'off'); ?>
               <?php $hidden = array('token' => $segment_id); ?>
-              <?= form_open('erp/add-note', $attributes, $hidden); ?>
+              <?= form_open('erp/add-task-note', $attributes, $hidden); ?>
               <div class="input-group mb-3">
                 <input type="text" name="description" class="form-control"
                   placeholder="<?= lang('Projects.xin_post_a_note'); ?>...">

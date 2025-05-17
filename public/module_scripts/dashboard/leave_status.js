@@ -1172,7 +1172,7 @@ function floatchart() {
 	$(function () {
 		$(function () {
 			$.ajax({
-				url: main_url + 'payroll/staff_payroll_chart',
+				url: main_url + 'staff-payroll-chart',
 				contentType: "application/json; charset=utf-8",
 				dataType: "json",
 				success: function (response) {
@@ -1624,7 +1624,7 @@ function floatchart() {
 	// [ project-status-chart ] start
 	$(function () {
 		$.ajax({
-			url: main_url + 'projects/staff_project_status_chart',
+			url: main_url + 'staff-project-status-chart',
 			contentType: "application/json; charset=utf-8",
 			dataType: "json",
 			success: function (response) {
@@ -1752,7 +1752,7 @@ function floatchart() {
 	// [ staff-ticket-priority-chart ] start
 	$(function () {
 		$.ajax({
-			url: main_url + 'tickets/staff_tickets_priority_chart',
+			url: main_url + 'staff-tickets-priority-chart',
 			contentType: "application/json; charset=utf-8",
 			dataType: "json",
 			success: function (response) {

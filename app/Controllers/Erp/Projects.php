@@ -2087,8 +2087,8 @@ class Projects extends BaseController
 		$Return['hold_lb'] = lang('Projects.xin_project_hold');
 		$Return['hold'] = $hold;
 		$Return['total_label'] = lang('Main.xin_total');
-		$this->output($Return);
-		exit;
+		return $this->response->setJSON($Return);
+		
 	}
 	public function client_project_status_chart()
 	{
@@ -2237,16 +2237,16 @@ class Projects extends BaseController
 		}
 	}
 	// delete record
-	public function delete_project_bug()
+	public function delete_project_bug($id)
 	{
 
-		if ($this->request->getVar('field_id')) {
+		if ($id) {
 			/* Define return | here result is used to return user data and error for error message */
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
-			$id = $this->request->getVar('field_id', FILTER_SANITIZE_STRING);
+			// $id = $this->request->getVar('field_id', FILTER_SANITIZE_STRING);
 			$Return['csrf_hash'] = csrf_hash();
 			$ProjectbugsModel = new ProjectbugsModel();
 			$result = $ProjectbugsModel->where('project_bug_id', $id)->delete($id);
@@ -2255,20 +2255,20 @@ class Projects extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 		}
 	}
 	// delete record
-	public function delete_project_discussion()
+	public function delete_project_discussion($id)
 	{
 
-		if ($this->request->getVar('field_id')) {
-			/* Define return | here result is used to return user data and error for error message */
+		if ($id) {
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
-			$id = $this->request->getVar('field_id', FILTER_SANITIZE_STRING);
+			
+			// $id = $this->request->getVar('field_id', FILTER_SANITIZE_STRING);
 			$Return['csrf_hash'] = csrf_hash();
 			$ProjectdiscussionModel = new ProjectdiscussionModel();
 			$result = $ProjectdiscussionModel->where('project_discussion_id', $id)->delete($id);
@@ -2277,7 +2277,7 @@ class Projects extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 		}
 	}
 	// delete record
@@ -2303,16 +2303,16 @@ class Projects extends BaseController
 		}
 	}
 	// delete record
-	public function delete_project_file()
+	public function delete_project_file($id)
 	{
 
-		if ($this->request->getVar('field_id')) {
-
+		if ($id) {
+			
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
-			$id = $this->request->getVar('field_id', FILTER_SANITIZE_STRING);
+			// $id = $this->request->getVar('field_id', FILTER_SANITIZE_STRING);
 			$Return['csrf_hash'] = csrf_hash();
 			$ProjectfilesModel = new ProjectfilesModel();
 			$result = $ProjectfilesModel->where('project_file_id', $id)->delete($id);
@@ -2321,8 +2321,9 @@ class Projects extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 		}
+		
 	}
 
 	public function edit_project()

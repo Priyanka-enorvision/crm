@@ -34,8 +34,8 @@ if($user_info['user_type'] == 'staff'){
       </div>
       <div class="card-body">
         <?php $attributes = array('name' => 'add_todo', 'id' => 'xin-form', 'autocomplete' => 'off');?>
-        <?php $hidden = array('user_id' => 0);?>
-        <?= form_open('erp/todo/add_todo', $attributes, $hidden);?>
+        <?php $hidden = array('user_id' => '0');?>
+        <?= form_open('erp/add-todo', $attributes, $hidden);?>
         <div class="input-group mb-3">
           <input type="text" name="task_insert" class="form-control add_task_todo" placeholder="<?= lang('Dashboard.dashboard_create_todo');?>...">
           <div class="input-group-append">

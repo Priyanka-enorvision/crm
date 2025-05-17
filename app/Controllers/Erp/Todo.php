@@ -25,16 +25,7 @@ class Todo extends BaseController {
 			$session->setFlashdata('err_not_logged_in',lang('Dashboard.err_not_logged_in'));
 			return redirect()->to(site_url('erp/login'));
 		}
-/*		if($user_info['user_type'] != 'company' && $user_info['user_type']!='staff'){
-			$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
-			return redirect()->to(site_url('erp/desk'));
-		}
-		if($user_info['user_type'] != 'company'){
-			if(!in_array('todo_ist',staff_role_resource())) {
-				$session->setFlashdata('unauthorized_module',lang('Dashboard.xin_error_unauthorized_module'));
-				return redirect()->to(site_url('erp/desk'));
-			}
-		}*/
+
 		$data['title'] = lang('Dashboard.dashboard_to_do_list').' | '.$xin_system['application_name'];
 		$data['path_url'] = 'todo';
 		$data['breadcrumbs'] = lang('Dashboard.dashboard_to_do_list');
@@ -68,7 +59,7 @@ class Todo extends BaseController {
 				foreach($ruleErrors as $err){
 					$Return['error'] = $err;
 					if($Return['error']!=''){
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -95,19 +86,15 @@ class Todo extends BaseController {
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
-				exit;
+				return $this->response->setJSON($Return);
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	public function add_todo_list() {
 
-		var_dump($this->input->post());
-		die;
 		$validation =  \Config\Services::validation();
 		$session = \Config\Services::session();
 		$request = \Config\Services::request();
@@ -173,7 +160,7 @@ class Todo extends BaseController {
 		if($this->request->getVar('field_id')) {
 			/* Define return | here result is used to return user data and error for error message */
 			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$session = \Config\Services::session($config);
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
 			//$id = udecode($this->request->getGet('field_id'));
@@ -193,7 +180,7 @@ class Todo extends BaseController {
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 		}
 	}
 	// update record
@@ -202,7 +189,7 @@ class Todo extends BaseController {
 		if($this->request->getVar('field_id')) {
 			/* Define return | here result is used to return user data and error for error message */
 			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$session = \Config\Services::session($config);
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
 			//$id = udecode($this->request->getGet('field_id'));

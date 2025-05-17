@@ -3,10 +3,7 @@
 namespace App\Controllers\Erp;
 
 use App\Controllers\BaseController;
-use CodeIgniter\HTTP\RequestInterface;
-use CodeIgniter\HTTP\ResponseInterface;
-use CodeIgniter\HTTP\Files\UploadedFile;
-use CodeIgniter\I18n\Time;
+
 
 use App\Models\SystemModel;
 use App\Models\RolesModel;
@@ -1430,7 +1427,8 @@ class Timesheet extends BaseController
 					$total_rest = '';
 				} else {
 					$check_user_attendance_value = check_user_attendance_value();
-					$cout = date_create($check_user_attendance_value[0]->clock_out);
+					
+					$cout = date_create($check_user_attendance_value[0]['clock_out']);
 					$cin = date_create($nowtime);
 
 					$interval_cin = date_diff($cin, $cout);
@@ -1497,8 +1495,8 @@ class Timesheet extends BaseController
 				}
 			}
 			$Return['csrf_hash'] = csrf_hash();
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
+			
 		}
 	}
 }

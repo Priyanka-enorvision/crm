@@ -54,6 +54,7 @@ $routes->match(['get', 'post'], 'erp/auth/login/', 'Auth::login', ['namespace' =
 $routes->get('erp/desk', 'Dashboard::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 $routes->get('erp/forgot-password/', 'Auth::forgot_password', ['namespace' => 'App\Controllers\Erp']);
+$routes->post('erp/check-password/', 'Auth::check_password', ['namespace' => 'App\Controllers\Erp']);
 $routes->get('erp/verified-password/', 'Auth::verified_password', ['namespace' => 'App\Controllers\Erp']);
 $routes->match(['get', 'post'], 'erp/auth/unlock/', 'Auth::unlock', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/my-profile/', 'Profile::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -61,6 +62,12 @@ $routes->get('erp/system-logout/', 'Logout::index', ['namespace' => 'App\Control
 
 $routes->get('erp/set-language/(:segment)', 'Dashboard::language/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
+$routes->post('erp/set-clocking', 'Timesheet::set_clocking', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/staff-tickets-priority-chart', 'Tickets::staff_tickets_priority_chart', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/staff-payroll-chart', 'Payroll::staff_payroll_chart', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/staff-project-status-chart', 'Projects::staff_project_status_chart', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
+$routes->get('download', 'Download::index', ['namespace' => 'App\Controllers','filter' => 'checklogin']);
 // planning Configuration
 $routes->get('erp/planning_configuration', 'Dashboard::planning_configuration', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/add-planning-entities', 'Dashboard::add_planning_entities', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -112,7 +119,9 @@ $routes->get('erp/milestones-getdata/(:any)', 'Milestones::getData/$1', ['namesp
 
 // add files
 $routes->post('erp/projects-add-attachment', 'projects::add_attachment', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->delete('erp/delete-project-file', 'projects::delete_project_file', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/delete-project-file/(:any)', 'projects::delete_project_file/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/delete-project-discussion/(:any)', 'projects::delete_project_discussion/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/delete-project-bug/(:any)', 'projects::delete_project_bug/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 // discussion and Notes
 $routes->post('erp/add-discussion', 'projects::add_discussion', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -156,12 +165,12 @@ $routes->delete('erp/delete-tasks', 'Tasks::delete_tasks', ['namespace' => 'App\
 $routes->get('erp/task-detail/(:segment)', 'Tasks::task_details', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/update-task-progress', 'Tasks::update_task_progress', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/update-task', 'Tasks::update_task', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->post('erp/add-discussion', 'Tasks::add_discussion', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->delete('erp/delete-task-discussion', 'Tasks::delete_task_discussion', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->post('erp/add-note', 'Tasks::add_note', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->delete('erp/delete-task-note', 'Tasks::delete_task_note', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-task-discussion', 'Tasks::add_discussion', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/delete-task-discussion', 'Tasks::delete_task_discussion', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-task-note', 'Tasks::add_note', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/delete-task-note', 'Tasks::delete_task_note', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/add-attachment', 'tasks::add_attachment', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->delete('erp/delete-task-file', 'Tasks::delete_task_file', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/delete-task-file', 'Tasks::delete_task_file', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 
 $routes->get('erp/tasks-grid/', 'Tasks::tasks_grid', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -725,6 +734,8 @@ $routes->get('erp/visitors-list/', 'Visitors::index', ['namespace' => 'App\Contr
 $routes->get('erp/visitors-data-list/', 'Visitors::visitors_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // todo
 $routes->get('erp/todo-list/', 'Todo::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-todo', 'Todo::add_todo', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/delete-todo', 'Todo::delete_todo', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // organization chart
 $routes->get('erp/chart/', 'Application::org_chart', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // subscription

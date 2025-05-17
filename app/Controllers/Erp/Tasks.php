@@ -2315,16 +2315,18 @@ class Tasks extends BaseController
 	// delete record
 	public function delete_task_discussion()
 	{
+
+		
 		$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 
-		if (!$this->request->getPost('field_id')) {
+		if (!$this->request->getVar('field_id')) {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
 		}
 
-		$id = $this->request->getPost('field_id');
+		$id = $this->request->getVar('field_id');
 		$Return['csrf_hash'] = csrf_hash();
 
 		$TaskdiscussionModel = new TaskdiscussionModel();

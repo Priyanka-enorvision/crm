@@ -74,7 +74,7 @@ $(document).ready(function() {
         $(this).parent().parent().fadeOut();
 		var field_id = $(this).data('fieldid');
 		$.ajax({
-		url : main_url+"todo/delete_todo",
+		url : main_url+"delete-todo",
 		type: "GET",
 		data: 'jd=1&data=todo&field_id='+field_id,
 		success: function (response) {

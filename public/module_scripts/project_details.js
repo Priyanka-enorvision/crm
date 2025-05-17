@@ -321,70 +321,98 @@ $(document).ready(function () {
 	});
 	$(".delete_discussion").on("click", function () {
 		var field_id = $(this).data('field');
-		$('#discussion_option_id_' + field_id).fadeOut();
-		$('.discussion_option_id_' + field_id).fadeOut();
+		
 		$.ajax({
-			url: main_url + "projects/delete_project_discussion",
+			url: main_url + "delete-project-discussion/" + field_id,
 			type: "GET",
-			data: 'jd=1&data=project_discussion&field_id=' + field_id,
-			success: function (response) {
+			success: function(response) {
 				if (response) {
-					toastr.success(response.result);
-					$('input[name="csrf_token"]').val(JSON.csrf_hash);
+
+					if (response.result) {
+						toastr.success(response.result);
+					}
+
+					if (response.csrf_hash) {
+						$('input[name="csrf_token"]').val(response.csrf_hash);
+					}
+
 					Ladda.stopAll();
+
 					setTimeout(function () {
-						window.location = '';
+						window.location.reload(true);
 					}, 3000);
 				}
+			},
+			error: function(xhr, status, error) {
+				toastr.error("Something went wrong.");
 			}
 		});
 	});
 	$(".delete_bug").on("click", function () {
 		var field_id = $(this).data('field');
 		$.ajax({
-			url: main_url + "projects/delete_project_bug",
+			url: main_url + "delete-project-bug/"+field_id,
 			type: "GET",
-			data: 'jd=1&data=project_bug&field_id=' + field_id,
-			success: function (response) {
+			
+			success: function(response) {
 				if (response) {
-					$('#bug_option_id_' + field_id).fadeOut();
-					$('.bug_option_id_' + field_id).remove();
-					toastr.success(response.result);
-					$('input[name="csrf_token"]').val(JSON.csrf_hash);
+
+					if (response.result) {
+						toastr.success(response.result);
+					}
+
+					if (response.csrf_hash) {
+						$('input[name="csrf_token"]').val(response.csrf_hash);
+					}
+
 					Ladda.stopAll();
+
 					setTimeout(function () {
-						window.location = '';
+						window.location.reload(true);
 					}, 3000);
 				}
+			},
+			error: function(xhr, status, error) {
+				toastr.error("Something went wrong.");
 			}
 		});
 	});
 	$(".delete_file").on("click", function () {
-		var field_id = $(this).data('field');
+		const field_id = $(this).data('field'); // <--- Fix 1: define field_id
+		
 		$.ajax({
-			url: main_url + "delete-project-file",
-			type: "DELETE",
-			data: 'field_id' + field_id,
-			success: function (response) {
+			url: main_url + "delete-project-file/" + field_id,
+			type: "GET",
+			success: function(response) {
 				if (response) {
-					$('#file_option_id_' + field_id).fadeOut();
-					$('.file_option_id_' + field_id).remove();
-					toastr.success(response.result);
-					$('input[name="csrf_token"]').val(JSON.csrf_hash);
+
+					if (response.result) {
+						toastr.success(response.result);
+					}
+
+					if (response.csrf_hash) {
+						$('input[name="csrf_token"]').val(response.csrf_hash);
+					}
+
 					Ladda.stopAll();
+
 					setTimeout(function () {
-						window.location = '';
+						window.location.reload(true);
 					}, 3000);
 				}
+			},
+			error: function(xhr, status, error) {
+				toastr.error("Something went wrong.");
 			}
 		});
 	});
+
 	$('[data-plugin="select_hrm"]').select2($(this).attr('data-options'));
 	$('[data-plugin="select_hrm"]').select2({ width: '100%' });
 });
 $(document).on("click", ".delete", function () {
 	$('input[name=_token]').val($(this).data('record-id'));
-	$('#delete_record').attr('action', main_url + 'tasks/delete_task');
+	$('#delete_record').attr('action', main_url + 'delete-tasks');
 });
 $(document).on("click", ".delete_timelog", function () {
 	$('input[name=_token]').val($(this).data('record-id'));
