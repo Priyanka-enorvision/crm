@@ -152,15 +152,15 @@ class Auth extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
 				$email = $this->request->getPost('email', FILTER_SANITIZE_STRING);
-				$check_user = $UsersModel->where('email', $email, 'is_active', 1)->countAllResults();
+				$check_user = $UsersModel->where(['email' => $email,'is_active' => 1])->countAllResults();
 				if ($check_user > 0) {
 					$Return['result'] = lang('Main.xin_error_msg__available');
-					$iuser = $UsersModel->where('email', $email, 'is_active', 1)->first();
+					$iuser = $UsersModel->where(['email'=>$email, 'is_active'=>1])->first();
 					$username = $iuser['username'];
 					$password = $iuser['password'];
 
@@ -171,18 +171,15 @@ class Auth extends BaseController
 					$body = html_entity_decode($template['message']);
 					$body = str_replace(array("{site_name}", "{site_url}", "{user_id}"), array($xin_system['company_name'], site_url(), uencode($email)), $body);
 					timehrm_mail_data($xin_system['email'], $xin_system['company_name'], $email, $subject, $body);
-					$this->output($Return);
-					exit;
+					return $this->response->setJSON($Return);
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg_not');
-					$this->output($Return);
-					exit;
+					return $this->response->setJSON($Return);
 				}
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	// verified_password
@@ -195,11 +192,10 @@ class Auth extends BaseController
 		$SystemModel = new SystemModel();
 		$EmailtemplatesModel = new EmailtemplatesModel();
 		$email = udecode($_GET['v']);
-		$data['title'] = lang('Verified');
 
 		$check_user = $UsersModel->where('email', $email)->countAllResults();
 		if ($check_user > 0) {
-			$iuser = $UsersModel->where('email', $email, 'is_active', 1)->first();
+			$iuser = $UsersModel->where(['email'=>$email, 'is_active'=>1])->first();
 			$username = $iuser['username'];
 			$options = array('cost' => 12);
 			$password = 'Hu2k4JHik42ol4hH32';
@@ -208,6 +204,7 @@ class Auth extends BaseController
 			$xin_system = $SystemModel->where('setting_id', 1)->first();
 			$data = [
 				'password' => $password_hash,
+				'title' => lang('Verified'),
 			];
 			$UsersModel->update($iuser['user_id'], $data);
 			// Send mail start
@@ -218,7 +215,6 @@ class Auth extends BaseController
 			timehrm_mail_data($xin_system['email'], $xin_system['company_name'], $email, $subject, $body);
 			// Send mail end
 		}
-
 
 		return view('erp/auth/verified_password', $data);
 	}

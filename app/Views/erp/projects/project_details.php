@@ -1048,7 +1048,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                             <small class="text-muted"><?= time_ago($_files['created_at']); ?></small>
                           </td>
                           <td>
-                            <a href="<?= site_url('download') ?>?type=project_files&filename=<?= uencode($_files['attachment_file']); ?>"
+                            <a href="<?= site_url('download') ?>?type=project_files&filename=<?= urlencode($_files['attachment_file']) ?>"
                               data-toggle="tooltip" title="Download File" class="btn btn-sm btn-secondary">
                               <i class="fas fa-download"></i>
                             </a>
@@ -1121,7 +1121,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                                 <i class="fas fa-edit"></i>
                               </a>
 
-                              <a href="#!" data-field="<?= $_discussion['project_discussion_id'] ?? '' ?>"
+                              <a href="#!" data-field="<?= $log['project_discussion_id'] ?? '' ?>"
                                 class="btn btn-sm btn-danger delete_discussion" data-toggle="tooltip"
                                 title="Delete Discussion">
                                 <i class="fas fa-trash-alt"></i>
@@ -1278,7 +1278,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                   aria-label="description"
                   aria-describedby="description_help"
                   spellcheck="true"
-                  data-validate="true"><?= $project_notes['project_note']; ?></textarea>
+                  data-validate="true"><?= isset($project_notes['project_note'])?$project_notes['project_note']:''; ?></textarea>
                 <button type="submit" class="btn btn-primary"
                   style="background-color: #007bff !important; border-color: #007bff !important; margin-top:10px;">Save Note</button>
 
@@ -1635,14 +1635,14 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                     </div>
 
                     <div class="form-group col-12" app-field-wrapper="name">
-                      <label for="employee">Member </label>
-                      <input type="hidden" value="0" name="member[]" />
+                      <label for="employee">Member</label>
                       <select multiple name="member[]" class="form-control" data-plugin="select_hrm">
-                        <option value="">Select Member</option>
-                        <?php foreach ($staff_info as $staff) { ?>
-                          <option value="<?= $staff['user_id'] ?>"><?= $staff['first_name'] . ' ' . $staff['last_name'] ?>
-                          </option>
-                        <?php } ?>
+                          <option value="">Select Member</option>
+                          <?php foreach ($staff_info as $staff) { ?>
+                              <option value="<?= $staff['user_id'] ?>">
+                                  <?= $staff['first_name'] . ' ' . $staff['last_name'] ?>
+                              </option>
+                          <?php } ?>
                       </select>
                     </div>
 

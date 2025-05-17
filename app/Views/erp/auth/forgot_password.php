@@ -5,12 +5,8 @@ use App\Models\UsersModel;
 
 $SystemModel = new SystemModel();
 $UsersModel = new UsersModel();
-
-$session = \Config\Services::session();
-$username = $session->get('sup_user_id');
 $xin_system = $SystemModel->where('setting_id', 1)->first();
-$favicon = base_url() . '/public/uploads/logo/favicon/' . $xin_system['favicon'];
-$user_info = $UsersModel->where('user_id', $username['sup_user_id'])->first();
+$favicon = base_url() . 'uploads/logo/favicon/' . $xin_system['favicon'];
 
 ?>
 <!DOCTYPE html>
@@ -19,13 +15,7 @@ $user_info = $UsersModel->where('user_id', $username['sup_user_id'])->first();
 <head>
 
 	<title><?= $title; ?></title>
-	<!-- HTML5 Shim and Respond.js IE11 support of HTML5 elements and media queries -->
-	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-	<!--[if lt IE 11]>
-		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-		<![endif]-->
-	<!-- Meta -->
+	
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -60,8 +50,8 @@ $user_info = $UsersModel->where('user_id', $username['sup_user_id'])->first();
 							<img src="<?= base_url(); ?>assets/images/auth/2456057.jpg" alt="" class="img-fluid mb-4">
 							<h4 class="mb-3 f-w-400">Reset your password</h4>
 							<?php $attributes = array('class' => 'form', 'name' => 'erp_form', 'id' => 'hrm-form', 'autocomplete' => 'off'); ?>
-							<?php $hidden = array('user_id' => 0); ?>
-							<?= form_open('erp/auth/check_password', $attributes, $hidden); ?>
+							<?php $hidden = array('user_id' => '0'); ?>
+							<?= form_open('erp/check-password', $attributes, $hidden); ?>
 							<div class="input-group mb-4">
 								<div class="input-group-prepend">
 									<span class="input-group-text"><i data-feather="mail"></i></span>
@@ -69,7 +59,7 @@ $user_info = $UsersModel->where('user_id', $username['sup_user_id'])->first();
 								<input type="text" name="email" class="form-control" placeholder="Email address">
 							</div>
 							<button type="submit" class="btn btn-block btn-primary mb-4">Reset password</button>
-							<p class="mb-0 text-muted">Remember password? <a href="<?= site_url('erp/login'); ?>" class="f-w-400">Click here</a></p>
+							<p class="mb-0 text-muted">Remember password? <a href="<?= site_url('/'); ?>" class="f-w-400">Click here</a></p>
 							<?= form_close(); ?>
 						</div>
 					</div>

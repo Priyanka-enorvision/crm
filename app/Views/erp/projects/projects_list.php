@@ -161,14 +161,11 @@ if ($session->has('entityId')) {
       ->groupEnd()
       ->countAllResults();
 
-    // Count projects by status
-    $status_counts = [
-      'not_started' => getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 0, $expert_id),
-      'in_progress' => getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 1, $expert_id),
-      'completed'   => getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 2, $expert_id),
-      'cancelled'   => getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 3, $expert_id),
-      'hold'        => getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 4, $expert_id)
-    ];
+      $not_started =  getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 0, $expert_id);
+      $in_progress = getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 1, $expert_id);
+      $completed = getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 2, $expert_id);
+      $cancelled = getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 3, $expert_id);
+      $hold = getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 4, $expert_id);
   } else {
 
     $staff_info = $UsersModel->where('company_id', $usession['sup_user_id'])->where('user_type', 'staff')->findAll();
@@ -289,13 +286,11 @@ if ($session->has('entityId')) {
       ->countAllResults();
 
     // Count projects by status
-    $status_counts = [
-      'not_started' => getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 0, $expert_id),
-      'in_progress' => getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 1, $expert_id),
-      'completed'   => getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 2, $expert_id),
-      'cancelled'   => getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 3, $expert_id),
-      'hold'        => getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 4, $expert_id)
-    ];
+    $not_started =  getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 0, $expert_id);
+    $in_progress = getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 1, $expert_id);
+    $completed = getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 2, $expert_id);
+    $cancelled = getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 3, $expert_id);
+    $hold = getProjectsCountByStatus($ProjectsModel, $company_id, $user_id, 4, $expert_id);
   } else {
 
     $staff_info = $UsersModel->where('company_id', $usession['sup_user_id'])->where('user_type', 'staff')->findAll();

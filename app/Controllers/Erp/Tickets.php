@@ -3,11 +3,7 @@
 namespace App\Controllers\Erp;
 
 use App\Controllers\BaseController;
-use CodeIgniter\HTTP\RequestInterface;
-use CodeIgniter\HTTP\ResponseInterface;
-use CodeIgniter\HTTP\Files\UploadedFile;
 
-use App\Models\MainModel;
 use App\Models\RolesModel;
 use App\Models\UsersModel;
 use App\Models\SystemModel;
@@ -35,7 +31,7 @@ class Tickets extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 
 		$usession = $session->get('sup_username');
@@ -86,7 +82,7 @@ class Tickets extends BaseController
 		}
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 
 		$usession = $session->get('sup_username');
@@ -109,7 +105,7 @@ class Tickets extends BaseController
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			return redirect()->to(site_url('erp/desk'));
@@ -118,7 +114,7 @@ class Tickets extends BaseController
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$data['title'] = lang('Employees.xin_employee_details') . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'tickets';
-		$data['breadcrumbs'] = lang('Employees.xin_employee_details') . $user_id;
+		$data['breadcrumbs'] = lang('Employees.xin_employee_details');
 
 		$data['subview'] = view('erp/tickets/helpdesk_dashboard', $data);
 		return view('erp/layout/layout_main', $data); //page load
@@ -130,7 +126,7 @@ class Tickets extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
@@ -829,7 +825,7 @@ class Tickets extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
@@ -862,7 +858,7 @@ class Tickets extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
@@ -870,6 +866,7 @@ class Tickets extends BaseController
 		$ConstantsModel = new ConstantsModel();
 		$TicketsModel = new TicketsModel();
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+		
 		if ($user_info['user_type'] == 'staff') {
 			$low = $TicketsModel->where('company_id', $user_info['company_id'])->where('ticket_priority', 1)->countAllResults();
 			$medium = $TicketsModel->where('company_id', $user_info['company_id'])->where('ticket_priority', 2)->countAllResults();
@@ -896,8 +893,8 @@ class Tickets extends BaseController
 		// critical
 		$Return['critical_lab'] = lang('Main.xin_critical');
 		$Return['critical_count'] = $critical;
-		$this->output($Return);
-		exit;
+		return $this->response->setJSON($Return);
+		
 	}
 	public function is_department($id)
 	{
@@ -965,7 +962,7 @@ class Tickets extends BaseController
 		if ($this->request->getVar('field_id')) {
 			/* Define return | here result is used to return user data and error for error message */
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-			$session = \Config\Services::session($config);
+			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
 			$id = $this->request->getVar('field_id', FILTER_SANITIZE_STRING);

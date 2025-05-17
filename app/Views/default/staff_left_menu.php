@@ -899,7 +899,6 @@ $singledocument_data = $documentModel->where('user_id', $user_info['user_id'])->
 
   <!-- Document Management -->
   <li class="pc-item <?php if (!empty($arr_mod['work_open'])) echo $arr_mod['work_open']; ?>">
-    <!-- <a href="<?= base_url('view/employe-document/' . base64_encode($singledocument_data['id'])) ?>" class="pc-link sidenav-toggle"> -->
     <a href="<?= base_url('erp/documentation/') ?>" class="pc-link sidenav-toggle">
       <span class="pc-micon">
         <i data-feather="file-text"></i> <!-- Feather icon for document -->

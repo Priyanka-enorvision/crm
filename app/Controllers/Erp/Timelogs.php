@@ -73,12 +73,25 @@ class Timelogs extends BaseController
             $endDateTime = new \DateTime($this->request->getPost('due_date') . ' ' . $this->request->getPost('due_time'));
             $interval = $startDateTime->diff($endDateTime);
             $totalHours = $interval->h + ($interval->days * 24) + ($interval->i / 60); // Total hours with minutes converted to fractions
+            $members = $this->request->getPost('member') ?? [];
+            // Filter out empty values (like the empty option) and ensure all values are valid
+            $members = array_filter($members, function($value) {
+                return $value !== '' && $value !== null;
+            });
+
+            // If no members selected, you might want to handle this case
+            if (empty($members)) {
+                // Either set to NULL, empty string, or handle the error
+                $employee_id = null;
+            } else {
+                $employee_id = implode(',', $members);
+            }
 
             $data = [
                 'company_id' => $user_info['company_id'],
                 'project_id' => $this->request->getPost('project_id'),
                 'task_id' => $this->request->getPost('task_id'),
-                'employee_id' => implode(',', $this->request->getPost('member')),
+                'employee_id' => $employee_id,
                 'start_time' => $this->request->getPost('start_time'),
                 'end_time' => $this->request->getPost('due_time'),
                 'start_date' => $this->request->getPost('start_date'),
@@ -87,7 +100,7 @@ class Timelogs extends BaseController
                 'timelogs_memo' => $this->request->getPost('note'),
                 'created_at' => date('Y-m-d H:i:s'),
             ];
-
+            
             if ($Model->insert($data)) {
                 $session->setFlashdata('message', 'TimeLogs successfully added.');
             } else {

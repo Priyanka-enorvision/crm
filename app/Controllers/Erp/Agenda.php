@@ -298,7 +298,7 @@ class Agenda extends BaseController {
 				$t_employee_name,
 				$r['visit_place'],
 				$r['visit_purpose'],
-				$category_info['category_name'],
+				isset($category_info['category_name'])?$category_info['category_name']:'',
 				$actual_budget,
 				$end_date,
 				$combhr
@@ -313,34 +313,35 @@ class Agenda extends BaseController {
      }
 	 // record list
 	public function advance_salary_list($id=null) {
-
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
-		$request = \Config\Services::request();	
+		$request = \Config\Services::request();    
 		if(!$session->has('sup_username')){ 
 			return redirect()->to(site_url('/'));
-		}		
+		}        
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
 		$SystemModel = new SystemModel();
 		$AdvancesalaryModel = new AdvancesalaryModel();
-		//$ConstantsModel = new ConstantsModel();
 		$xin_system = erp_company_settings();
-		// $id = $request->getUri()->getSegment(4);
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		$get_data = $AdvancesalaryModel->where('employee_id',$id)->where('salary_type','advance')->orderBy('advance_salary_id', 'ASC')->findAll();
 		$data = [];
 		
-          foreach($get_data as $r) {						
-		  			
-			// awards month year
-			$d = explode('-',$r['month_year']);
-			$get_month = date('F', mktime(0, 0, 0, $d[1], 10));
-			$month_year = $get_month.', '.$d[0];
+		foreach($get_data as $r) {                        
+			// awards month year - add validation for month_year format
+			$month_year = $r['month_year']; // default value
+			if (!empty($r['month_year']) && strpos($r['month_year'], '-') !== false) {
+				$d = explode('-', $r['month_year']);
+				if (count($d) >= 2) {
+					$get_month = date('F', mktime(0, 0, 0, $d[1], 10));
+					$month_year = $get_month.', '.$d[0];
+				}
+			}
+			
 			// user info
 			$iuser_info = $UsersModel->where('user_id', $r['employee_id'])->first();
-			//$combhr = $edit.$delete;
-			if($r['one_time_deduct']==1): $onetime = lang('Main.xin_yes'); else: $onetime = lang('Main.xin_no'); endif;	
+			if($r['one_time_deduct']==1): $onetime = lang('Main.xin_yes'); else: $onetime = lang('Main.xin_no'); endif;    
 			if($r['status'] == 0){
 				$app_status = '<span class="badge badge-light-warning">'.lang('Main.xin_pending').'</span>';
 			} else if($r['status'] == 1){
@@ -355,7 +356,7 @@ class Agenda extends BaseController {
 			$total_paid = number_to_currency($r['total_paid'], $xin_system['default_currency'],null,2);
 			$itotal_paid = $advance_amount.'<br>'.lang('Invoices.xin_paid').': '.$total_paid;
 			$iapp_status = $created_at.'<br>'.$app_status;
-			//'xin_paid' => 'Paid',
+			
 			$employee_name = $iuser_info['first_name'].' '.$iuser_info['last_name'];
 			$uname = '<div class="d-inline-block align-middle">
 				<img src="'.base_url().'uploads/users/thumb/'.$iuser_info['profile_photo'].'" alt="user image" class="img-radius align-top m-r-15" style="width:40px;">
@@ -374,15 +375,14 @@ class Agenda extends BaseController {
 				$monthly_installment,
 				$iapp_status,
 			);
-			
 		}
-          $output = [
-			//"draw" => $draw,
+		
+		$output = [
 			"data" => $data
-		  ];
-          echo json_encode($output);
-          exit();
-     }
+		];
+		echo json_encode($output);
+		exit();
+	}
 	 
 	 // record list
 	public function overtime_request_list($id=null) {

@@ -129,7 +129,7 @@ if (!function_exists('check_user_attendance_value')) {
 	function check_user_attendance_value()
 	{
 		// Initialize session service
-		$session = Services::session();
+		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 
 		// Validate session data
@@ -138,8 +138,8 @@ if (!function_exists('check_user_attendance_value')) {
 			return null;
 		}
 
-		// Get user information
-		$UsersModel = new UsersModel();
+		
+		$UsersModel = new \App\Models\UsersModel();
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 
 		// Validate user data
@@ -150,7 +150,7 @@ if (!function_exists('check_user_attendance_value')) {
 
 		try {
 			// Initialize database connection
-			$db = Database::connect();
+			$db = \Config\Database::connect();
 			$today_date = date('Y-m-d');
 
 			// Build query
@@ -598,14 +598,13 @@ if (!function_exists('timehrm_mail_data')) {
 
 		// get session
 		$session = \Config\Services::session();
-		$usession = $session->get('sup_username');
 
 		$SystemModel = new \App\Models\SystemModel();
 		$UsersModel = new \App\Models\UsersModel();
 		//$EmailtemplatesModel = new \App\Models\EmailtemplatesModel();
 
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
-		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+		
 
 		if ($xin_system['email_type'] == "codeigniter") {
 

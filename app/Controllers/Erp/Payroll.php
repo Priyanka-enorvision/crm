@@ -3,9 +3,6 @@
 namespace App\Controllers\Erp;
 
 use App\Controllers\BaseController;
-use CodeIgniter\HTTP\RequestInterface;
-use CodeIgniter\HTTP\ResponseInterface;
-use CodeIgniter\HTTP\Files\UploadedFile;
 
 use App\Models\MainModel;
 use App\Models\SystemModel;
@@ -1610,8 +1607,8 @@ class Payroll extends BaseController
 		$Return['payslip_month'] = $strtotime;
 		$Return['paid_inv_label'] = lang('Dashboard.left_payroll');
 		$Return['payroll_amount'] = $paid_payroll;
-		$this->output($Return);
-		exit;
+		return $this->response->setJSON($Return);
+		
 	}
 	// read record
 	public function read_advance_salary()
