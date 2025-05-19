@@ -20,7 +20,7 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 $user_id = $usession['sup_user_id'];
 
 if ($user_info['user_type'] == 'staff') {
-    $employee_list = $UsersModel->where('company_id', $user_info['company_id'])->whereIn('user_id', $user_id)->orderBy('user_id', 'ASC')->findAll();
+    $employee_list = $UsersModel->where('company_id', $user_info['company_id'])->where('user_id', $user_id)->orderBy('user_id', 'ASC')->findAll();
     $document_list = $documentModel->where('user_id', $usession['sup_user_id'])->orderBy('id', 'desc')->findAll();
     $category_list = $doc_categoryModel->where(['company_id' => $user_info['company_id'], 'status' => 1])->findAll();
 } else {
@@ -285,10 +285,6 @@ if ($user_info['user_type'] == 'staff') {
         });
     });
 </script>
-
-
-
-
 
 <script>
     $(document).ready(function() {

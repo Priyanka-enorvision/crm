@@ -17,6 +17,10 @@ use App\Models\ConstantsModel;
 use App\Models\TransactionsModel;
 use App\Models\InvestmentTypeModel;
 use App\Models\Tax_declarationModel;
+use Dompdf\Options;
+use Dompdf\Dompdf;
+use App\Models\ContractModel;
+use App\Models\PayrollModel;
 
 class Finance extends BaseController
 {
@@ -1451,23 +1455,19 @@ class Finance extends BaseController
 						$DeclarationModel->update($insertedID, ['proof' => 'Proof uploaded']);
 					}
 				}
-
 				if ($result) {
-					return $this->response->setJSON([
-						'status' => 'success',
-						'message' => 'Declaration successfully added.',
-					]);
+					$Result['result'] = 'Declaration successfully added.'; // Changed from 'success' to 'result'
 				} else {
-					return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to add declaration.']);
+					$Result['error'] = 'Failed to add declaration.';
 				}
+				return $this->response->setJSON($Result);
 			} else {
-				return $this->response->setJSON([
-					'status' => 'error',
-					'message' => 'Your limit is only ' . $limitAmount . '. You have declared ' . ($declaredAmount + $data['declared_amount']) . '.',
-				]);
+				$Result['error'] = 'Your limit is only ' . $limitAmount . '. You have declared ' . ($declaredAmount + $data['declared_amount']) . '.';
+				return $this->response->setJSON($Result);
 			}
 		} else {
-			return $this->response->setJSON(['status' => 'error', 'message' => implode(", ", $validation->getErrors())]);
+			$Result['error'] = implode(", ", $validation->getErrors());
+			return $this->response->setJSON($Result);
 		}
 	}
 
@@ -1699,10 +1699,15 @@ class Finance extends BaseController
 
 	public function getInvestmentname()
 	{
-		$section = $this->request->getPost('section');
+		$section = $this->request->getGet('section');
+
+		if (!$section) {
+			return $this->response->setJSON([]);
+		}
 
 		$investmentModel = new InvestmentTypeModel();
 		$investments = $investmentModel->where('section', $section)->findAll();
+
 		return $this->response->setJSON($investments);
 	}
 	public function getLimitedAmount()
@@ -1804,7 +1809,8 @@ class Finance extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		$id = $this->request->getPost('id');
 
-		if ($this->request->getMethod() === 'post') {
+
+		if ($this->request->getMethod()) {
 			$data = [
 				'section' => $this->request->getPost('section'),
 				'invest_name' => $this->request->getPost('invest_name'),
@@ -1818,7 +1824,7 @@ class Finance extends BaseController
 			// Handle proof files if provided
 			$files = $this->request->getFileMultiple('proof');
 			if ($files) {
-				$uploadPath = FCPATH . 'public/uploads/tax_proof/';
+				$uploadPath = FCPATH . 'uploads/tax_proof/';
 				if (!is_dir($uploadPath)) {
 					mkdir($uploadPath, 0777, true);
 				}
@@ -1841,23 +1847,24 @@ class Finance extends BaseController
 							];
 							$ProofModel->insert($proofdata);
 						} else {
-							$session->setFlashdata('error', 'Failed to upload proof file.');
-							return $this->response->setJSON(['success' => false, 'message' => 'Failed to upload proof file.']);
+							$Result['error'] =  'Failed to upload proof file.';
+							return $this->response->setJSON($Result);
 						}
 					}
 				}
 
-				// Update proof status in the main declaration
 				$DeclarationModel->update($id, ['proof' => 'Proof uploaded']);
 			}
 
 			if ($result) {
-				return $this->response->setJSON(['success' => true, 'message' => 'Declaration successfully updated.']);
+				$Result['result'] = 'Declaration successfully updated.'; // Changed from 'success' to 'result'
 			} else {
-				return $this->response->setJSON(['success' => false, 'message' => 'Failed to update declaration.']);
+				$Result['error'] = 'Failed to update declaration.';
 			}
+			return $this->response->setJSON($Result);
 		} else {
-			return $this->response->setJSON(['success' => false, 'message' => 'Invalid request method.']);
+			$Result['error'] =  'Invalid request method.';
+			return $this->response->setJSON($Result);
 		}
 	}
 
@@ -1865,5 +1872,86 @@ class Finance extends BaseController
 	public function checktax_apply()
 	{
 		return	view('tax/applyTax');
+	}
+	public function generatePdf($id)
+	{
+		require_once APPPATH . 'ThirdParty/dompdf/vendor/autoload.php';
+		$options = new \Dompdf\Options();
+		$options->set('isRemoteEnabled', true);
+
+		$dompdf = new \Dompdf\Dompdf($options);
+		$data = $this->getFormDetails($id);
+		$html = view('erp/finance/form16', $data);
+
+		$dompdf->loadHtml($html);
+		// $dompdf->setPaper('A4', 'landscape');
+		$dompdf->setPaper('A4', 'portrait');
+		$dompdf->render();
+		$dompdf->stream("sample_partA.pdf", array("Attachment" => 1));
+	}
+
+	public function form16_partB($id)
+	{
+		require_once APPPATH . 'ThirdParty/dompdf/vendor/autoload.php';
+		$options = new \Dompdf\Options();
+		$options->set('isRemoteEnabled', true);
+
+		$dompdf = new \Dompdf\Dompdf($options);
+		$data = $this->getFormDetails($id);
+		$html = view('erp/finance/form16_part_b', $data);
+
+		$dompdf->loadHtml($html);
+		// $dompdf->setPaper('A4', 'landscape');
+		$dompdf->setPaper('A4', 'portrait');
+		$dompdf->render();
+		$dompdf->stream("sample_partB.pdf", array("Attachment" => 1));
+	}
+	public function getFormDetails($id = null)
+	{
+		$UsersModel = new UsersModel();
+		$Taxdeclarationlist = new Tax_declarationModel();
+		$ContractModel = new ContractModel();
+		$session = \Config\Services::session();
+		$db = \Config\Database::connect();
+		$usession = $session->get('sup_username');
+		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+		$employee_id = $id ?? $user_info['user_id'];
+
+		$tax_list = $Taxdeclarationlist->where('company_id', $user_info['company_id'])->where('employee_id', $employee_id)->orderBy('id', 'desc')->findAll();
+
+		$getsalary = $db->table('ci_erp_users_details');
+		$getsalary->where('user_id', $employee_id);
+		$query = $getsalary->get();
+		$getgrossSalary = $query->getRowArray();
+
+		$approved_tax_list = $Taxdeclarationlist->where('company_id', $user_info['company_id'])
+			->where('employee_id', $employee_id)
+			->whereIn('status', ['Approved', 'Pending'])
+			->orderBy('id', 'desc')
+			->findAll();
+
+		$total_declared_amount = 0;
+		if (!empty($approved_tax_list)) {
+			foreach ($approved_tax_list as $tax) {
+				$total_declared_amount += isset($tax['declared_amount']) ? $tax['declared_amount'] : 0;
+			}
+		}
+		$HRA_Exemption = $ContractModel->where(['user_id' => $employee_id, 'option_title' => 'HRA'])->first();
+		$contract_amount = isset($HRA_Exemption['contract_amount']) ? $HRA_Exemption['contract_amount'] : 0;
+
+		$annualSalary  = $getgrossSalary['basic_salary'] * 12  - ($total_declared_amount + $contract_amount);
+		$total_salary = $getgrossSalary['basic_salary'] * 12;
+
+		$totalDeductions = $total_declared_amount + $contract_amount;
+		$result = array(
+			'tax_list' => $tax_list,
+			'Taxable_Amount' => $annualSalary,
+			'Tax_amount' => getSalaryTax($total_salary, $totalDeductions),
+			'declared' => $totalDeductions,
+			'hra_exemption' => $contract_amount,
+			'certificateNumber' => generateCertificateNumber(),
+			'user_info' => $user_info,
+		);
+		return $result;
 	}
 }

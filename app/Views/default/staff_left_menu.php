@@ -839,7 +839,7 @@ $singledocument_data = $documentModel->where('user_id', $user_info['user_id'])->
   <?php } ?>
   <?php if (in_array('mom_1', staff_role_resource())) { ?>
     <!-- MOM -->
-    <li class="pc-item"> <a href="<?= site_url('erp/moms-list'); ?>" class="pc-link"> <span class="pc-micon"><i
+    <li class="pc-item"> <a href="<?= site_url('erp/moms-grid'); ?>" class="pc-link"> <span class="pc-micon"><i
             data-feather="book-open"></i></span><span class="pc-mtext">
           MOM
         </span> </a> </li>
@@ -899,7 +899,7 @@ $singledocument_data = $documentModel->where('user_id', $user_info['user_id'])->
 
   <!-- Document Management -->
   <li class="pc-item <?php if (!empty($arr_mod['work_open'])) echo $arr_mod['work_open']; ?>">
-    <a href="<?= base_url('erp/documentation/') ?>" class="pc-link sidenav-toggle">
+    <a href="<?= base_url('erp/documentation') ?>" class="pc-link sidenav-toggle">
       <span class="pc-micon">
         <i data-feather="file-text"></i> <!-- Feather icon for document -->
       </span>
@@ -907,5 +907,5 @@ $singledocument_data = $documentModel->where('user_id', $user_info['user_id'])->
       <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
     </a>
   </li>
-  
+
 </ul>

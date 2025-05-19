@@ -1,4 +1,3 @@
-
 <?php
 
 use App\Models\UsersModel;
@@ -35,8 +34,9 @@ $user_company_id = $user['company_id'];
 $user_type = $user['user_type'];
 $currentYear = date('Y');
 
-$planning_configuration_data = $PlanningConfigurationSettingModel->where(['company_id'=> $user_company_id,'user_type'=>$user_type])->findAll();
-$year_planning_data = $YearPlanningModel->where(['company_id'=> $user_company_id,'user_type'=>$user_type])->findAll();
+$planning_configuration_data = $PlanningConfigurationSettingModel->where(['company_id' => $user_company_id, 'user_type' => $user_type])->findAll();
+
+$year_planning_data = $YearPlanningModel->where(['company_id' => $user_company_id, 'user_type' => $user_type])->findAll();
 $years = array_column($year_planning_data, 'year');
 
 $unique_years = array_unique($years);
@@ -298,7 +298,7 @@ $tax_duration = $TaxDurationModel->where('company_id', $user_company_id)->first(
                                 <input type="file" class="custom-file-input" name="other_logo">
                                 <label class="custom-file-label"><?= lang('Main.xin_choose_file'); ?></label>
                                 <div class="mt-3">
-                                    <?php if (!empty($logo_details)) { ?>
+                                  <?php if (!empty($logo_details)) { ?>
                                     <?php if ($logo_details['other_logo'] != '' && $logo_details['other_logo'] != 'no file') { ?>
                                       <img src="<?= base_url() . 'uploads/logo/other/' . $logo_details['other_logo']; ?>"
                                         width="70px" style="margin-left:30px;" id="u_file3">
@@ -583,88 +583,88 @@ $tax_duration = $TaxDurationModel->where('company_id', $user_company_id)->first(
               <div class="row">
                 <!-- Financial Year Selection -->
                 <div class="col-md-4">
-                    <div class="form-group">
-                                  <label for="financial_year" class="font-weight-bold">Financial Year<span class="text-danger">*</span></label>
-                                  <?php
-                                    
-                                    $currentYear = (int)date('Y');
-                                    $currentMonth = (int)date('n');
-                                    $unique_years = $unique_years ?? []; 
-                                    $financialYearStart = ($currentMonth >= 4) ? $currentYear : $currentYear - 1;
-                                    $currentFY = sprintf("%d-%02d", $financialYearStart, ($financialYearStart + 1) % 100);
-                                    ?>
+                  <div class="form-group">
+                    <label for="financial_year" class="font-weight-bold">Financial Year<span class="text-danger">*</span></label>
+                    <?php
 
-                                    <select class="form-control" id="financial_year" name="year" required>
-                                        <option value="">Select Financial Year</option>
-                                        <?php if (!empty($unique_years)): ?>
-                                            <?php foreach ($unique_years as $year): ?>
-                                                <?php
-                                                
-                                                $year = (int)$year;
-                                                if ($year < 2000 || $year > 2100) continue;
-                                                
-                                                $startYear = $year;
-                                                $endYear = $year + 1;
-                                                $fyValue = sprintf("%d-%02d", $startYear, $endYear % 100);
-                                                $fyDisplay = sprintf("April %d - March %d", $startYear, $endYear);
-                                                $selected = ($fyValue === $currentFY) ? 'selected' : '';
-                                                ?>
-                                                <option value="<?= htmlspecialchars($fyValue) ?>" <?= $selected ?>>
-                                                    <?= htmlspecialchars("$fyValue ($fyDisplay)") ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        <?php else: ?>
-                                            <?php  ?>
-                                            <?php for ($i = 2; $i >= -5; $i--): ?>
-                                                <?php
-                                                $startYear = $financialYearStart + $i;
-                                                $endYear = $startYear + 1;
-                                                $fyValue = sprintf("%d-%02d", $startYear, $endYear % 100);
-                                                $fyDisplay = sprintf("April %d - March %d", $startYear, $endYear);
-                                                $selected = ($fyValue === $currentFY) ? 'selected' : '';
-                                                ?>
-                                                <option value="<?= htmlspecialchars($fyValue) ?>" <?= $selected ?>>
-                                                    <?= htmlspecialchars("$fyValue ($fyDisplay)") ?>
-                                                </option>
-                                            <?php endfor; ?>
-                                        <?php endif; ?>
-                                    </select>
-                    </div>
+                    $currentYear = (int)date('Y');
+                    $currentMonth = (int)date('n');
+                    $unique_years = $unique_years ?? [];
+                    $financialYearStart = ($currentMonth >= 4) ? $currentYear : $currentYear - 1;
+                    $currentFY = sprintf("%d-%02d", $financialYearStart, ($financialYearStart + 1) % 100);
+                    ?>
+
+                    <select class="form-control" id="financial_year" name="year" required>
+                      <option value="">Select Financial Year</option>
+                      <?php if (!empty($unique_years)): ?>
+                        <?php foreach ($unique_years as $year): ?>
+                          <?php
+
+                          $year = (int)$year;
+                          if ($year < 2000 || $year > 2100) continue;
+
+                          $startYear = $year;
+                          $endYear = $year + 1;
+                          $fyValue = sprintf("%d-%02d", $startYear, $endYear % 100);
+                          $fyDisplay = sprintf("April %d - March %d", $startYear, $endYear);
+                          $selected = ($fyValue === $currentFY) ? 'selected' : '';
+                          ?>
+                          <option value="<?= htmlspecialchars($fyValue) ?>" <?= $selected ?>>
+                            <?= htmlspecialchars("$fyValue ($fyDisplay)") ?>
+                          </option>
+                        <?php endforeach; ?>
+                      <?php else: ?>
+                        <?php  ?>
+                        <?php for ($i = 2; $i >= -5; $i--): ?>
+                          <?php
+                          $startYear = $financialYearStart + $i;
+                          $endYear = $startYear + 1;
+                          $fyValue = sprintf("%d-%02d", $startYear, $endYear % 100);
+                          $fyDisplay = sprintf("April %d - March %d", $startYear, $endYear);
+                          $selected = ($fyValue === $currentFY) ? 'selected' : '';
+                          ?>
+                          <option value="<?= htmlspecialchars($fyValue) ?>" <?= $selected ?>>
+                            <?= htmlspecialchars("$fyValue ($fyDisplay)") ?>
+                          </option>
+                        <?php endfor; ?>
+                      <?php endif; ?>
+                    </select>
+                  </div>
                 </div>
                 <!-- Month Selection -->
                 <div class="col-md-4">
-                              <div class="form-group">
-                                  <label for="month" class="font-weight-bold">Month<span class="text-danger">*</span></label>
-                                  <select class="form-control" id="month" name="month" required>
-                                      <option value="" disabled selected>Select Month</option>
-                                      <?php
-                                      $months = [
-                                          ['name' => 'April', 'year_offset' => 0],
-                                          ['name' => 'May', 'year_offset' => 0],
-                                          ['name' => 'June', 'year_offset' => 0],
-                                          ['name' => 'July', 'year_offset' => 0],
-                                          ['name' => 'August', 'year_offset' => 0],
-                                          ['name' => 'September', 'year_offset' => 0],
-                                          ['name' => 'October', 'year_offset' => 0],
-                                          ['name' => 'November', 'year_offset' => 0],
-                                          ['name' => 'December', 'year_offset' => 0],
-                                          ['name' => 'January', 'year_offset' => 1],
-                                          ['name' => 'February', 'year_offset' => 1],
-                                          ['name' => 'March', 'year_offset' => 1]
-                                      ];
-                                      
-                                      foreach ($months as $month) {
-                                          $year = $currentYear + $month['year_offset'];
-                                          if ($currentMonth >= 4 && $month['year_offset'] == 1) {
-                                              $year = $currentYear + 1;
-                                          } elseif ($currentMonth < 4 && $month['year_offset'] == 0) {
-                                              $year = $currentYear;
-                                          }
-                                          echo "<option value='{$month['name']}-$year'>{$month['name']} $year</option>";
-                                      }
-                                      ?>
-                                  </select>
-                              </div>
+                  <div class="form-group">
+                    <label for="month" class="font-weight-bold">Month<span class="text-danger">*</span></label>
+                    <select class="form-control" id="month" name="month" required>
+                      <option value="" disabled selected>Select Month</option>
+                      <?php
+                      $months = [
+                        ['name' => 'April', 'year_offset' => 0],
+                        ['name' => 'May', 'year_offset' => 0],
+                        ['name' => 'June', 'year_offset' => 0],
+                        ['name' => 'July', 'year_offset' => 0],
+                        ['name' => 'August', 'year_offset' => 0],
+                        ['name' => 'September', 'year_offset' => 0],
+                        ['name' => 'October', 'year_offset' => 0],
+                        ['name' => 'November', 'year_offset' => 0],
+                        ['name' => 'December', 'year_offset' => 0],
+                        ['name' => 'January', 'year_offset' => 1],
+                        ['name' => 'February', 'year_offset' => 1],
+                        ['name' => 'March', 'year_offset' => 1]
+                      ];
+
+                      foreach ($months as $month) {
+                        $year = $currentYear + $month['year_offset'];
+                        if ($currentMonth >= 4 && $month['year_offset'] == 1) {
+                          $year = $currentYear + 1;
+                        } elseif ($currentMonth < 4 && $month['year_offset'] == 0) {
+                          $year = $currentYear;
+                        }
+                        echo "<option value='{$month['name']}-$year'>{$month['name']} $year</option>";
+                      }
+                      ?>
+                    </select>
+                  </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
@@ -713,7 +713,7 @@ $tax_duration = $TaxDurationModel->where('company_id', $user_company_id)->first(
                               <span data-toggle="tooltip" title="Delete Planning Configuration">
                                 <button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete"
                                   data-toggle="modal" data-target="#deleteModal"
-                                  data-record-id="<?php $data['id']; ?>">
+                                  data-record-id="<?= $data['id'] ?>"> <!-- Fixed this line -->
                                   <i class="feather icon-trash-2"></i>
                                 </button>
                               </span>
@@ -982,26 +982,34 @@ $tax_duration = $TaxDurationModel->where('company_id', $user_company_id)->first(
           $('#deleteModal').on('show.bs.modal', function(event) {
             var button = $(event.relatedTarget);
             var recordId = button.data('record-id');
+
+            // Store the ID in the modal for later use
+            $(this).data('record-id', recordId);
             $('#confirmDeleteBtn').data('record-id', recordId);
           });
 
           // Handle delete confirmation
           $('#confirmDeleteBtn').on('click', function() {
             var recordId = $(this).data('record-id');
-            var URL = '<?= base_url('erp/delete-planning-configuration') ?>';
 
-            $(this).prop('disabled', true);
+            if (!recordId) {
+              toastr.error('No record ID found!');
+              return;
+            }
+
+            var URL = '<?= base_url('erp/delete-planning-configuration') ?>';
+            var $btn = $(this).prop('disabled', true);
 
             $.ajax({
               url: URL,
-              type: 'POST',
+              type: 'GET', // Changed to uppercase for consistency
               data: {
                 id: recordId,
                 '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
               },
               dataType: "json",
               success: function(response) {
-                $('#confirmDeleteBtn').prop('disabled', false);
+                $btn.prop('disabled', false);
                 if (response.result) {
                   toastr.success(response.result);
                   $('#deleteModal').modal('hide');
@@ -1018,7 +1026,7 @@ $tax_duration = $TaxDurationModel->where('company_id', $user_company_id)->first(
                 $('input[name="<?= csrf_token() ?>"]').val(response.csrf_hash);
               },
               error: function(xhr, status, error) {
-                $('#confirmDeleteBtn').prop('disabled', false);
+                $btn.prop('disabled', false);
                 toastr.error('An error occurred while deleting the record.');
                 console.error("Error deleting record: ", error);
               }

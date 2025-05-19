@@ -29,31 +29,73 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 
 if ($user_info['user_type'] == 'staff') {
     $user_id = $user_info['user_id'];
+    $user_ids = [$user_info['user_id']]; // Initialize with current user
+
     $builder = $db->table('ci_erp_users_details');
-    $builder->select('ci_erp_users.first_name , ci_erp_users.last_name,ci_erp_users.user_id');
+    $builder->select('ci_erp_users.first_name, ci_erp_users.last_name, ci_erp_users.user_id');
     $builder->join('ci_erp_users', 'ci_erp_users.user_id = ci_erp_users_details.user_id');
     $builder->where('ci_erp_users_details.reporting_manager', $user_id);
-    $query = $builder->get();
-    $result = $query->getResultArray();
+    $result = $builder->get()->getResultArray();
     $get_data = [];
 
     if (!empty($result)) {
         $user_ids = array_column($result, 'user_id');
-        $user_ids[] = $user_info['user_id'];
-
-        $get_data = $KpiModel->where('company_id', $user_info['company_id'])
-            ->whereIn('user_id', $user_ids)
-            ->orderBy('performance_indicator_id', 'ASC')
-            ->findAll();
-    } else {
-        $get_data = $KpiModel->where('company_id', $user_info['company_id'])
-            ->where('user_id', $user_info['user_id'])
-            ->orderBy('performance_indicator_id', 'ASC')
-            ->findAll();
+        $user_ids[] = $user_info['user_id']; // Add current user to the list
     }
-    $employee_list = $UsersModel->where('company_id', $user_info['company_id'])->whereIn('user_id', $user_ids)->orderBy('user_id', 'ASC')->findAll();
-    $designations = $DesignationModel->where('company_id', $user_info['company_id'])->orderBy('designation_id', 'ASC')->findAll();
-    $competencies = $ConstantsModel->where('company_id', $user_info['company_id'])->where('type', 'competencies')->orderBy('constants_id', 'ASC')->findAll();
+
+    // Get KPI data
+    $get_data = $KpiModel
+        ->where('company_id', $user_info['company_id'])
+        ->whereIn('user_id', $user_ids)
+        ->orderBy('performance_indicator_id', 'ASC')
+        ->findAll();
+
+    // Get employee list (now $user_ids is always defined)
+    $employee_list = $UsersModel
+        ->where('company_id', $user_info['company_id'])
+        ->whereIn('user_id', $user_ids)
+        ->orderBy('user_id', 'ASC')
+        ->findAll();
+
+    // Get designations
+    $designations = $DesignationModel
+        ->where('company_id', $user_info['company_id'])
+        ->orderBy('designation_id', 'ASC')
+        ->findAll();
+
+    // Get competencies
+    $competencies = $ConstantsModel
+        ->where('company_id', $user_info['company_id'])
+        ->where('type', 'competencies')
+        ->orderBy('constants_id', 'ASC')
+        ->findAll();
+
+    // $user_id = $user_info['user_id'];
+    // $builder = $db->table('ci_erp_users_details');
+    // $builder->select('ci_erp_users.first_name , ci_erp_users.last_name,ci_erp_users.user_id');
+    // $builder->join('ci_erp_users', 'ci_erp_users.user_id = ci_erp_users_details.user_id');
+    // $builder->where('ci_erp_users_details.reporting_manager', $user_id);
+    // $query = $builder->get();
+    // $result = $query->getResultArray();
+    // $get_data = [];
+
+    // if (!empty($result)) {
+    //     $user_ids = array_column($result, 'user_id');
+    //     $user_ids[] = $user_info['user_id'];
+
+    //     $get_data = $KpiModel->where('company_id', $user_info['company_id'])
+    //         ->whereIn('user_id', $user_ids)
+    //         ->orderBy('performance_indicator_id', 'ASC')
+    //         ->findAll();
+    // } else {
+    //     $get_data = $KpiModel->where('company_id', $user_info['company_id'])
+    //         ->where('user_id', $user_info['user_id'])
+    //         ->orderBy('performance_indicator_id', 'ASC')
+    //         ->findAll();
+    // }
+    // $employee_list = $UsersModel->where('company_id', $user_info['company_id'])->whereIn('user_id', $user_ids)->orderBy('user_id', 'ASC')->findAll();
+    // $designations = $DesignationModel->where('company_id', $user_info['company_id'])->orderBy('designation_id', 'ASC')->findAll();
+    // $competencies = $ConstantsModel->where('company_id', $user_info['company_id'])->where('type', 'competencies')->orderBy('constants_id', 'ASC')->findAll();
 } else {
     $get_data = $KpiModel->where('company_id', $user_info['company_id'])->orderBy('performance_indicator_id', 'ASC')->findAll();
     $designations = $DesignationModel->where('company_id', $usession['sup_user_id'])->orderBy('designation_id', 'ASC')->findAll();

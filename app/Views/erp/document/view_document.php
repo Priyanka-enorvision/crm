@@ -27,7 +27,7 @@ $user_id = $usession['sup_user_id'];
 
 if ($user_info['user_type'] == 'staff') {
 
-    $employee_list = $UsersModel->where('company_id', $user_info['company_id'])->whereIn('user_id', $user_id)->orderBy('user_id', 'ASC')->findAll();
+    $employee_list = $UsersModel->where('company_id', $user_info['company_id'])->where('user_id', $user_id)->orderBy('user_id', 'ASC')->findAll();
     $category_list = $doc_categoryModel->where(['company_id' => $user_info['company_id'], 'status' => 1])->findAll();
     $singledocument_data = $documentModel->where('id', $document_id)->first();
     $documentoption_item = $itemDocument->where('employe_docu_id', $document_id)->findAll();

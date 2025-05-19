@@ -363,7 +363,7 @@ class Settings extends BaseController
 			return $this->response->setJSON($Return);
 		}
 	}
-	
+
 	public function add_other_logo()
 	{
 		$validation = \Config\Services::validation();
@@ -1514,8 +1514,7 @@ class Settings extends BaseController
 			return $this->response->setJSON($Return);
 		}
 
-		// Get record ID from POST
-		$id = $this->request->getPost('id');
+		$id = $this->request->getGet('id');
 
 		if (!$id) {
 			$Return['error'] = 'Record ID is missing.';

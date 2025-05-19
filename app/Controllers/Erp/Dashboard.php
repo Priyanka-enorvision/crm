@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controllers\Erp;
+
 use App\Controllers\BaseController;
 use App\Models\SystemModel;
 use App\Models\UsersModel;
@@ -13,6 +14,7 @@ use App\Models\Form_model;
 use App\Models\CompanysettingsModel;
 use App\Models\MonthlyPlanReviewModel;
 use App\Models\ProjectsModel;
+use PhpParser\Node\Stmt\Else_;
 
 class Dashboard extends BaseController
 {
@@ -227,7 +229,6 @@ class Dashboard extends BaseController
 
 					$session->setFlashdata('result', 'Company Added Successfully!');
 					return redirect()->to(site_url('erp/web-leads'));
-
 				} else {
 					$session->setFlashdata('error', lang('Main.xin_error_msg'));
 					return redirect()->to(site_url('erp/web-leads'));
@@ -262,12 +263,13 @@ class Dashboard extends BaseController
 			$data = [
 				'lead_status' => 1,
 			];
-			
+
 
 			$UsersModel = new UsersModel();
 			$Form_model = new Form_model();
 			$result = $Form_model->update($id, $data);
-			var_dump($result);die;
+			var_dump($result);
+			die;
 			$web_lead_info = $Form_model->where('id', $id)->first();
 			$name_parts = explode(' ', trim($web_lead_info['name']), 2);
 			$first_name = $name_parts[0];
@@ -349,7 +351,6 @@ class Dashboard extends BaseController
 
 					$session->setFlashdata('result', 'Client Added Successfully!');
 					return redirect()->to(site_url('erp/web-leads-list'));
-
 				} else {
 					$session->setFlashdata('error', lang('Main.xin_error_msg'));
 					return redirect()->to(site_url('erp/web-leads-list'));
@@ -468,7 +469,7 @@ class Dashboard extends BaseController
 			'updated_at'  => date('Y-m-d H:i:s')
 		];
 
-		
+
 
 		// Initialize Form model
 		$Form_model = new Form_model();
@@ -487,7 +488,7 @@ class Dashboard extends BaseController
 		$db->transStart();
 
 		try {
-			
+
 			$updateSuccessful = $Form_model->update($postData['web_lead_id'], $data);
 			$db->transComplete();
 
@@ -504,7 +505,6 @@ class Dashboard extends BaseController
 				'status' => 'success',
 				'message' => 'Web Lead updated successfully!'
 			]);
-
 		} catch (\Exception $e) {
 			// Rollback on error
 			$db->transRollback();
@@ -545,7 +545,6 @@ class Dashboard extends BaseController
 		$data['path_url'] = 'planning_configuration';
 		$data['subview'] = view('erp/planning/planning_entity', $data);
 		return view('erp/layout/layout_main', $data);
-
 	}
 
 	public function add_planning_entities()
@@ -753,7 +752,7 @@ class Dashboard extends BaseController
 		}
 	}
 
-	
+
 
 	public function delete_planning_entity()
 	{
@@ -778,7 +777,7 @@ class Dashboard extends BaseController
 
 			// Delete related records first
 			$YearPlanningModel->where('entities_id', $data['id'])->delete();
-			
+
 			// Delete main entity
 			$result = $PlanningEntityModel->delete($id);
 
@@ -787,7 +786,7 @@ class Dashboard extends BaseController
 			} else {
 				$session->setFlashdata('error', 'Failed to delete entity.');
 			}
-			
+
 			// Redirect back to the same page
 			return redirect()->back();
 		}
@@ -807,7 +806,6 @@ class Dashboard extends BaseController
 		$data['path_url'] = 'yearplanningform';
 		$data['subview'] = view('erp/planning/yearplanningform', $data);
 		return view('erp/layout/layout_main', $data);
-
 	}
 
 	public function year_planning_submit()
@@ -961,7 +959,7 @@ class Dashboard extends BaseController
 			'user_type' => $user_type,
 			'updated_at' => date('Y-m-d H:i:s')
 		];
-		
+
 		$data2 = [
 			'entities_id' => $postData['year_planning_id'],
 			'entity_value' => $postData['entity_value'],
@@ -988,7 +986,7 @@ class Dashboard extends BaseController
 				}
 				$message = 'Year planning updated successfully!';
 			}
-			
+
 			$db->transComplete();
 
 			// Clear cache
@@ -1000,7 +998,6 @@ class Dashboard extends BaseController
 				'status' => 'success',
 				'message' => $message
 			]);
-
 		} catch (\Exception $e) {
 			$db->transRollback();
 			return $this->response->setJSON([
@@ -1053,7 +1050,7 @@ class Dashboard extends BaseController
 				]);
 			}
 
-			$result = $YearPlanningModel->where('id',$id)->delete();
+			$result = $YearPlanningModel->where('id', $id)->delete();
 
 			if ($result) {
 				$session->setFlashdata('success', 'Year planning data deleted successfully.');
@@ -1134,65 +1131,77 @@ class Dashboard extends BaseController
 		$MonthlyPlanningModel = new MonthlyPlanningModel();
 		$YearPlanningModel = new YearPlanningModel();
 
+		// Get the posted data
 		$entities_data = $this->request->getPost('entities');
 		$year = $this->request->getPost('year');
-		$month = $this->request->getPost('month');
-		$month = strtolower($month);
+		$month = $this->request->getPost('month'); // Changed from getVar to getPost for consistency
+
+		$month = strtolower($year);
+
+		// echo $month;
+		// echo $year;
+		// echo $entities_data;
+		// die;
 
 		$yearData = $YearPlanningModel->where(['company_id' => $company_id, 'user_type' => $user_type, 'year' => $year])->first();
-		$existingYear = $yearData['year'];
 
-		if ($existingYear) {
+		if (!empty($yearData)) {
+			$existingYear = $yearData['year'];
 
-			$record = $MonthlyPlanningModel->where(['company_id' => $company_id, 'user_type' => $user_type, 'year' => $year, 'month' => $month])->first();
+			if ($existingYear) {
 
-			if ($record == null) {
-				$errors = [];
+				$record = $MonthlyPlanningModel->where(['company_id' => $company_id, 'user_type' => $user_type, 'year' => $year, 'month' => $month])->first();
 
-				if (!empty($entities_data)) {
-					foreach ($entities_data as $entity_data) {
-						if (
-							isset($entity_data['entities_id']) && !empty($entity_data['entities_id']) &&
-							isset($entity_data['entity_value']) && !empty($entity_data['entity_value'])
-						) {
-							$data = [
-								'entities_id' => $entity_data['entities_id'],
-								'entity_value' => $entity_data['entity_value'],
-								'year' => $year,
-								'month' => $month,
-								'company_id' => $company_id,
-								'user_type' => $user_type,
-							];
+				if ($record == null) {
+					$errors = [];
 
-							if (!$MonthlyPlanningModel->insert($data)) {
-								$errors[] = $MonthlyPlanningModel->errors();
+					if (!empty($entities_data)) {
+						foreach ($entities_data as $entity_data) {
+							if (
+								isset($entity_data['entities_id']) && !empty($entity_data['entities_id']) &&
+								isset($entity_data['entity_value']) && !empty($entity_data['entity_value'])
+							) {
+								$data = [
+									'entities_id' => $entity_data['entities_id'],
+									'entity_value' => $entity_data['entity_value'],
+									'year' => $year,
+									'month' => $month,
+									'company_id' => $company_id,
+									'user_type' => $user_type,
+								];
+
+								if (!$MonthlyPlanningModel->insert($data)) {
+									$errors[] = $MonthlyPlanningModel->errors();
+								}
+							} else {
+								$errors[] = 'Missing required fields for entity ID ' . (isset($entity_data['entities_id']) ? $entity_data['entities_id'] : 'unknown');
 							}
-						} else {
-							$errors[] = 'Missing required fields for entity ID ' . (isset($entity_data['entities_id']) ? $entity_data['entities_id'] : 'unknown');
 						}
+					} else {
+						$errors[] = 'No data was received';
 					}
-				} else {
-					$errors[] = 'No data was received';
-				}
 
-				if (!empty($errors)) {
+					if (!empty($errors)) {
+						return $this->response->setJSON([
+							'status' => 'error',
+							'errors' => $errors
+						]);
+					}
 					return $this->response->setJSON([
-						'status' => 'error',
-						'errors' => $errors
+						'status' => 'success',
+						'message' => 'Form submitted successfully!'
 					]);
+				} else {
+					return $this->response->setJSON(['message' => 'This Year Month Data Already Exists.']);
 				}
-				return $this->response->setJSON([
-					'status' => 'success',
-					'message' => 'Form submitted successfully!'
-				]);
 			} else {
-				return $this->response->setJSON(['message' => 'This Year Month Data Already Exists.']);
+				return $this->response->setJSON(['message' => 'First Plan This Year Data']);
 			}
 		} else {
 			return $this->response->setJSON(['message' => 'First Plan This Year Data']);
 		}
 	}
-	
+
 
 	public function monthly_planning_detail($ifield_id)
 	{
@@ -1307,12 +1316,9 @@ class Dashboard extends BaseController
 			} else {
 				return $this->response->setJSON(['message' => 'FIrst Plan This  Month Data']);
 			}
-
 		} else {
 			return $this->response->setJSON(['message' => 'First Plan This Year Data']);
 		}
-
-
 	}
 
 	public function monthly_planning_review($ifield_id)
@@ -1434,18 +1440,18 @@ class Dashboard extends BaseController
 		try {
 			if (empty($record)) {
 				$insertID = $MonthlyPlanningModel->insert($insertData);
-				
+
 				if (!$insertID) {
 					throw new \Exception('Failed to insert record');
 				}
-				
+
 				$returnId = $insertID;
 				$action = 'inserted';
 			} else {
 				if (!$MonthlyPlanningModel->update($postData['monthly_planning_id'], $updateData)) {
 					throw new \Exception('Failed to update record');
 				}
-				
+
 				$returnId = $postData['monthly_planning_id'];
 				$action = 'updated';
 			}
@@ -1464,7 +1470,6 @@ class Dashboard extends BaseController
 					'entity_value' => $postData['entity_value']
 				]
 			]);
-
 		} catch (\Exception $e) {
 			$db->transRollback();
 			return $this->response->setJSON([
@@ -1500,7 +1505,7 @@ class Dashboard extends BaseController
 		}
 
 		$company_id = $user_info['company_id'];
-		
+
 		$user_type = $user_info['user_type'];
 
 		$rules = [
@@ -1604,5 +1609,4 @@ class Dashboard extends BaseController
 			}
 		}
 	}
-
 }

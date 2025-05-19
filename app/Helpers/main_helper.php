@@ -1808,4 +1808,47 @@ if (!function_exists('all_timezones')) {
 			return count($result); // Return the count of rows
 		}
 	}
+	if (!function_exists('getSalaryTax')) {
+		function getSalaryTax($annualSalary, $deductions)
+		{
+			// Ensure valid numeric values for salary and deductions
+			$annualSalary = is_numeric($annualSalary) ? $annualSalary : 0;
+			$deductions = is_numeric($deductions) ? $deductions : 0;
+
+			// Calculate the net taxable income
+			$netTaxableIncome = $annualSalary - $deductions;
+
+			// Ensure net taxable income is non-negative
+			$netTaxableIncome = max($netTaxableIncome, 0);
+
+			$tax = 0;
+
+			// Old tax regime slabs
+			if ($netTaxableIncome <= 250000) {
+				$tax = 0; // No tax for income up to Rs. 2,50,000
+			} elseif ($netTaxableIncome <= 500000) {
+				$tax = ($netTaxableIncome - 250000) * 0.05; // 5% tax for income between Rs. 2,50,001 and Rs. 5,00,000
+			} elseif ($netTaxableIncome <= 1000000) {
+				$tax = (250000 * 0.05) + (($netTaxableIncome - 500000) * 0.20); // 20% tax for income between Rs. 5,00,001 and Rs. 10,00,000
+			} else {
+				$tax = (250000 * 0.05) + (500000 * 0.20) + (($netTaxableIncome - 1000000) * 0.30); // 30% tax for income above Rs. 10,00,000
+			}
+
+			// Add 4% cess to the tax
+			$cess = $tax * 0.04;
+			$totalTax = $tax + $cess;
+
+			// Return the total tax formatted to 2 decimal places
+			return number_format($totalTax, 2, '.', '');
+		}
+	}
+
+	if (!function_exists('generateCertificateNumber')) {
+		function generateCertificateNumber($length = 7)
+		{
+			$randomBytes = random_bytes(ceil($length / 2));
+			$randomString = strtoupper(bin2hex($randomBytes));
+			return substr($randomString, 0, $length);
+		}
+	}
 }

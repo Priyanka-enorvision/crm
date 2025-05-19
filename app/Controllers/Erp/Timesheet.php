@@ -462,47 +462,72 @@ class Timesheet extends BaseController
 
 		// Get current user info
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+		if (!$user_info) {
+			return $this->response->setJSON([
+				"csrf_hash" => csrf_hash(),
+				"error" => "User not found"
+			]);
+		}
 
-		// Base query
+		// Base query setup
+		$timesheetQuery = $TimesheetModel->select('*')
+			->orderBy('time_attendance_id', 'ASC');
+
+		// Set company ID based on user type
 		$companyId = ($user_info['user_type'] == 'staff')
 			? $user_info['company_id']
 			: $usession['sup_user_id'];
 
-		$timesheetQuery = $TimesheetModel->where('company_id', $companyId)
-			->orderBy('time_attendance_id', 'ASC');
+		$timesheetQuery->where('company_id', $companyId);
 
-		// Filter by user and date if provided
-		if ($request->getGet('user') && $request->getGet('date')) {
-			$uid = ($user_info['user_type'] == 'staff')
-				? $usession['sup_user_id']
-				: $request->getGet('user');
+		// Handle filters
+		$userId = $request->getGet('user');
+		$date = $request->getGet('date');
 
-			$timesheetQuery->where('employee_id', $uid)
-				->where('attendance_date', $request->getGet('date'));
+		// For staff users, restrict to their own records unless filtering
+		if ($user_info['user_type'] == 'staff') {
+			if (!$userId && !$date) {
+				$timesheetQuery->where('employee_id', $usession['sup_user_id']);
+			} elseif ($userId && $userId != $usession['sup_user_id']) {
+				// Prevent staff from viewing other users' data
+				return $this->response->setJSON([
+					"csrf_hash" => csrf_hash(),
+					"error" => "Unauthorized access"
+				]);
+			}
+		}
+
+		// Apply filters if provided
+		if ($userId) {
+			$timesheetQuery->where('employee_id', $userId);
+		}
+		if ($date) {
+			$timesheetQuery->where('attendance_date', $date);
 		}
 
 		$get_data = $timesheetQuery->findAll();
 
-		// Preload user data to avoid N+1 queries
+		// Preload user data
 		$userIds = array_column($get_data, 'employee_id');
-		$users = $userIds ? $UsersModel->whereIn('user_id', $userIds)->findAll() : [];
+		$users = !empty($userIds) ? $UsersModel->whereIn('user_id', $userIds)->findAll() : [];
 		$usersMap = array_column($users, null, 'user_id');
 
 		$data = [];
-		foreach ($get_data as $r) {
-			$iuser = $usersMap[$r['employee_id']] ?? null;
-			$uname = $iuser
-				? $iuser['first_name'] . ' ' . $iuser['last_name']
-				: 'Unknown User';
-			$email = $iuser['email'] ?? '';
+		foreach ($get_data as $record) {
+			$user = $usersMap[$record['employee_id']] ?? null;
 
-			// Action buttons
+			// User info
+			$fullName = $user ? $user['first_name'] . ' ' . $user['last_name'] : 'Unknown User';
+			$email = $user['email'] ?? '';
+			$profilePhoto = $user['profile_photo'] ?? 'default.png';
+
+			// Action buttons (only show if user has permission)
 			$edit = $delete = '';
 			if (in_array('upattendance3', staff_role_resource()) || $user_info['user_type'] == 'company') {
 				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_edit') . '">
                 <button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" 
                     data-toggle="modal" data-target=".edit-modal-data" 
-                    data-field_id="' . uencode($r['time_attendance_id']) . '">
+                    data-field_id="' . uencode($record['time_attendance_id']) . '">
                     <i class="feather icon-edit"></i>
                 </button>
             </span>';
@@ -512,35 +537,34 @@ class Timesheet extends BaseController
 				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '">
                 <button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" 
                     data-toggle="modal" data-target=".delete-modal" 
-                    data-record-id="' . uencode($r['time_attendance_id']) . '">
+                    data-record-id="' . uencode($record['time_attendance_id']) . '">
                     <i class="feather icon-trash-2"></i>
                 </button>
             </span>';
 			}
 
-			$profilePhoto = $iuser['profile_photo'] ?? 'default.png';
-			$fname = '<div class="d-inline-block align-middle">
+			$userDisplay = '<div class="d-inline-block align-middle">
             <img src="' . base_url("uploads/users/thumb/{$profilePhoto}") . '" 
                 alt="user image" class="img-radius align-top m-r-15" style="width:40px;">
             <div class="d-inline-block">
-                <h6 class="m-b-0">' . $uname . '</h6>
+                <h6 class="m-b-0">' . $fullName . '</h6>
                 <p class="m-b-0">' . $email . '</p>
             </div>
         </div>';
 
 			$data[] = [
-				$fname . '<div class="overlay-edit">' . $edit . $delete . '</div>',
-				set_date_format($r['attendance_date']),
-				$r['clock_in'] ? date("h:i a", strtotime($r['clock_in'])) : '-',
-				$r['clock_out'] ? date("h:i a", strtotime($r['clock_out'])) : '-',
-				$r['total_work'] ?? '-',
+				$userDisplay . '<div class="overlay-edit">' . $edit . $delete . '</div>',
+				set_date_format($record['attendance_date']),
+				$record['clock_in'] ? date("h:i a", strtotime($record['clock_in'])) : '-',
+				$record['clock_out'] ? date("h:i a", strtotime($record['clock_out'])) : '-',
+				$record['total_work'] ?? '-',
 			];
 		}
 
 		return $this->response->setJSON([
 			"csrf_hash" => csrf_hash(),
 			"data" => $data,
-			"result" => "Success" // Added for consistent response structure
+			"result" => "Success"
 		]);
 	}
 
@@ -853,7 +877,7 @@ class Timesheet extends BaseController
 
 	public function add_attendance()
 	{
-		$validation =  \Config\Services::validation();
+		$validation = \Config\Services::validation();
 		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
@@ -884,19 +908,22 @@ class Timesheet extends BaseController
 				]
 			];
 
-			if (!$this->validate($rules)) {
-				$ruleErrors = [
-					"attendance_date_m" => $validation->getError('attendance_date_m'),
-					"clock_in_m" => $validation->getError('clock_in_m'),
-					"clock_out_m" => $validation->getError('clock_out_m')
+			$this->validate($rules);
+
+			if ($validation->hasError('attendance_date_m') || $validation->hasError('clock_in_m') || $validation->hasError('clock_out_m')) {
+				// Get all validation errors
+				$errors = [
+					'attendance_date_m' => $validation->getError('attendance_date_m'),
+					'clock_in_m' => $validation->getError('clock_in_m'),
+					'clock_out_m' => $validation->getError('clock_out_m')
 				];
-				foreach ($ruleErrors as $err) {
-					$Return['error'] = $err;
-					if ($Return['error'] != '') {
-						$this->output($Return);
-						exit;
-					}
-				}
+
+				// Combine all error messages
+				$errorMessages = array_filter($errors); // Remove empty values
+				$Return['error'] = implode("\n", $errorMessages);
+
+				return $this->response->setJSON($Return);
+				exit;
 			} else {
 				$attendance_date = $this->request->getPost('attendance_date_m', FILTER_SANITIZE_STRING);
 				$clock_in = $this->request->getPost('clock_in_m', FILTER_SANITIZE_STRING);
@@ -964,12 +991,10 @@ class Timesheet extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg') . ' Error';
 				}
 				return $this->response->setJSON($Return);
-				exit;
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
 		}
 	}
 
@@ -1427,7 +1452,7 @@ class Timesheet extends BaseController
 					$total_rest = '';
 				} else {
 					$check_user_attendance_value = check_user_attendance_value();
-					
+
 					$cout = date_create($check_user_attendance_value[0]['clock_out']);
 					$cin = date_create($nowtime);
 
@@ -1496,7 +1521,6 @@ class Timesheet extends BaseController
 			}
 			$Return['csrf_hash'] = csrf_hash();
 			return $this->response->setJSON($Return);
-			
 		}
 	}
 }

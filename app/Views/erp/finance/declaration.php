@@ -791,36 +791,38 @@ if ($user_info['user_type'] == 'staff') {
                                         formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
 
                                         $.ajax({
-                                            url: '<?= base_url('erp/finance/tax_updateItem') ?>',
+                                            url: '<?= base_url('erp/tax_updateItem') ?>',
                                             type: 'POST',
                                             dataType: 'json',
                                             processData: false,
                                             contentType: false,
                                             data: formData,
-                                            success: function(response) {
-                                                if (response.success) {
-                                                    toastr.success('Updated successfully!', 'Success');
-                                                    setTimeout(function() {
-                                                        location.reload();
-                                                    }, 1000);
-                                                } else {
-                                                    toastr.error(response.message || 'Failed to update', 'Error');
+                                            success: function(response) { // Changed parameter name from JSON to response
+                                                if (response.error) {
+                                                    toastr.error(response.error);
+                                                    Ladda.stopAll();
+                                                } else if (response.result) {
+                                                    toastr.success(response.result);
+                                                    Ladda.stopAll();
+                                                    // Optional: reload or update the table/data
                                                 }
                                             },
-                                            error: function(xhr, status, error) {
-                                                alert(error);
+                                            error: function(xhr, error, thrown) {
+                                                console.log("AJAX Error: ", xhr.responseText);
+                                                toastr.error("An error occurred while saving.");
+                                                Ladda.stopAll();
                                             }
                                         });
                                     }
                                 </script>
 
                                 <?php if ($user_info['user_type'] == 'staff') { ?>
-                                    <form id="declarationForm" action="<?= base_url('erp/Finance/save_declaration') ?>" method="post" enctype="multipart/form-data">
-
+                                    <form id="declarationForm" enctype="multipart/form-data">
+                                        <input type="hidden" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
                                         <tr id="newDataRow">
                                             <td>
                                                 <select id="section" name="section" class="form-control" required style="width: 150px;">
-                                                    <option value="" disabled selected> Section</option>
+                                                    <option value="" disabled selected>Section</option>
                                                     <option value="80C">80C</option>
                                                     <option value="80D">80D</option>
                                                     <option value="80E">80E</option>
@@ -830,8 +832,8 @@ if ($user_info['user_type'] == 'staff') {
                                                 </select>
                                             </td>
                                             <td>
-                                                <select id="investment_name" name="name" class="form-control" required style="width: 200px;">
-                                                    <option value="" disabled selected>Select Deduction</option>
+                                                <select id="investment_name" name="name" class="form-control" required style="width: 200px;" disabled>
+                                                    <option value="" disabled selected>Select Section First</option>
                                                 </select>
                                             </td>
                                             <td>
@@ -885,6 +887,7 @@ if ($user_info['user_type'] == 'staff') {
 
                 </ul>
             </div>
+
             <div class="tab-pane fade" id="forms-tab" role="tabpanel">
                 <div class="card">
                     <div class=" panel_s" style="background-color: #d9d8d8;">
@@ -898,13 +901,16 @@ if ($user_info['user_type'] == 'staff') {
                                             needed for filing tax returns.
                                         </p>
                                         <div class="d-flex align-items-center">
-                                            <select class="form-select me-3" style="width: 232px; height: 39px;margin-right: 25px;" aria-label="Select Financial Year">
+                                            <!-- <select class="form-select me-3" style="width: 232px; height: 39px;margin-right: 25px;" aria-label="Select Financial Year">
                                                 <option selected>Select Financial Year</option>
                                                 <option value="2024">2024</option>
                                                 <option value="2025">2025</option>
-                                            </select>
-                                            <button class="btn px-4 py-2" style="background-color: #6e6f71;color:white;">
-                                                Download Form 16 <i class="fas fa-download"></i>
+                                            </select> -->
+                                            <button class="btn px-4 py-2" style="margin-right: 25px;background-color: #6e6f71;color:white;" id="generatePdfButton">
+                                                Form 16 Part A <i class="fas fa-download"></i>
+                                            </button>
+                                            <button class="btn px-4 py-2" style="background-color: #6e6f71;color:white;" id="generatePdf_partb">
+                                                Form 16 Part B <i class="fas fa-download"></i>
                                             </button>
                                         </div>
 
@@ -938,6 +944,7 @@ if ($user_info['user_type'] == 'staff') {
                     </div>
                 </div>
             </div>
+
 
             <div class="tab-pane fade" id="tax-saving-investment" role="tabpanel">
                 <div class="card">
@@ -984,11 +991,12 @@ if ($user_info['user_type'] == 'staff') {
                 </div>
             </div>
         </div>
-
-
-
-
     </div>
+
+
+
+
+</div>
 
 </div>
 
@@ -1031,51 +1039,70 @@ if ($user_info['user_type'] == 'staff') {
             var formData = new FormData(this);
             $('#addRowBtn').prop('disabled', true).html('Loading...');
             $.ajax({
-                url: '<?= base_url('erp/Finance/save_declaration') ?>',
+                url: '<?= base_url('erp/save-declaration') ?>',
                 type: 'POST',
                 data: formData,
                 processData: false,
                 contentType: false,
                 dataType: 'json',
+
                 success: function(response) {
                     $('#addRowBtn').prop('disabled', false).html('Add');
-                    if (response.status === 'success') {
-                        toastr.success(response.message);
-                    } else {
-                        toastr.error(response.message);
+                    if (response.error) {
+                        toastr.error(response.error);
+                        Ladda.stopAll();
+                    } else if (response.result) {
+                        toastr.success(response.result);
+                        Ladda.stopAll();
+                        // Optional: reload or update the table/data
                     }
                 },
-                error: function(xhr, status, error) {
+                error: function(xhr, error, thrown) {
                     $('#addRowBtn').prop('disabled', false).html('Add');
-                    alert('Error: ' + error);
+                    console.log("AJAX Error: ", xhr.responseText);
                 }
             });
         });
 
         $('#section').change(function() {
             var section = $(this).val();
+            var investmentDropdown = $('#investment_name');
 
             if (section) {
+                investmentDropdown.prop('disabled', false);
+
                 $.ajax({
-                    url: '<?= base_url('erp/finance/getInvestmentname') ?>',
-                    type: 'POST',
+                    url: '<?= base_url('erp/get-investmentname') ?>',
+                    type: 'GET',
                     dataType: 'json',
                     data: {
                         section: section,
                         <?= csrf_token() ?>: '<?= csrf_hash() ?>'
                     },
+                    beforeSend: function() {
+                        investmentDropdown.empty().append('<option value="">Loading...</option>');
+                    },
                     success: function(response) {
-                        $('#investment_name').empty();
-                        $('#investment_name').append('<option value="" disabled selected>Select Investment</option>');
+                        investmentDropdown.empty();
 
-                        $.each(response, function(index, investment) {
-                            $('#investment_name').append('<option value="' + investment.investment_name + '">' + investment.investment_name + '</option>');
-                        });
+                        if (response.length > 0) {
+                            investmentDropdown.append('<option value="" disabled selected>Select Investment</option>');
+                            $.each(response, function(index, investment) {
+                                investmentDropdown.append('<option value="' + investment.investment_name + '">' + investment.investment_name + '</option>');
+                            });
+                        } else {
+                            investmentDropdown.append('<option value="" disabled>No investments found</option>');
+                        }
                     },
                     error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                        investmentDropdown.empty().append('<option value="" disabled>Error loading investments</option>');
                         toastr.error('Error fetching investment names: ' + error);
                     }
                 });
+            } else {
+                investmentDropdown.empty().append('<option value="" disabled selected>Select Section First</option>');
+                investmentDropdown.prop('disabled', true);
             }
         });
     });
@@ -1090,7 +1117,7 @@ if ($user_info['user_type'] == 'staff') {
             var id = this.getAttribute('data-id');
             if (status) {
                 $.ajax({
-                    url: '<?= base_url('erp/finance/tax_statusUpdate') ?>',
+                    url: '<?= base_url('erp/tax-statusUpdate') ?>',
                     type: 'POST',
                     dataType: 'json',
                     data: {
@@ -1115,7 +1142,12 @@ if ($user_info['user_type'] == 'staff') {
 </script>
 
 
-
+<script>
+    document.getElementById('generatePdf_partb').addEventListener('click', function() {
+        var employeeId = '<?= $employe_id ?>';
+        window.location.href = '<?= base_url('erp/form16-partB') ?>' + '/' + employeeId;
+    });
+</script>
 <script>
     $(document).ready(function() {
         <?php if (session()->getFlashdata('error')): ?>
@@ -1170,34 +1202,33 @@ if ($user_info['user_type'] == 'staff') {
 
         $('#confirmDeleteBtn').on('click', function() {
             var recordId = $(this).data('record-id');
-            var URL = '<?= base_url('erp/Finance/delete_alltaxProof') ?>/' + recordId;
+            var URL = '<?= base_url('erp/delete-alltaxProof') ?>/' + recordId;
             $('#confirmDeleteBtn').prop('disabled', true);
 
             $.ajax({
                 url: URL,
-                type: 'POST',
+                type: 'DELETE',
                 dataType: "json",
                 data: {
                     <?= csrf_token() ?>: '<?= csrf_hash() ?>', // Include the CSRF token
                 },
-                success: function(response) {
-                    $('#confirmDeleteBtn').prop('disabled', false); // Re-enable the button
-                    if (response.result) {
-                        toastr.success(response.result);
+
+                success: function(JSON) {
+                    $('#confirmDeleteBtn').prop('disabled', false);
+                    if (JSON.error != '') {
+                        toastr.error(JSON.error);
+                        $('input[name="csrf_token"]').val(JSON.csrf_hash);
+                        Ladda.stopAll();
+                    } else {
                         $('#deleteModal').modal('hide');
-                        setTimeout(function() {
-                            if (response.redirect_url) {
-                                window.location.href = response.redirect_url;
-                            } else {
-                                location.reload(); // Fallback to reload if no URL provided
-                            }
-                        }, 1000);
-                    } else if (response.error) {
-                        toastr.error(response.error);
+                        toastr.success(JSON.result);
+                        window.location.href = JSON.redirect_url;
+                        $('input[name="csrf_token"]').val(JSON.csrf_hash);
+
+                        Ladda.stopAll();
                     }
-                    $('input[name="<?= csrf_token() ?>"]').val(response.csrf_hash); // Update CSRF token
                 },
-                error: function(xhr, status, error) {
+                error: function(xhr, error, thrown) {
                     $('#confirmDeleteBtn').prop('disabled', false); // Re-enable the button
                     toastr.error('An error occurred while deleting the record.');
                     console.error("Error deleting record: ", error);
@@ -1207,6 +1238,12 @@ if ($user_info['user_type'] == 'staff') {
     });
 </script>
 
+<script>
+    document.getElementById('generatePdfButton').addEventListener('click', function() {
+        var employeeId = '<?= $employe_id ?>';
+        window.location.href = '<?= base_url('erp/generate-Pdf') ?>' + '/' + employeeId;
+    });
+</script>
 <script>
     const ctx = document.getElementById('financeChart').getContext('2d');
     const financeChart = new Chart(ctx, {

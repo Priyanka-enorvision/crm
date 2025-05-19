@@ -42,75 +42,75 @@ $monthly_planning_data = $MonthlyPlanningModel->where(['company_id' => $company_
 $planned_entity_ids = array_column($monthly_planning_data, 'entities_id');
 
 
-$unplanned_entities = array_filter($planning_entities, function($entity) use ($planned_entity_ids) {
-    return !in_array($entity['id'], $planned_entity_ids);
+$unplanned_entities = array_filter($planning_entities, function ($entity) use ($planned_entity_ids) {
+  return !in_array($entity['id'], $planned_entity_ids);
 });
 $record = [];
 
 if (!empty($monthly_planning_data)) {
-    $currentYear = (int)date('Y');
-    $currentMonth = (int)date('n');
-    $monthNames = ['january'=>1,'february'=>2,'march'=>3,'april'=>4,'may'=>5,'june'=>6,'july'=>7,'august'=>8,'september'=>9,'october'=>10,'november'=>11,'december'=>12];
-    $entityCache = [];
-    $i=0;
+  $currentYear = (int)date('Y');
+  $currentMonth = (int)date('n');
+  $monthNames = ['january' => 1, 'february' => 2, 'march' => 3, 'april' => 4, 'may' => 5, 'june' => 6, 'july' => 7, 'august' => 8, 'september' => 9, 'october' => 10, 'november' => 11, 'december' => 12];
+  $entityCache = [];
+  $i = 0;
 
-    foreach ($monthly_planning_data as $r) {
-        $recordMonthName = strtolower(explode('-', $r['month'])[0]);
-        $recordMonth = $monthNames[$recordMonthName] ?? 0;
-        $recordYear = (int)substr($r['year'], 0, 4);
-        
-        // Check if record is editable (current or next month)
-        $isEditable = ($recordYear == $currentYear && $recordMonth == $currentMonth) || 
-                     ($recordYear == $currentYear && $recordMonth == $currentMonth + 1) || 
-                     ($currentMonth == 1 && $recordYear == $currentYear + 1 && $recordMonth == 12);
-        
-        // Generate action buttons
-        $actions = '';
-        if (in_array('monthly_planning4', staff_role_resource()) || $user_info['user_type'] == 'company') {
-            $actions .= '<button type="button" class="btn btn-sm btn-light-danger delete-monthly-planning" data-toggle="modal" data-target=".delete-modal" data-record-id="'.$r['id'].'" title="Delete"><i class="feather icon-trash-2"></i></button>';
-        }
-        if (in_array('monthly_planning3', staff_role_resource()) || $user_info['user_type'] == 'company') {
-            $actions .= $isEditable 
-                ? '<a href="'.site_url('erp/monthly-planning-detail/'.$r['id']).'" class="btn btn-sm btn-light-primary" title="Edit"><i class="feather icon-edit"></i></a>'
-                : '<button class="btn btn-sm btn-light-secondary" disabled title="Editing Disabled"><i class="feather icon-edit"></i></button>';
-        }
-        if (in_array('monthly_planning5', staff_role_resource()) || $user_info['user_type'] == 'company') {
-            $actions .= '<a href="'.site_url('erp/monthly-planning-review/'.$r['id']).'" class="btn btn-sm btn-light-warning" title="Review"><i class="feather icon-eye"></i></a>';
-        }
+  foreach ($monthly_planning_data as $r) {
+    $recordMonthName = strtolower(explode('-', $r['month'])[0]);
+    $recordMonth = $monthNames[$recordMonthName] ?? 0;
+    $recordYear = (int)substr($r['year'], 0, 4);
 
-        // Cache entity data to reduce queries
-        if (!isset($entityCache[$r['entities_id']])) {
-            $entity_data = $PlanningEntityModel->where('id', $r['entities_id'])->first();
-            $entityCache[$r['entities_id']] = $entity_data['entity'] ?? 'N/A';
-        }
-        $i++;
-        $record[] = [
-            $i,
-            $entityCache[$r['entities_id']],
-            ($entityCache[$r['entities_id']] == 'revenue') ? '₹'.$r['entity_value'] : $r['entity_value'],
-            $r['year'],
-            $r['month'],
-            $actions
-        ];
+    // Check if record is editable (current or next month)
+    $isEditable = ($recordYear == $currentYear && $recordMonth == $currentMonth) ||
+      ($recordYear == $currentYear && $recordMonth == $currentMonth + 1) ||
+      ($currentMonth == 1 && $recordYear == $currentYear + 1 && $recordMonth == 12);
+
+    // Generate action buttons
+    $actions = '';
+    if (in_array('monthly_planning4', staff_role_resource()) || $user_info['user_type'] == 'company') {
+      $actions .= '<button type="button" class="btn btn-sm btn-light-danger delete-monthly-planning" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r['id'] . '" title="Delete"><i class="feather icon-trash-2"></i></button>';
+    }
+    if (in_array('monthly_planning3', staff_role_resource()) || $user_info['user_type'] == 'company') {
+      $actions .= $isEditable
+        ? '<a href="' . site_url('erp/monthly-planning-detail/' . $r['id']) . '" class="btn btn-sm btn-light-primary" title="Edit"><i class="feather icon-edit"></i></a>'
+        : '<button class="btn btn-sm btn-light-secondary" disabled title="Editing Disabled"><i class="feather icon-edit"></i></button>';
+    }
+    if (in_array('monthly_planning5', staff_role_resource()) || $user_info['user_type'] == 'company') {
+      $actions .= '<a href="' . site_url('erp/monthly-planning-review/' . $r['id']) . '" class="btn btn-sm btn-light-warning" title="Review"><i class="feather icon-eye"></i></a>';
     }
 
-    foreach ($unplanned_entities as $entity) {
-      $actions = '';
-      if (in_array('monthly_planning3', staff_role_resource()) || $user_info['user_type'] == 'company') {
-        $actions .= $isEditable 
-            ? '<a href="'.site_url('erp/monthly-planning-detail/'.uencode($entity['id'])).'" class="btn btn-sm btn-light-primary" title="Edit"><i class="feather icon-edit"></i></a>'
-            : '<button class="btn btn-sm btn-light-secondary" disabled title="Editing Disabled"><i class="feather icon-edit"></i></button>';
-      }
-  
-      $record[] = [
-          $entity['id'],
-          $entity['entity'],
-          '-',
-          '-',
-          '-',
-          $actions
-      ];
+    // Cache entity data to reduce queries
+    if (!isset($entityCache[$r['entities_id']])) {
+      $entity_data = $PlanningEntityModel->where('id', $r['entities_id'])->first();
+      $entityCache[$r['entities_id']] = $entity_data['entity'] ?? 'N/A';
     }
+    $i++;
+    $record[] = [
+      $i,
+      $entityCache[$r['entities_id']],
+      ($entityCache[$r['entities_id']] == 'revenue') ? '₹' . $r['entity_value'] : $r['entity_value'],
+      $r['year'],
+      $r['month'],
+      $actions
+    ];
+  }
+
+  foreach ($unplanned_entities as $entity) {
+    $actions = '';
+    if (in_array('monthly_planning3', staff_role_resource()) || $user_info['user_type'] == 'company') {
+      $actions .= $isEditable
+        ? '<a href="' . site_url('erp/monthly-planning-detail/' . uencode($entity['id'])) . '" class="btn btn-sm btn-light-primary" title="Edit"><i class="feather icon-edit"></i></a>'
+        : '<button class="btn btn-sm btn-light-secondary" disabled title="Editing Disabled"><i class="feather icon-edit"></i></button>';
+    }
+
+    $record[] = [
+      $entity['id'],
+      $entity['entity'],
+      '-',
+      '-',
+      '-',
+      $actions
+    ];
+  }
 }
 
 ?>
@@ -148,124 +148,125 @@ if (!empty($monthly_planning_data)) {
                   <?php if (!empty($planning_entities)): ?>
                     <form id="add-form" method="post" autocomplete="off">
                       <div class="row">
-                          <!-- Financial Year Selection -->
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                  <label for="financial_year" class="font-weight-bold">Financial Year<span class="text-danger">*</span></label>
-                                  <?php
-                                    
-                                    $currentYear = (int)date('Y');
-                                    $currentMonth = (int)date('n');
-                                    $unique_years = $unique_years ?? []; 
-                                    $financialYearStart = ($currentMonth >= 4) ? $currentYear : $currentYear - 1;
-                                    $currentFY = sprintf("%d-%02d", $financialYearStart, ($financialYearStart + 1) % 100);
-                                    ?>
+                        <!-- Financial Year Selection -->
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="financial_year" class="font-weight-bold">Financial Year<span class="text-danger">*</span></label>
+                            <?php
 
-                                    <select class="form-control" id="financial_year" name="year" required>
-                                        <option value="">Select Financial Year</option>
-                                        <?php if (!empty($unique_years)): ?>
-                                            <?php foreach ($unique_years as $year): ?>
-                                                <?php
-                                                
-                                                $year = (int)$year;
-                                                if ($year < 2000 || $year > 2100) continue;
-                                                
-                                                $startYear = $year;
-                                                $endYear = $year + 1;
-                                                $fyValue = sprintf("%d-%02d", $startYear, $endYear % 100);
-                                                $fyDisplay = sprintf("April %d - March %d", $startYear, $endYear);
-                                                $selected = ($fyValue === $currentFY) ? 'selected' : '';
-                                                ?>
-                                                <option value="<?= htmlspecialchars($fyValue) ?>" <?= $selected ?>>
-                                                    <?= htmlspecialchars("$fyValue ($fyDisplay)") ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        <?php else: ?>
-                                            <?php  ?>
-                                            <?php for ($i = 2; $i >= -5; $i--): ?>
-                                                <?php
-                                                $startYear = $financialYearStart + $i;
-                                                $endYear = $startYear + 1;
-                                                $fyValue = sprintf("%d-%02d", $startYear, $endYear % 100);
-                                                $fyDisplay = sprintf("April %d - March %d", $startYear, $endYear);
-                                                $selected = ($fyValue === $currentFY) ? 'selected' : '';
-                                                ?>
-                                                <option value="<?= htmlspecialchars($fyValue) ?>" <?= $selected ?>>
-                                                    <?= htmlspecialchars("$fyValue ($fyDisplay)") ?>
-                                                </option>
-                                            <?php endfor; ?>
-                                        <?php endif; ?>
-                                    </select>
-                              </div>
+                            $currentYear = (int)date('Y');
+                            $currentMonth = (int)date('n');
+                            $unique_years = $unique_years ?? [];
+                            $financialYearStart = ($currentMonth >= 4) ? $currentYear : $currentYear - 1;
+                            $currentFY = sprintf("%d-%02d", $financialYearStart, ($financialYearStart + 1) % 100);
+                            ?>
+
+                            <select class="form-control" id="financial_year" name="year" required>
+                              <option value="">Select Financial Year</option>
+                              <?php if (!empty($unique_years)): ?>
+                                <?php foreach ($unique_years as $year): ?>
+                                  <?php
+
+                                  $year = (int)$year;
+                                  if ($year < 2000 || $year > 2100) continue;
+
+                                  $startYear = $year;
+                                  $endYear = $year + 1;
+                                  $fyValue = sprintf("%d-%02d", $startYear, $endYear % 100);
+                                  $fyDisplay = sprintf("April %d - March %d", $startYear, $endYear);
+                                  $selected = ($fyValue === $currentFY) ? 'selected' : '';
+                                  ?>
+                                  <option value="<?= htmlspecialchars($fyValue) ?>" <?= $selected ?>>
+                                    <?= htmlspecialchars("$fyValue ($fyDisplay)") ?>
+                                  </option>
+                                <?php endforeach; ?>
+                              <?php else: ?>
+                                <?php  ?>
+                                <?php for ($i = 2; $i >= -5; $i--): ?>
+                                  <?php
+                                  $startYear = $financialYearStart + $i;
+                                  $endYear = $startYear + 1;
+                                  $fyValue = sprintf("%d-%02d", $startYear, $endYear % 100);
+                                  $fyDisplay = sprintf("April %d - March %d", $startYear, $endYear);
+                                  $selected = ($fyValue === $currentFY) ? 'selected' : '';
+                                  ?>
+                                  <option value="<?= htmlspecialchars($fyValue) ?>" <?= $selected ?>>
+                                    <?= htmlspecialchars("$fyValue ($fyDisplay)") ?>
+                                  </option>
+                                <?php endfor; ?>
+                              <?php endif; ?>
+                            </select>
                           </div>
-                          <!-- Month Selection -->
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                  <label for="month" class="font-weight-bold">Month<span class="text-danger">*</span></label>
-                                  <select class="form-control" id="month" name="month" required>
-                                      <option value="" disabled selected>Select Month</option>
-                                      <?php
-                                      $months = [
-                                          ['name' => 'April', 'year_offset' => 0],
-                                          ['name' => 'May', 'year_offset' => 0],
-                                          ['name' => 'June', 'year_offset' => 0],
-                                          ['name' => 'July', 'year_offset' => 0],
-                                          ['name' => 'August', 'year_offset' => 0],
-                                          ['name' => 'September', 'year_offset' => 0],
-                                          ['name' => 'October', 'year_offset' => 0],
-                                          ['name' => 'November', 'year_offset' => 0],
-                                          ['name' => 'December', 'year_offset' => 0],
-                                          ['name' => 'January', 'year_offset' => 1],
-                                          ['name' => 'February', 'year_offset' => 1],
-                                          ['name' => 'March', 'year_offset' => 1]
-                                      ];
-                                      
-                                      foreach ($months as $month) {
-                                          $year = $currentYear + $month['year_offset'];
-                                          if ($currentMonth >= 4 && $month['year_offset'] == 1) {
-                                              $year = $currentYear + 1;
-                                          } elseif ($currentMonth < 4 && $month['year_offset'] == 0) {
-                                              $year = $currentYear;
-                                          }
-                                          echo "<option value='{$month['name']}-$year'>{$month['name']} $year</option>";
-                                      }
-                                      ?>
-                                  </select>
-                              </div>
+                        </div>
+                        <!-- Month Selection -->
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="month" class="font-weight-bold">Month<span class="text-danger">*</span></label>
+                            <select class="form-control" id="month" name="month" required>
+                              <option value="" disabled selected>Select Month</option>
+                              <?php
+                              $months = [
+                                ['name' => 'April', 'year_offset' => 0],
+                                ['name' => 'May', 'year_offset' => 0],
+                                ['name' => 'June', 'year_offset' => 0],
+                                ['name' => 'July', 'year_offset' => 0],
+                                ['name' => 'August', 'year_offset' => 0],
+                                ['name' => 'September', 'year_offset' => 0],
+                                ['name' => 'October', 'year_offset' => 0],
+                                ['name' => 'November', 'year_offset' => 0],
+                                ['name' => 'December', 'year_offset' => 0],
+                                ['name' => 'January', 'year_offset' => 1],
+                                ['name' => 'February', 'year_offset' => 1],
+                                ['name' => 'March', 'year_offset' => 1]
+                              ];
+
+                              foreach ($months as $month) {
+                                $year = $currentYear + $month['year_offset'];
+                                if ($currentMonth >= 4 && $month['year_offset'] == 1) {
+                                  $year = $currentYear + 1;
+                                } elseif ($currentMonth < 4 && $month['year_offset'] == 0) {
+                                  $year = $currentYear;
+                                }
+                                echo "<option value='{$month['name']}-$year'>{$month['name']} $year</option>";
+                              }
+                              ?>
+                            </select>
                           </div>
+                        </div>
                       </div>
 
                       <!-- Planning Entities -->
                       <div class="row">
-                          <?php if (!empty($planning_entities)): ?>
-                              <?php foreach ($planning_entities as $index => $entity): ?>
-                                  <div class="col-md-6">
-                                      <div class="form-group">
-                                          <fieldset style="margin-bottom: 15px;">
-                                              <input type="hidden" name="entities[<?= $entity['id'] ?>][entities_id]" value="<?= $entity['id'] ?>">
-                                              <label for="entities_<?= $entity['id'] ?>" class="font-weight-bold">
-                                                  <?= htmlspecialchars($entity['entity'] ?? '') ?><span class="text-danger">*</span>
-                                              </label>
-                                              <input type="<?= htmlspecialchars($entity['type'] ?? 'text') ?>" 
-                                                    class="form-control"
-                                                    id="entities_<?= $entity['id'] ?>"
-                                                    name="entities[<?= $entity['id'] ?>][entity_value]"
-                                                    placeholder="<?= htmlspecialchars($entity['entity'] ?? '') ?>"
-                                                    required
-                                                    <?= ($entity['type'] == 'number') ? 'step="any"' : '' ?>>
-                                          </fieldset>
-                                      </div>
-                                  </div>
+                        <?php if (!empty($planning_entities)): ?>
+                          <?php foreach ($planning_entities as $index => $entity): ?>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <fieldset style="margin-bottom: 15px;">
+                                  <input type="hidden" name="entities[<?= $entity['id'] ?>][entities_id]" value="<?= $entity['id'] ?>">
+                                  <label for="entities_<?= $entity['id'] ?>" class="font-weight-bold">
+                                    <?= htmlspecialchars($entity['entity'] ?? '') ?><span class="text-danger">*</span>
+                                  </label>
+                                  <input type="<?= htmlspecialchars($entity['type'] ?? 'text') ?>"
+                                    class="form-control"
+                                    id="entities_<?= $entity['id'] ?>"
+                                    name="entities[<?= $entity['id'] ?>][entity_value]"
+                                    placeholder="<?= htmlspecialchars($entity['entity'] ?? '') ?>"
+                                    required
+                                    <?= ($entity['type'] == 'number') ? 'step="any"' : '' ?>>
+                                </fieldset>
+                              </div>
+                            </div>
 
-                                  <?php if (($index + 1) % 2 == 0): ?>
-                                      </div><div class="row">
-                                  <?php endif; ?>
-                              <?php endforeach; ?>
-                          <?php endif; ?>
+                            <?php if (($index + 1) % 2 == 0): ?>
+                      </div>
+                      <div class="row">
+                      <?php endif; ?>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
                       </div>
 
                       <div class="text-right">
-                          <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                        <button type="submit" class="btn btn-primary mt-3">Submit</button>
                       </div>
                     </form>
 
@@ -326,7 +327,7 @@ if (!empty($monthly_planning_data)) {
   <script src="https://cdn.jsdelivr.net/npm/toastr@latest/build/toastr.min.js"></script>
 
   <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
       toastr.options = {
         "closeButton": true,
         "progressBar": true,
@@ -334,11 +335,11 @@ if (!empty($monthly_planning_data)) {
         "extendedTimeOut": 3000
       };
 
-      $('.add-button').click(function () {
+      $('.add-button').click(function() {
         $('#form-container').toggle();
       });
 
-      $('#add-form').submit(function (event) {
+      $('#add-form').submit(function(event) {
         event.preventDefault();
         $('#submit-btn').prop('disabled', true);
 
@@ -346,17 +347,17 @@ if (!empty($monthly_planning_data)) {
         console.log("Form Data:", formData);
 
         $.ajax({
-          type: 'POST',
-          url: '<?php echo base_url('erp/monthly-plan-submit'); ?>',
-          data: formData,
-          dataType: 'json',
-          encode: true,
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': '<?php echo csrf_hash(); ?>'
-          }
-        })
-          .done(function (response) {
+            type: 'POST',
+            url: '<?php echo base_url('erp/monthly-plan-submit'); ?>',
+            data: formData,
+            dataType: 'json',
+            encode: true,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRF-TOKEN': '<?php echo csrf_hash(); ?>'
+            }
+          })
+          .done(function(response) {
             console.log("Response:", response);
             if (response.message === 'Form submitted successfully!') {
               toastr.success(response.message);
@@ -367,7 +368,7 @@ if (!empty($monthly_planning_data)) {
             }
           })
 
-          .always(function () {
+          .always(function() {
             $('#submit-btn').prop('disabled', false);
           });
       });
@@ -375,13 +376,12 @@ if (!empty($monthly_planning_data)) {
   </script>
 
   <script>
-
-    $(document).ready(function () {
+    $(document).ready(function() {
       $('[data-toggle="tooltip"]').tooltip();
     });
 
 
-    $(document).on("click", ".delete-monthly-planning", function () {
+    $(document).on("click", ".delete-monthly-planning", function() {
       $('input[name=_token]').val($(this).data('record-id'));
       $('#delete_record').attr('action', main_url + 'delete-monthly-planning');
     });
@@ -389,7 +389,7 @@ if (!empty($monthly_planning_data)) {
 
   <?php if ($session->getFlashdata('success')): ?>
     <script>
-      $(document).ready(function () {
+      $(document).ready(function() {
         toastr.success("<?= $session->getFlashdata('success'); ?>");
       });
     </script>
@@ -397,7 +397,7 @@ if (!empty($monthly_planning_data)) {
 
   <?php if ($session->getFlashdata('error')): ?>
     <script>
-      $(document).ready(function () {
+      $(document).ready(function() {
         toastr.error("<?= $session->getFlashdata('error'); ?>");
       });
     </script>

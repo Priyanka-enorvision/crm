@@ -85,6 +85,7 @@ class Filters extends BaseConfig
 				'delete-project-file',
 				'erp/save-document',
 				'erp/documentfiles-updates',
+				'erp/save-declaration'
 			]],
 		],
 		'after'  => [
