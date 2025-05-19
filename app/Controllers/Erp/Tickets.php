@@ -605,12 +605,12 @@ class Tickets extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||update record|||
@@ -667,18 +667,16 @@ class Tickets extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
 		}
 	}
 	// |||update record|||
 	public function update_ticket()
 	{
-
 		$validation =  \Config\Services::validation();
 		$session = \Config\Services::session();
 		$request = \Config\Services::request();
@@ -974,7 +972,7 @@ class Tickets extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 		}
 	}
 	// delete record

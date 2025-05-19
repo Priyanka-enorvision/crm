@@ -1,8 +1,5 @@
 <?php
 
-
-use App\Models\SystemModel;
-use App\Models\RolesModel;
 use App\Models\UsersModel;
 use App\Models\TicketsModel;
 
@@ -75,36 +72,27 @@ if ($request->getGet('type') === 'ticket' && $request->getGet('field_id')) {
     </button>
   </div>
   <?= form_close(); ?>
+  
   <script type="text/javascript">
     $(document).ready(function() {
-
       $('[data-plugin="select_hrm"]').select2($(this).attr('data-options'));
       $('[data-plugin="select_hrm"]').select2({
         width: '100%'
       });
       Ladda.bind('button[type=submit]');
-      $(".meditor").kendoEditor({
-        resizable: {
-          content: true,
-          toolbar: true
-        }
-      });
+
+    
       /* Edit data */
       $("#update_ticket").submit(function(e) {
         e.preventDefault();
-        var obj = $(this);
-
-        // Show loading state
-        var submitBtn = obj.find('[type="submit"]');
-        var originalText = submitBtn.text();
-        submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Processing...');
-
+        var obj = $(this),
+          action = obj.attr('action');
         $.ajax({
           type: "POST",
-          url: obj.attr('action'),
+          url: action,
           data: obj.serialize() + "&is_ajax=1&type=edit_record&form=update_ticket",
-          dataType: 'json',
           cache: false,
+          dataType: 'json',
           success: function(response) {
             if (response.error) {
               toastr.error(response.error);
@@ -112,7 +100,6 @@ if ($request->getGet('type') === 'ticket' && $request->getGet('field_id')) {
               toastr.success(response.result);
               $('input[name="csrf_token"]').val(response.csrf_hash);
 
-              // Delay redirect to allow toastr to show
               setTimeout(function() {
                 window.location.href = main_url + 'support-tickets';
               }, 1000);

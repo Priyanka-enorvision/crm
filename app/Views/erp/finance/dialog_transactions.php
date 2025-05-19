@@ -40,6 +40,9 @@ if ($request->getGet('data') === 'deposit' && $request->getGet('field_id')) {
     $category_info = $ConstantsModel->where('company_id', $usession['sup_user_id'])->where('type', 'income_type')->orderBy('constants_id', 'ASC')->findAll();
     $payers_info = $UsersModel->where('company_id', $usession['sup_user_id'])->where('user_type', 'staff')->findAll();
   }
+
+
+
 ?>
 
   <div class="modal-header">
@@ -168,7 +171,7 @@ if ($request->getGet('data') === 'deposit' && $request->getGet('field_id')) {
           </label>
           <br />
           <?php if ($result['attachment_file'] != '' && $result['attachment_file'] != 'no_file'): ?>
-            <a href="<?php echo site_url('download') ?>?type=transactions&filename=<?php echo uencode($result['attachment_file']); ?>">
+            <a href="<?php echo site_url('download') ?>?type=transactions&filename=<?php echo $result['attachment_file']; ?>">
               <?= lang('Main.xin_download'); ?>
             </a>
           <?php endif; ?>
@@ -387,7 +390,7 @@ if ($request->getGet('data') === 'deposit' && $request->getGet('field_id')) {
           </label>
           <br />
           <?php if ($result['attachment_file'] != '' && $result['attachment_file'] != 'no_file'): ?>
-            <a href="<?php echo site_url('download') ?>?type=transactions&filename=<?php echo uencode($result['attachment_file']); ?>">
+            <a href="<?php echo site_url('download') ?>?type=transactions&filename=<?php echo $result['attachment_file']; ?>">
               <?= lang('Main.xin_download'); ?>
             </a>
           <?php endif; ?>

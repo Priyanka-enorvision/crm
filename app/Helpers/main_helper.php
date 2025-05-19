@@ -149,23 +149,17 @@ if (!function_exists('leave_halfday_cal')) {
 	}
 }
 if (! function_exists('count_employee_leave')) {
-	function count_employee_leave(string $employee_id, string $leave_type_id): float
+	function count_employee_leave($employee_id, $leave_type_id): float
 	{
-		// Initialize variables
 		$totalDays = 0.0;
-
-		// Get services
-		$session = \Config\Services::session();
 		$leaveModel = new \App\Models\LeaveModel();
 
-		// Get approved leaves (status = 2)
 		$approvedLeaves = $leaveModel->where([
 			'employee_id' => $employee_id,
 			'leave_type_id' => $leave_type_id,
-			'status' => 2 // Assuming 2 means 'approved'
+			'status' => 2
 		])->findAll();
 
-		// Calculate days for each leave
 		foreach ($approvedLeaves as $leave) {
 			$days = erp_date_difference($leave['from_date'], $leave['to_date']);
 			$totalDays += ($days < 2) ? 1 : $days;
@@ -174,6 +168,7 @@ if (! function_exists('count_employee_leave')) {
 		return $totalDays;
 	}
 }
+
 // generate employee id
 if (!function_exists('generate_random_employeeid')) {
 	function generate_random_employeeid($length = 6)

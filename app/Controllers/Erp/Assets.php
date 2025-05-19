@@ -137,14 +137,14 @@ class Assets extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
 				// upload file
 				$asset_image = $this->request->getFile('asset_image');
 				$file_name = $asset_image->getName();
-				$asset_image->move('public/uploads/asset_image/');
+				$asset_image->move('uploads/asset_image/');
 
 				$asset_name = $this->request->getPost('asset_name', FILTER_SANITIZE_STRING);
 				$category_id = $this->request->getPost('category_id', FILTER_SANITIZE_STRING);
@@ -193,12 +193,12 @@ class Assets extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	public function update_asset()
@@ -319,7 +319,7 @@ class Assets extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		}
 	}

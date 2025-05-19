@@ -65,7 +65,7 @@ $get_animate = '';
       <div id="add_form" class="collapse add-form <?= $get_animate; ?>" data-parent="#accordion" style="">
         <?php $attributes = array('name' => 'add_assets', 'id' => 'xin-form', 'autocomplete' => 'off', 'class' => 'form'); ?>
         <?php $hidden = array('user_id' => '0'); ?>
-        <?= form_open_multipart('erp/assets/add_asset', $attributes, $hidden); ?>
+        <?= form_open_multipart('erp/add-asset', $attributes, $hidden); ?>
         <div class="row">
           <div class="col-md-8">
             <div class="card mb-2">

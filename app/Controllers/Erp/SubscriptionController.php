@@ -39,7 +39,7 @@ class SubscriptionController extends BaseController
         $session = \Config\Services::session();
         $request = \Config\Services::request();
         if (!$session->has('sup_username')) {
-            return redirect()->to(site_url('erp/login'));
+            return redirect()->to(site_url('/'));
         }
         $id = $request->uri->getSegment(4);
 

@@ -538,7 +538,7 @@ $get_type = $request->getVar('type', FILTER_SANITIZE_STRING);
                           </a> </small>
                         <div class="row justify-content-between">
                           <div class="col-auto mt-2"> <a
-                              href="<?php echo site_url('download') ?>?type=task_files&filename=<?php echo uencode($_files['attachment_file']); ?>"
+                              href="<?php echo site_url('download') ?>?type=task_files&filename=<?php echo $_files['attachment_file']; ?>"
                               class="text-secondary"><i class="fas fa-download m-r-5"></i>
                               <?php echo lang('Main.xin_download'); ?></a> </div>
                           <div class="col-auto mt-2">

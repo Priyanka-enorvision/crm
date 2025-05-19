@@ -502,12 +502,12 @@ class Types extends BaseController
 		foreach ($category as $r) {
 
 			if (in_array('asset_cat3', staff_role_resource()) || $user_info['user_type'] == 'company') { //edit
-				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_edit') . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="' . uencode($r['constants_id']) . '"><i class="feather icon-edit"></i></button></span>';
+				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_edit') . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="' . $r['constants_id'] . '"><i class="feather icon-edit"></i></button></span>';
 			} else {
 				$edit = '';
 			}
 			if (in_array('asset_cat4', staff_role_resource()) || $user_info['user_type'] == 'company') { //edit
-				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . uencode($r['constants_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
+				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r['constants_id'] . '"><i class="feather icon-trash-2"></i></button></span>';
 			} else {
 				$delete = '';
 			}
@@ -1335,12 +1335,12 @@ class Types extends BaseController
 		foreach ($category as $r) {
 
 			if (in_array('award_type3', staff_role_resource()) || $user_info['user_type'] == 'company') { //edit
-				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_edit') . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="' . uencode($r['constants_id']) . '"><i class="feather icon-edit"></i></button></span>';
+				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_edit') . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="' . $r['constants_id'] . '"><i class="feather icon-edit"></i></button></span>';
 			} else {
 				$edit = '';
 			}
 			if (in_array('award_type4', staff_role_resource()) || $user_info['user_type'] == 'company') { //edit
-				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . uencode($r['constants_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
+				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r['constants_id'] . '"><i class="feather icon-trash-2"></i></button></span>';
 			} else {
 				$delete = '';
 			}
@@ -1394,12 +1394,12 @@ class Types extends BaseController
 		foreach ($category as $r) {
 
 			if (in_array('asset_brand3', staff_role_resource()) || $user_info['user_type'] == 'company') { //edit
-				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_edit') . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="' . uencode($r['constants_id']) . '"><i class="feather icon-edit"></i></button></span>';
+				$edit = '<span data-toggle="tooltip" data-placement="top" data-state="primary" title="' . lang('Main.xin_edit') . '"><button type="button" class="btn icon-btn btn-sm btn-light-primary waves-effect waves-light" data-toggle="modal" data-target=".view-modal-data" data-field_id="' . $r['constants_id'] . '"><i class="feather icon-edit"></i></button></span>';
 			} else {
 				$edit = '';
 			}
 			if (in_array('asset_brand4', staff_role_resource()) || $user_info['user_type'] == 'company') { //edit
-				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . uencode($r['constants_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
+				$delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r['constants_id'] . '"><i class="feather icon-trash-2"></i></button></span>';
 			} else {
 				$delete = '';
 			}
@@ -1818,12 +1818,12 @@ class Types extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||add record|||
@@ -2810,7 +2810,8 @@ class Types extends BaseController
 			} else {
 				// Get sanitized input
 				$name = $this->request->getPost('name', FILTER_SANITIZE_STRING);
-				$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
+				
+				$id = $this->request->getPost('token', FILTER_SANITIZE_STRING);
 				$erp_constant = $this->request->getPost('erp_constant', FILTER_SANITIZE_STRING);
 
 				// Determine company ID
@@ -3008,7 +3009,7 @@ class Types extends BaseController
 		return $this->response->setJSON($Return);
 	}
 	// delete record
-	public function delete_type($Id)
+	public function delete_type($id)
 	{
 
 		if ($this->request->getPost('type') == 'delete_record') {
@@ -3016,7 +3017,7 @@ class Types extends BaseController
 			$session = \Config\Services::session();
 			$request = \Config\Services::request();
 			$usession = $session->get('sup_username');
-			$id = udecode($Id);
+			// $id = udecode($Id);
 			$Return['csrf_hash'] = csrf_hash();
 			$ConstantsModel = new ConstantsModel();
 			$UsersModel = new UsersModel();

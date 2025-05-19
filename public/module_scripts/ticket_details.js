@@ -141,7 +141,7 @@ $(document).ready(function () {
 		var field_id = $(this).data('field');
 		$('#reply_option_id_' + field_id).fadeOut();
 		$.ajax({
-			url: main_url + "tickets/delete_ticket_reply",
+			url: main_url + "delete-ticket-reply",
 			type: "GET",
 			data: 'jd=1&data=ticket_reply&field_id=' + field_id,
 			success: function (response) {

@@ -33,7 +33,7 @@ class Finance extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -208,7 +208,7 @@ class Finance extends BaseController
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			return redirect()->to(site_url('erp/desk'));
@@ -234,7 +234,7 @@ class Finance extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -617,7 +617,7 @@ class Finance extends BaseController
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($this->request->getPost('type') === 'add_record') {
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
@@ -733,12 +733,12 @@ class Finance extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||add record|||
@@ -750,9 +750,9 @@ class Finance extends BaseController
 		$request = \Config\Services::request();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
-		if ($this->request->getPost('type') === 'add_record') {
+		if ($this->request->getPost()) {
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$Return['csrf_hash'] = csrf_hash();
 			// set rules
@@ -814,14 +814,14 @@ class Finance extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
 				// upload file
 				$attachment = $this->request->getFile('attachment');
 				$file_name = $attachment->getName();
-				$attachment->move('public/uploads/transactions/');
+				$attachment->move('uploads/transactions/');
 
 				$account_id = $this->request->getPost('account_id', FILTER_SANITIZE_STRING);
 				$amount = $this->request->getPost('amount', FILTER_SANITIZE_STRING);
@@ -866,12 +866,11 @@ class Finance extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
 		}
 	}
 	// |||edit record|||
@@ -968,6 +967,7 @@ class Finance extends BaseController
 				$description = $this->request->getPost('description', FILTER_SANITIZE_STRING);
 				$reference = $this->request->getPost('reference', FILTER_SANITIZE_STRING);
 				$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
+				var_dump($id);die;
 
 				if ($validated) {
 					$data = [
@@ -1003,12 +1003,12 @@ class Finance extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||edit record|||
@@ -1140,12 +1140,12 @@ class Finance extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||edit record|||

@@ -150,7 +150,7 @@ $result = $AssetsModel->where('assets_id', $assets_id)->first();
                     <td><?= lang('Asset.xin_asset_image'); ?></td>
                     <td class="text-warning">
                       <?php if ($result['asset_image'] != '' && $result['asset_image'] != 'no file') { ?>
-                        <a href="<?= site_url() ?>download?type=asset_image&filename=<?= uencode($result['asset_image']); ?>">
+                        <a href="<?= site_url() ?>download?type=asset_image&filename=<?= $result['asset_image']; ?>">
                           <?= lang('Main.xin_download'); ?>
                         </a>
                       <?php } ?>
@@ -170,7 +170,7 @@ $result = $AssetsModel->where('assets_id', $assets_id)->first();
           <div class="tab-pane fade" id="pills-edit" role="tabpanel" aria-labelledby="pills-edit-tab">
             <?php $attributes = array('name' => 'update_asset', 'id' => 'update_asset', 'autocomplete' => 'off', 'class' => 'm-b-1'); ?>
             <?php $hidden = array('_method' => 'EDIT', 'token' => $segment_id); ?>
-            <?= form_open_multipart('erp/assets/update_asset', $attributes, $hidden); ?>
+            <?= form_open_multipart('erp/update-asset', $attributes, $hidden); ?>
             <div class="card-body">
               <div class="row">
                 <div class="col-md-4">

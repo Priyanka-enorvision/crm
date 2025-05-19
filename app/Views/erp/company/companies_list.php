@@ -17,6 +17,7 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 $get_companies = $UsersModel->where('user_type', 'company')->findAll();
 
 $locale = service('request')->getLocale();
+$get_animate="";
 ?>
 <?php if ($session->get('unauthorized_module')) { ?>
   <div class="alert alert-danger alert-dismissible fade show">
@@ -29,8 +30,8 @@ $locale = service('request')->getLocale();
   <div id="accordion">
     <div id="add_form" class="collapse add-form <?php echo $get_animate; ?>" data-parent="#accordion" style="">
       <?php $attributes = array('name' => 'add_company', 'id' => 'xin-form', 'autocomplete' => 'off'); ?>
-      <?php $hidden = array('user_id' => 0); ?>
-      <?= form_open_multipart('erp/company/add_company', $attributes, $hidden); ?>
+      <?php $hidden = array('user_id' => '0'); ?>
+      <?= form_open_multipart('erp/add-company', $attributes, $hidden); ?>
       <div class="row">
         <div class="col-md-8">
           <div class="card mb-2">
@@ -294,7 +295,7 @@ $locale = service('request')->getLocale();
   $(document).on("click", ".delete", function() {
     var id = $(this).data('record-id');
     $('input[name=_token]').val(id);
-    $('#delete_record').attr('action', main_url + 'company/delete_company');
+    $('#delete_record').attr('action', main_url + 'delete-company');
   });
 </script>
 

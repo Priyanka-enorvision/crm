@@ -1,15 +1,10 @@
 <?php
 namespace App\Controllers\Erp;
 use App\Controllers\BaseController;
-use CodeIgniter\HTTP\RequestInterface;
-use CodeIgniter\HTTP\ResponseInterface;
-use CodeIgniter\HTTP\Files\UploadedFile;
-use CodeIgniter\I18n\Time;
- 
+
 use App\Models\SystemModel;
 use App\Models\RolesModel;
 use App\Models\UsersModel;
-use App\Models\MainModel;
 use App\Models\TrainersModel;
 
 class Trainers extends BaseController {

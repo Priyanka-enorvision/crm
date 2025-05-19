@@ -39,7 +39,7 @@ class Company extends BaseController
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 
 		$usession = $session->get('sup_username');
@@ -70,7 +70,7 @@ class Company extends BaseController
 		$UsersModel = new UsersModel();
 		$result = $UsersModel->update($company_id, $data);
 		if ($result) {
-			$session->setFlashdata('message', 'Status Updated successfully.');
+			$session->setFlashdata('success', 'Status Updated successfully.');
 		} else {
 			$session->setFlashdata('error', 'Failed to updated Status.');
 		}
@@ -87,7 +87,7 @@ class Company extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$data['title'] = lang('Projects.xin_manage_companies') . ' | ' . $xin_system['application_name'];
@@ -104,7 +104,7 @@ class Company extends BaseController
 		$request = \Config\Services::request();
 
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 
 		if ($request->getPost()) {
@@ -159,22 +159,22 @@ class Company extends BaseController
 				$newName = $avatar->getRandomName();
 
 				// Ensure directories exist
-				if (!is_dir(ROOTPATH . 'public/uploads/companies')) {
-					mkdir(ROOTPATH . 'public/uploads/companies', 0755, true);
+				if (!is_dir(ROOTPATH . 'uploads/companies')) {
+					mkdir(ROOTPATH . 'uploads/companies', 0755, true);
 				}
-				if (!is_dir(ROOTPATH . 'public/uploads/companies/thumb')) {
-					mkdir(ROOTPATH . 'public/uploads/companies/thumb', 0755, true);
+				if (!is_dir(ROOTPATH . 'uploads/companies/thumb')) {
+					mkdir(ROOTPATH . 'uploads/companies/thumb', 0755, true);
 				}
 
 				// Move the file
-				$avatar->move(ROOTPATH . 'public/uploads/companies', $newName);
+				$avatar->move(ROOTPATH . 'uploads/companies', $newName);
 				$file_name = $newName;
 
 				// Create thumbnail
 				$image = \Config\Services::image()
-					->withFile(ROOTPATH . 'public/uploads/companies/' . $newName)
+					->withFile(ROOTPATH . 'uploads/companies/' . $newName)
 					->fit(100, 100, 'center')
-					->save(ROOTPATH . 'public/uploads/companies/thumb/' . $newName);
+					->save(ROOTPATH . 'uploads/companies/thumb/' . $newName);
 			}
 
 			$data = [
@@ -275,12 +275,12 @@ class Company extends BaseController
 		$usession = $session->get('sup_username');
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 
 		$usession = $session->get('sup_username');
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
-		$segment_id = $request->uri->getSegment(3);
+		$segment_id = $request->getUri()->getSegment(3);
 		$ifield_id = udecode($segment_id);
 		$isegment_val = $UsersModel->where('user_id', $ifield_id)->first();
 		$user_id = $isegment_val['user_id'];
@@ -303,7 +303,7 @@ class Company extends BaseController
 		$request = \Config\Services::request();
 
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 
 		if ($request->getPost()) {
@@ -359,11 +359,11 @@ class Company extends BaseController
 
 				$avatar = $request->getFile('file');
 				$file_name = $avatar->getName();
-				$avatar->move('public/uploads/companies/');
+				$avatar->move('uploads/companies/');
 
-				$image->withFile('public/uploads/companies/' . $file_name)
+				$image->withFile('uploads/companies/' . $file_name)
 					->fit(100, 100, 'center')
-					->save('public/uploads/companies/thumb/' . $file_name);
+					->save('uploads/companies/thumb/' . $file_name);
 			}
 
 			// Prepare data for update

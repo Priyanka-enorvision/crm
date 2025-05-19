@@ -1264,7 +1264,7 @@ class Payroll extends BaseController
 			}
 
 			if ($Return['error'] != '') {
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 			}
 			$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
 			$salary_month = udecode($this->request->getPost('token2', FILTER_SANITIZE_STRING));
@@ -1523,12 +1523,10 @@ class Payroll extends BaseController
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			exit;
+			return $this->response->setJSON($Return);
 		}
 	}
 	public function payroll_chart()
