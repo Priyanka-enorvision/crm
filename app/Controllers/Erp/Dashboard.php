@@ -516,22 +516,6 @@ class Dashboard extends BaseController
 		}
 	}
 
-
-	// public function web_leads_grid()
-	// {
-	// 	$SystemModel = new SystemModel();
-	// 	$UsersModel = new UsersModel();
-	// 	$session = \Config\Services::session();
-	// 	$usession = $session->get('sup_username');
-	// 	$xin_system = $SystemModel->where('setting_id', 1)->first();
-	// 	$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
-	// 	$data['title'] = "Web Leads | " . $xin_system['application_name'];
-	// 	$data['path_url'] = 'web-leads';
-	// 	$data['breadcrumbs'] ="Manage Web Leads";
-	// 	$data['subview'] = view('erp/web_lead/web_lead_grid', $data);
-	// 	return view('erp/layout/layout_main', $data);
-	// }
-
 	public function planning_configuration()
 	{
 		$SystemModel = new SystemModel();

@@ -12,7 +12,7 @@ $UsersModel = new UsersModel();
 $ConstantsModel = new ConstantsModel();
 $get_animate = '';
 if ($request->getGet('data') === 'award_type' && $request->getGet('field_id')) {
-	$category_id = udecode($field_id);
+	$category_id = $field_id;
 	$result = $ConstantsModel->where('constants_id', $category_id)->where('type', 'award_type')->first();
 ?>
 

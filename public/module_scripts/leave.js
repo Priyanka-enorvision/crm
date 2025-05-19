@@ -99,6 +99,7 @@ $(document).ready(function () {
 
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
 					window.location.href = main_url + 'leave-list';
+					location.reload();
 				}
 			},
 			error: function (xhr, status, error) {
@@ -106,6 +107,7 @@ $(document).ready(function () {
 				if (xhr.responseJSON && xhr.responseJSON.csrf_hash) {
 					$('input[name="csrf_token"]').val(xhr.responseJSON.csrf_hash);
 				}
+				location.reload();
 			}
 		});
 	});

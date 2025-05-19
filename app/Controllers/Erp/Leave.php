@@ -76,7 +76,7 @@ class Leave extends BaseController
 		}
 		$data['title'] = lang('Employees.xin_employee_details') . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'leave';
-		$data['breadcrumbs'] = lang('Employees.xin_employee_details') . $user_id;
+		$data['breadcrumbs'] = lang('Employees.xin_employee_details');
 
 		$data['subview'] = view('erp/leave/leave_status', $data);
 		return view('erp/layout/layout_main', $data); //page load
@@ -295,6 +295,7 @@ class Leave extends BaseController
 	// |||add record|||
 	public function add_leave()
 	{
+
 		$validation =  \Config\Services::validation();
 		$session = \Config\Services::session();
 		$request = \Config\Services::request();
@@ -302,7 +303,6 @@ class Leave extends BaseController
 		$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 		$Return['csrf_hash'] = csrf_hash();
 		if ($this->request->getPost('type') === 'add_record') {
-
 			// set rules
 			$rules = [
 				'leave_type' => [
@@ -340,7 +340,7 @@ class Leave extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -358,23 +358,27 @@ class Leave extends BaseController
 				$end_date = $this->request->getPost('end_date', FILTER_SANITIZE_STRING);
 				if (strtotime($end_date) < strtotime($start_date)) {
 					$Return['error'] = 'End date cannot be earlier than start date.';
-					$this->output($Return);
-					exit;
+					return $this->response->setJSON($Return);
+					
 				}
 				$reason = $this->request->getPost('reason', FILTER_SANITIZE_STRING);
 				$leave_half_day = $this->request->getPost('leave_half_day', FILTER_SANITIZE_STRING);
 				$remarks = $this->request->getPost('remarks', FILTER_SANITIZE_STRING);
 				$luser_id = $this->request->getPost('employee_id', FILTER_SANITIZE_STRING);
+				
 				$UsersModel = new UsersModel();
 				$ConstantsModel = new ConstantsModel();
 				$leave_user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 				if ($leave_user_info['user_type'] == 'staff') {
+					$luser_id = $leave_user_info['user_id'];
 					$leave_types = $ConstantsModel->where('company_id', $leave_user_info['company_id'])->where('type', 'leave_type')->first();
+					
 				} else {
 					$leave_types = $ConstantsModel->where('company_id', $usession['sup_user_id'])->where('type', 'leave_type')->first();
 				}
 				// check half leave
 				$no_of_days = erp_date_difference($start_date, $end_date);
+
 				$tinc = count_employee_leave($luser_id, $leave_type);
 				$days_per_year = $leave_types['field_one'];
 				$rem_leave = $days_per_year - $tinc;
@@ -386,14 +390,14 @@ class Leave extends BaseController
 				}
 				if ($Return['error'] != '') {
 					$Return['csrf_hash'] = csrf_hash();
-					$this->output($Return);
+					return $this->response->setJSON($Return);
 				}
 				if ($leave_half_day == 1 && $no_of_days > 1) {
 					$Return['error'] = lang('Success.xin_hr_cant_appply_morethan') . ' 1 ' . lang('Main.xin_day');
 				}
 				if ($Return['error'] != '') {
 					$Return['csrf_hash'] = csrf_hash();
-					$this->output($Return);
+					return $this->response->setJSON($Return);
 				}
 				if ($leave_half_day == 1) {
 					$leave_half_day_opt = 1;
@@ -423,7 +427,7 @@ class Leave extends BaseController
 				if ($validated) {
 					$attachment = $this->request->getFile('attachment');
 					$file_name = $attachment->getName();
-					$attachment->move('public/uploads/leave/');
+					$attachment->move('uploads/leave/');
 					$data = [
 						'company_id' => $company_id,
 						'employee_id'  => $staff_id,
@@ -462,33 +466,33 @@ class Leave extends BaseController
 				if ($existing_leave) {
 					$Return['error'] = 'This employee has already applied for the same leave type for the selected date range.';
 					return $this->response->setJSON($Return);
-					exit;
+					
 				}
 				$EmailtemplatesModel = new EmailtemplatesModel();
 				$result = $LeaveModel->insert($data);
 				$Return['csrf_hash'] = csrf_hash();
 				if ($result == TRUE) {
 					$Return['result'] = lang('Success.ci_leave_created__msg');
-					// if($xin_system['enable_email_notification'] == 1){
-					// 	// Send mail start
-					// 	$itemplate = $EmailtemplatesModel->where('template_id', 13)->first();
-					// 	$istaff_info = $UsersModel->where('user_id', $staff_id)->first();
-					// 	$full_name = $istaff_info['first_name'].' '.$istaff_info['last_name'];
-					// 	// leave type
-					// 	$ltype = $ConstantsModel->where('constants_id', $leave_type)->where('type','leave_type')->first();
-					// 	$category_name = $ltype['category_name'];	
-					// 	$isubject = $itemplate['subject'];
-					// 	$ibody = html_entity_decode($itemplate['message']);
-					// 	$fbody = str_replace(array("{site_name}","{employee_name}","{leave_type}"),array($company_info['company_name'],$full_name,$category_name),$ibody);
-					// 	timehrm_mail_data($istaff_info['email'],$company_info['company_name'],$company_info['email'],$isubject,$fbody);
+					if($xin_system['enable_email_notification'] == 1){
+						// Send mail start
+						$itemplate = $EmailtemplatesModel->where('template_id', 13)->first();
+						$istaff_info = $UsersModel->where('user_id', $staff_id)->first();
+						$full_name = $istaff_info['first_name'].' '.$istaff_info['last_name'];
+						// leave type
+						$ltype = $ConstantsModel->where('constants_id', $leave_type)->where('type','leave_type')->first();
+						$category_name = $ltype['category_name'];	
+						$isubject = $itemplate['subject'];
+						$ibody = html_entity_decode($itemplate['message']);
+						$fbody = str_replace(array("{site_name}","{employee_name}","{leave_type}"),array($company_info['company_name'],$full_name,$category_name),$ibody);
+						timehrm_mail_data($istaff_info['email'],$company_info['company_name'],$company_info['email'],$isubject,$fbody);
 
-					// }
+					}
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 			}
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 
@@ -564,7 +568,7 @@ class Leave extends BaseController
 		$Return['rejected'] = lang('Main.xin_rejected');
 		$Return['rejected_count'] = $total_rejected;
 		return $this->response->setJSON($Return);
-		exit;
+		
 	}
 
 	public function update_leave()
@@ -591,12 +595,6 @@ class Leave extends BaseController
 
 		// Check if it's a POST request
 		if (!$this->request->is('post')) {
-			$Return['error'] = lang('Main.xin_error_msg');
-			return $this->response->setJSON($Return);
-		}
-
-		// For staff, check if it's an edit record request
-		if ($user_info['user_type'] == 'staff' && $this->request->getPost('type') !== 'edit_record') {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
 		}

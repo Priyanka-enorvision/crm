@@ -104,6 +104,7 @@ $(document).ready(function () {
 
 				if (JSON.error != '') {
 					toastr.error(JSON.error);
+					location.reload();
 				} else {
 					toastr.success(JSON.result);
 
@@ -117,6 +118,7 @@ $(document).ready(function () {
 					setTimeout(function () {
 						window.location.href = main_url + 'disciplinary-cases';
 					}, 1000);
+					location.reload();
 				}
 			},
 			error: function (xhr, status, error) {
@@ -127,6 +129,7 @@ $(document).ready(function () {
 				setTimeout(function () {
 					window.location.href = main_url + 'disciplinary-cases';
 				}, 1000);
+				location.reload();
 			}
 		});
 	});

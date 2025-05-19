@@ -3,12 +3,8 @@
 namespace App\Controllers\Erp;
 
 use App\Controllers\BaseController;
-use CodeIgniter\HTTP\RequestInterface;
-use CodeIgniter\HTTP\ResponseInterface;
-use CodeIgniter\HTTP\Files\UploadedFile;
 
-use App\Models\OffModel;
-use App\Models\MainModel;
+
 use App\Models\RolesModel;
 use App\Models\UsersModel;
 use App\Models\AwardsModel;
@@ -30,7 +26,7 @@ class Awards extends BaseController
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -143,14 +139,14 @@ class Awards extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
 				// upload file
 				$award_picture = $this->request->getFile('award_picture');
 				$file_name = $award_picture->getName();
-				$award_picture->move('public/uploads/awards/');
+				$award_picture->move('uploads/awards/');
 
 				$award_type_id = $this->request->getPost('award_type_id', FILTER_SANITIZE_STRING);
 				$award_date = $this->request->getPost('award_date', FILTER_SANITIZE_STRING);
@@ -210,12 +206,12 @@ class Awards extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// |||edit record|||
@@ -276,7 +272,7 @@ class Awards extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -339,12 +335,12 @@ class Awards extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// record list
@@ -414,10 +410,10 @@ class Awards extends BaseController
 	// read record
 	public function read_award()
 	{
-		$session = \Config\Services::session($config);
+		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$id = $request->getGet('field_id');
 		$data = [
@@ -426,7 +422,7 @@ class Awards extends BaseController
 		if ($session->has('sup_username')) {
 			return view('erp/awards/dialog_award', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
 	// delete record

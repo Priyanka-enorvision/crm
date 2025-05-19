@@ -84,7 +84,7 @@ if($request->getGet('data') === 'payroll' && $request->getGet('field_id')){
 </div>
 <?php $attributes = array('name' => 'pay_monthly', 'id' => 'pay_monthly', 'autocomplete' => 'off', 'class'=>'m-b-1');?>
 <?php $hidden = array('token' => $field_id,'token2' => $payment_date);?>
-<?php echo form_open('erp/payroll/add_pay_monthly', $attributes, $hidden);?>
+<?php echo form_open('erp/add-pay-monthly', $attributes, $hidden);?>
 <div class="modal-body" style="overflow:auto;">
   <h6 class="m-b-15 text-primary">
     <?= lang('Employees.xin_basic_salary');?>
@@ -246,30 +246,30 @@ $(document).ready(function(){
 					Ladda.stopAll();
 				} else {
 					$('.payroll-modal-data').modal('toggle');
-					var xin_table = $('#xin_table').dataTable({
-						"bDestroy": true,
-						"ajax": {
-							url : "<?php echo site_url("erp/payroll/payslip_list") ?>?staff_id=0&payment_date=<?= udecode($payment_date);?>",
-							type : 'GET'
-						},
-						"language": {
-							"lengthMenu": dt_lengthMenu,
-							"zeroRecords": dt_zeroRecords,
-							"info": dt_info,
-							"infoEmpty": dt_infoEmpty,
-							"infoFiltered": dt_infoFiltered,
-							"search": dt_search,
-							"paginate": {
-								"first": dt_first,
-								"previous": dt_previous,
-								"next": dt_next,
-								"last": dt_last
-							},
-						},
-						"fnDrawCallback": function(settings){
-						$('[data-toggle="tooltip"]').tooltip();          
-						}
-					});
+					// var xin_table = $('#xin_table').dataTable({
+					// 	"bDestroy": true,
+					// 	"ajax": {
+					// 		url : "<?php echo site_url("payroll/payslip_list") ?>?staff_id=0&payment_date=<?= udecode($payment_date);?>",
+					// 		type : 'GET'
+					// 	},
+					// 	"language": {
+					// 		"lengthMenu": dt_lengthMenu,
+					// 		"zeroRecords": dt_zeroRecords,
+					// 		"info": dt_info,
+					// 		"infoEmpty": dt_infoEmpty,
+					// 		"infoFiltered": dt_infoFiltered,
+					// 		"search": dt_search,
+					// 		"paginate": {
+					// 			"first": dt_first,
+					// 			"previous": dt_previous,
+					// 			"next": dt_next,
+					// 			"last": dt_last
+					// 		},
+					// 	},
+					// 	"fnDrawCallback": function(settings){
+					// 	$('[data-toggle="tooltip"]').tooltip();          
+					// 	}
+					// });
 					xin_table.api().ajax.reload(function(){ 
 						toastr.success(JSON.result);
 					}, true);

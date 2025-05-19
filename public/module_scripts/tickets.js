@@ -11,6 +11,7 @@ $(document).ready(function () {
 			cache: false,
 			success: function (JSON) {
 				if (JSON.error != '') {
+					alert('frist');
 					toastr.error(JSON.error);
 				} else {
 					toastr.success(JSON.result);

@@ -31,7 +31,7 @@ class Complaints extends BaseController
 		$user_id = $user_info['user_id'];
 		if (!$session->has('sup_username')) {
 			$session->setFlashdata('err_not_logged_in', lang('Dashboard.err_not_logged_in'));
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		if ($user_info['user_type'] != 'company' && $user_info['user_type'] != 'staff') {
 			$session->setFlashdata('unauthorized_module', lang('Dashboard.xin_error_unauthorized_module'));
@@ -241,7 +241,7 @@ class Complaints extends BaseController
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$RolesModel = new RolesModel();
 		$UsersModel = new UsersModel();
@@ -250,12 +250,16 @@ class Complaints extends BaseController
 		$ConstantsModel = new ConstantsModel();
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if ($user_info['user_type'] == 'staff') {
-			if ($user_info['user_role_id'] == 4) {
-				$get_data = $ComplaintsModel->where('company_id', $user_info['company_id'])->orderBy('complaint_id', 'ASC')->findAll();
-			} else {
-				$get_data = $ComplaintsModel->where('company_id', $user_info['company_id'])
-					->where("FIND_IN_SET('" . $user_info['user_id'] . "', complaint_against) >", 0)->orderBy('complaint_id', 'ASC')->findAll();
-			}
+			$user_id = $user_info['user_id'];
+			$get_data = $ComplaintsModel
+			->where('company_id', $user_info['company_id'])
+    		->groupStart()
+    		    ->where('complaint_from', $user_id)
+    		    ->orWhere("FIND_IN_SET($user_id, complaint_against) > 0", null, false)
+    		->groupEnd()
+    		->orderBy('complaint_id', 'ASC')
+    		->findAll();
+
 		} else {
 			$get_data = $ComplaintsModel->where('company_id', $usession['sup_user_id'])->orderBy('complaint_id', 'ASC')->findAll();
 		}
@@ -331,7 +335,7 @@ class Complaints extends BaseController
 		$session = \Config\Services::session();
 		$request = \Config\Services::request();
 		if (!$session->has('sup_username')) {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 		$id = $request->getGet('field_id');
 		$data = [
@@ -340,7 +344,7 @@ class Complaints extends BaseController
 		if ($session->has('sup_username')) {
 			return view('erp/complaints/dialog_complaint', $data);
 		} else {
-			return redirect()->to(site_url('erp/login'));
+			return redirect()->to(site_url('/'));
 		}
 	}
 	// delete record

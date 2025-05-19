@@ -14,8 +14,7 @@ $router = service('router');
 $xin_system = $SystemModel->where('setting_id', 1)->first();
 $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 
-
-$segment_id = $request->uri->getSegment(3);
+$segment_id = $request->getUri()->getSegment(3);
 $company_id = udecode($segment_id);
 
 
@@ -36,7 +35,7 @@ $locale = service('request')->getLocale();
   <div id="edit_form" class="collapse show" data-parent="#accordion">
     <?php $attributes = array('name' => 'edit_company', 'id' => 'xin-form', 'autocomplete' => 'off'); ?>
     <?php $hidden = array('user_id' => $company_info['user_id']); ?>
-    <?= form_open_multipart('erp/company/update_company', $attributes, $hidden); ?>
+    <?= form_open_multipart('erp/update-company', $attributes, $hidden); ?>
     <div class="row">
       <div class="col-md-8">
         <div class="card mb-2">

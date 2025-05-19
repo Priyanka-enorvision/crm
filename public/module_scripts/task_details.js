@@ -162,16 +162,14 @@ $(document).ready(function () {
 	$(".delete_discussion").on("click", function (e) {
 		e.preventDefault(); // Prevent default action
 		var field_id = $(this).data('field');
-
-
 		$.ajax({
-			url: main_url + "delete-task-discussion", // Make sure this matches your route
+			url: main_url + "delete-task-discussion", 
 			type: "GET",
 			data: {
 				jd: 1,
 				data: 'task_discussion',
 				field_id: field_id,
-				csrf_token: $('input[name="csrf_token"]').val() // Include CSRF token
+				csrf_token: $('input[name="csrf_token"]').val()
 			},
 			dataType: 'json',
 			success: function (JSON) {

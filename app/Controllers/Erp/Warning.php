@@ -3,11 +3,8 @@
 namespace App\Controllers\Erp;
 
 use App\Controllers\BaseController;
-use CodeIgniter\HTTP\RequestInterface;
-use CodeIgniter\HTTP\ResponseInterface;
-use CodeIgniter\HTTP\Files\UploadedFile;
 
-use App\Models\MainModel;
+
 use App\Models\RolesModel;
 use App\Models\UsersModel;
 use App\Models\SystemModel;
@@ -115,7 +112,7 @@ class Warning extends BaseController
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -160,12 +157,11 @@ class Warning extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
 		}
 	}
 	// |||edit record|||
@@ -234,12 +230,12 @@ class Warning extends BaseController
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
 				return $this->response->setJSON($Return);
-				exit;
+				
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 			return $this->response->setJSON($Return);
-			exit;
+			
 		}
 	}
 	// record list
@@ -258,7 +254,12 @@ class Warning extends BaseController
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 		if ($user_info['user_type'] == 'staff') {
-			$get_data = $WarningModel->where('warning_to', $user_info['user_id'])->orderBy('warning_id', 'ASC')->findAll();
+			$get_data = $WarningModel->where('company_id',$user_info['company_id'])
+			->groupStart()
+			->where('warning_to', $user_info['user_id'])
+			->orWhere('warning_by', $user_info['user_id'])
+			->groupEnd()
+			->orderBy('warning_id', 'ASC')->findAll();
 		} else {
 			$get_data = $WarningModel->where('company_id', $usession['sup_user_id'])->orderBy('warning_id', 'ASC')->findAll();
 		}
