@@ -357,7 +357,7 @@ class Projects extends BaseController
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
 		$data['title'] = lang('Dashboard.left_projects') . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'projects_client';
-		$data['breadcrumbs'] = lang('Dashboard.left_projects');
+		$data['breadcrumbs'] = lang(line: 'Dashboard.left_projects');
 
 		$data['subview'] = view('erp/projects/clients_projects_list', $data);
 		return view('erp/layout/layout_main', $data); //page load
@@ -420,7 +420,7 @@ class Projects extends BaseController
 		}
 		$usession = $session->get('sup_username');
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
-		$segment_id = $request->uri->getSegment(3);
+		$segment_id = $request->getUri()->getSegment(3);
 		$ifield_id = udecode($segment_id);
 		$isegment_val = $ProjectsModel->where('project_id', $ifield_id)->first();
 		if (!$isegment_val) {
@@ -812,7 +812,6 @@ class Projects extends BaseController
 	// record list
 	public function client_projects_list()
 	{
-
 		$session = \Config\Services::session();
 		$usession = $session->get('sup_username');
 		if (!$session->has('sup_username')) {
@@ -848,9 +847,9 @@ class Projects extends BaseController
 							$ol .= '<a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" data-state="primary" title="' . $assigned_name . '"><span class="mb-1"><img src="' . base_url() . '/public/uploads/users/thumb/' . $assigned_to['profile_photo'] . '" class="img-fluid img-radius wid-30" alt=""></span></a>';
 						} else {
 							if ($assigned_to['gender'] == 'Male') {
-								$de_file = base_url() . '/public/uploads/profile/default_male.jpg';
+								$de_file = base_url() . 'uploads/profile/default_male.jpg';
 							} else {
-								$de_file = base_url() . '/public/uploads/profile/default_female.jpg';
+								$de_file = base_url() . 'uploads/profile/default_female.jpg';
 							}
 							$ol .= '<a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" data-state="primary" title="' . $assigned_name . '"><span class="mb-1"><img src="' . $de_file . '" class="img-fluid img-radius wid-30" alt=""></span></a>';
 						}
@@ -1494,9 +1493,151 @@ class Projects extends BaseController
 			exit;
 		}
 	}
+	public function add_client_project_note()
+	{
+		$validation = \Config\Services::validation();
+		$session = \Config\Services::session();
+		$request = \Config\Services::request();
+		$usession = $session->get('sup_username');
+
+		if ($this->request->getPost('type') === 'add_record') {
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = csrf_hash();
+
+			// set rules
+			$rules = [
+				'description' => [
+					'rules' => 'required',
+					'errors' => [
+						'required' => lang('Success.xin_note_field_error')
+					]
+				]
+			];
+
+			if (!$this->validate($rules)) {
+				$ruleErrors = [
+					"description" => $validation->getError('description')
+				];
+				foreach ($ruleErrors as $err) {
+					$Return['error'] = $err;
+					if ($Return['error'] != '') {
+						return $this->response->setJSON($Return);
+					}
+				}
+			} else {
+				$UsersModel = new UsersModel();
+				$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+				$company_id = ($user_info['user_type'] == 'staff') ? $user_info['company_id'] : $usession['sup_user_id'];
+
+				$description = $this->request->getPost('description', FILTER_SANITIZE_STRING);
+				$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
+
+				$ProjectnotesModel = new ProjectnotesModel();
+				$existingNote = $ProjectnotesModel->where('company_id', $company_id)
+					->where('project_id', $id)
+					->first();
+
+				if ($existingNote) {
+					$data = [
+						'project_note' => $description
+					];
+					$result = $ProjectnotesModel->update($existingNote['project_note_id'], $data);
+					if ($result) {
+						$Return['result'] = "Notes Updated Successfully ";
+						$Return['redirect_url'] = base_url('erp/project-detail/') . uencode($id);
+					} else {
+						$Return['error'] = lang('Main.xin_error_msg');
+					}
+				} else {
+					// Insert new note if no existing note is found
+					$data = [
+						'company_id' => $company_id,
+						'project_id' => $id,
+						'employee_id' => $usession['sup_user_id'],
+						'project_note' => $description,
+						'created_at' => date('d-m-Y h:i:s')
+					];
+					$result = $ProjectnotesModel->insert($data);
+					if ($result) {
+						$Return['result'] = lang('Success.ci_project_note_added_msg');
+						$Return['redirect_url'] = base_url('erp/project-detail/') . uencode($id);
+					} else {
+						$Return['error'] = lang('Main.xin_error_msg');
+					}
+				}
+
+				$Return['csrf_hash'] = csrf_hash();
+				return $this->response->setJSON($Return);
+			}
+		} else {
+			$Return['error'] = lang('Main.xin_error_msg');
+			return $this->response->setJSON($Return);
+		}
+	}
 
 	// |||add record|||
 	public function add_bug()
+	{
+		$validation = \Config\Services::validation();
+		$session = \Config\Services::session();
+		$request = \Config\Services::request();
+		$usession = $session->get('sup_username');
+
+		if ($this->request->getMethod()) {
+			$Return = ['result' => '', 'error' => '', 'csrf_hash' => csrf_hash()];
+
+			// Validation rules
+			$rules = [
+				'bug_description' => [
+					'rules' => 'required',
+					'errors' => [
+						'required' => lang('Success.xin_bug_field_error'),
+					],
+				],
+			];
+
+			if (!$this->validate($rules)) {
+				$Return['error'] = $validation->getError('bug_description');
+				return $this->response->setJSON($Return);
+			}
+
+			// Get user info
+			$UsersModel = new UsersModel();
+			$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+
+			$company_id = $user_info['user_type'] === 'staff'
+				? $user_info['company_id']
+				: $usession['sup_user_id'];
+
+			// Retrieve and sanitize input
+			$description = $this->request->getPost('bug_description');
+			$project_id = udecode($this->request->getPost('token'));
+
+			$data = [
+				'company_id' => $company_id,
+				'project_id' => $project_id,
+				'employee_id' => $usession['sup_user_id'],
+				'bug_note' => $description,
+				'created_at' => date('Y-m-d H:i:s'),
+			];
+
+			// Insert into database
+			$ProjectbugsModel = new ProjectbugsModel();
+			if ($ProjectbugsModel->insert($data)) {
+				$Return['result'] = lang('Success.ci_project_bug_added_msg');
+				$Return['redirect_url'] = base_url('erp/project-detail/') . uencode($project_id);
+			} else {
+				$Return['error'] = lang('Main.xin_error_msg');
+			}
+
+			$Return['csrf_hash'] = csrf_hash();
+			return $this->response->setJSON($Return);
+		}
+
+		$Return = ['error' => lang('Main.xin_error_msg'), 'csrf_hash' => csrf_hash()];
+		return $this->response->setJSON($Return);
+	}
+	public function add_client_project_bug()
 	{
 		$validation = \Config\Services::validation();
 		$session = \Config\Services::session();
@@ -1855,6 +1996,76 @@ class Projects extends BaseController
 		$Return['csrf_hash'] = csrf_hash();
 		return $this->output($Return);
 	}
+	public function add_project_client_discussion()
+	{
+		$validation = \Config\Services::validation();
+		$session = \Config\Services::session();
+		$request = \Config\Services::request();
+		$usession = $session->get('sup_username');
+
+		$Return = [
+			'result' => '',
+			'error' => '',
+			'csrf_hash' => csrf_hash()
+		];
+
+		$rules = [
+			'description' => [
+				'rules' => 'required',
+				'errors' => ['required' => lang('Success.xin_discussion_field_error')]
+			],
+			
+		];
+
+		if (!$this->validate($rules)) {
+			$errors = $validation->getErrors();
+			$Return['error'] = reset($errors);
+			return $this->response->setJSON($Return);
+		}
+
+		$UsersModel = new UsersModel();
+		$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+
+		$company_id = ($user_info['user_type'] === 'staff') ? $user_info['company_id'] : $usession['sup_user_id'];
+
+		$description = $this->request->getPost('description', FILTER_SANITIZE_STRING);
+		$project_id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
+		$discussion_id = $this->request->getPost('discussion_id');
+
+		$data = [
+			'company_id' => $company_id,
+			'project_id' => $project_id,
+			'employee_id' => $usession['sup_user_id'],
+			'discussion_text' => $description,
+		];
+
+		$ProjectdiscussionModel = new ProjectdiscussionModel();
+
+		if (!empty($discussion_id)) {
+			$result = $ProjectdiscussionModel->update($discussion_id, $data);
+
+			if ($result) {
+				$Return['result'] = "Discussion Updated Successgully";
+				$Return['redirect_url'] = base_url('erp/project-detail/') . uencode($project_id);
+			} else {
+				$Return['error'] = lang('Main.xin_error_msg');
+			}
+		} else {
+			// Insert new discussion
+			$data['created_at'] = date('Y-m-d H:i:s'); // Add created_at only for new entries
+			$result = $ProjectdiscussionModel->insert($data);
+
+			if ($result) {
+				$Return['result'] = lang('Success.ci_project_discussion_added_msg');
+				$Return['redirect_url'] = base_url('erp/project-detail/') . uencode($project_id);
+			} else {
+				$Return['error'] = lang('Main.xin_error_msg');
+			}
+		}
+
+		$Return['csrf_hash'] = csrf_hash();
+		return $this->response->setJSON($Return);
+	}
 
 
 	public function add_attachment()
@@ -1941,6 +2152,89 @@ class Projects extends BaseController
 
 		echo json_encode($Return);
 		return;
+	}
+	public function add_client_project_attachment()
+	{
+		$validation = \Config\Services::validation();
+		$session = \Config\Services::session();
+		$request = \Config\Services::request();
+		$usession = $session->get('sup_username');
+		$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+		$Return['csrf_hash'] = csrf_hash();
+
+		if ($this->request->getPost('file_name')) {
+			// Set validation rules
+			$rules = [
+				'file_name' => [
+					'rules' => 'required',
+					'errors' => [
+						'required' => lang('Main.xin_error_field_text')
+					]
+				],
+				'attachment_file' => [
+					'rules' => 'uploaded[attachment_file]|mime_in[attachment_file,image/jpg,image/jpeg,image/gif,image/png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet]|max_size[attachment_file,3072]',
+					'errors' => [
+						'uploaded' => lang('Success.xin_file_field_error'),
+						'mime_in' => 'Unsupported file format or wrong size',
+					],
+				],
+			];
+
+			if (!$this->validate($rules)) {
+				$ruleErrors = [
+					"file_name" => $validation->getError('file_name'),
+					"attachment_file" => $validation->getError('attachment_file')
+				];
+				foreach ($ruleErrors as $err) {
+					$Return['error'] = $err;
+					if ($Return['error'] != '') {
+						return $this->response->setJSON($Return);	
+					}
+				}
+			} else {
+				// File Upload
+				$attachment = $this->request->getFile('attachment_file');
+				if ($attachment->isValid() && !$attachment->hasMoved()) {
+					$file_name = $attachment->getRandomName(); // Get a random file name to avoid conflicts
+					$attachment->move('uploads/project_files/', $file_name); // Move file to desired folder
+
+					// Retrieve other form inputs
+					$file_title = $this->request->getPost('file_name', FILTER_SANITIZE_STRING);
+					$id = udecode($this->request->getPost('token', FILTER_SANITIZE_STRING));
+
+					// Fetch user info from session
+					$UsersModel = new UsersModel();
+					$user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
+					$company_id = ($user_info['user_type'] == 'staff') ? $user_info['company_id'] : $usession['sup_user_id'];
+
+					// Prepare data to store in the database
+					$data = [
+						'company_id' => $company_id,
+						'project_id' => $id,
+						'employee_id' => $usession['sup_user_id'],
+						'file_title' => $file_title,
+						'attachment_file' => $file_name,
+						'created_at' => date('Y-m-d H:i:s') // Use current date and time
+					];
+
+					// Insert data into the database
+					$ProjectfilesModel = new ProjectfilesModel();
+					$result = $ProjectfilesModel->insert($data);
+
+					if ($result) {
+						$Return['result'] = lang('Success.ci_project_file_added_msg');
+					} else {
+						$Return['error'] = lang('Main.xin_error_msg');
+					}
+				} else {
+					$Return['error'] = lang('Success.xin_file_field_error');
+				}
+			}
+		} else {
+			$Return['error'] = "First Add a Title name Then upload a document file.";
+		}
+
+		return $this->response->setJSON($Return);
 	}
 	// update record
 	public function update_project_status()
@@ -2128,8 +2422,8 @@ class Projects extends BaseController
 		$Return['hold_lb'] = lang('Projects.xin_project_hold');
 		$Return['hold'] = $hold;
 		$Return['total_label'] = lang('Main.xin_total');
-		$this->output($Return);
-		exit;
+		return $this->response->setJSON($Return);
+		
 	}
 	public function projects_priority_chart()
 	{

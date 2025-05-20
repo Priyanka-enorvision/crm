@@ -1,5 +1,4 @@
 <?php
-
 use App\Models\UsersModel;
 use App\Models\ProjectsModel;
 use App\Models\PlanningEntityModel;
@@ -25,17 +24,13 @@ $company_id = $user_info['company_id'];
 $user_type = $user_info['user_type'];
 
 
-$planning_entities = $PlanningEntityModel->where(['company_id' => $company_id, 'user_type' => $user_type, 'valid' => '1'])->findAll();
-
-
 $year_planning_data = $YearPlanningModel->where(['company_id' => $company_id, 'user_type' => $user_type])->findAll();
 $years = array_column($year_planning_data, 'year');
-
 
 $unique_years = array_unique($years);
 rsort($unique_years);
 
-$currentYear = date('Y'); 
+$currentYear = date('Y');
 $nextYear = $currentYear + 1;
 $financialYear = $currentYear . '-' . substr($nextYear, -2);
 
@@ -44,22 +39,36 @@ $month = array_column($monthlyPlanningRecords, 'month');
 
 $unique_months = array_unique($month);
 
+
 $financialYearMonths = [
-    'april', 'may', 'june', 'july', 'august', 'september',
-    'october', 'november', 'december', 'january', 'february', 'march'
+    'april',
+    'may',
+    'june',
+    'july',
+    'august',
+    'september',
+    'october',
+    'november',
+    'december',
+    'january',
+    'february',
+    'march'
 ];
 
 // Extract just the month names from records (without year)
-$plannedMonths = array_map(function($item) {
+$plannedMonths = array_map(function ($item) {
     return strtolower(explode('-', $item)[0]); // Get "april" from "april-2024"
 }, $unique_months);
 
 $remaining_months = array_diff($financialYearMonths, $plannedMonths);
 
+
 $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('project_id', 'ASC')->findAll();
 
-?>
 
+
+?>
+<meta name="csrf-token" content="<?= csrf_token() ?>">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
 <style>
@@ -70,12 +79,12 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
     }
 
     .content-slider {
-        max-width: 1115px !important;
         margin-left: 15px;
+        margin-right: 15px;
     }
 
     .dashboard-container {
-        max-width: 1200px;
+
         padding: 20px;
         /* background-color: #f9f9f9; */
         border-radius: 10px;
@@ -183,7 +192,7 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
         justify-content: space-between;
         margin-bottom: 20px;
         gap: 15px;
-        flex-direction:column;
+        flex-direction: column;
 
     }
 
@@ -218,8 +227,8 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
     .main-border {
         border: solid 1px lightgray;
         border-radius: 6px;
-        margin-left:25px;
-        margin-right:25px;
+        margin-left: 25px;
+        margin-right: 25px;
     }
 
 
@@ -269,13 +278,14 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
         } else {
             $message = "Great! All months for financial year $financialYear are already planned.";
         }
-
         echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
         ?>
     </div>
 </div>
+
+
 <div class="dashboard-container">
-<div class="cards-container">
+    <div class="cards-container">
         <div class="card sales-target">
             <h6>Sales Target</h6>
             <p id="salesTargetRevenue">0.00</p>
@@ -292,318 +302,149 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
 
     <div>
         <h4>Yearly Planning</h4>
-    </div>  
-    <div class="annual-summary" id="planningEntitiesContainer">
+    </div>
+    <div class="annual-summary" id="yearPlanningEntitiesContainers">
         <!-- Dynamic entity list will be added here -->
     </div>
 
-    <div class="row justify-content-between align-items-center mb-5  mr-1">
-        <h5 class="col-auto">Annual Planning</h5>
-        <?php if ($super_user_type != 'super_user') { ?>
-            <button class="btn btn-primary  add-button text-right"><i data-feather="plus"></i>
-                Add</button>
-        <?php } ?>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastr@latest/build/toastr.min.js"></script>
+
+<div class="analytics-section">
+    <div class="analytics-header">
+        <h6>Performance Analytics</h6>
+        <select id="yearSelectPerformance" class="year-selector">
+            <?php
+            $currentYear = date('Y');
+            $startYear = $currentYear - 15;
+            if (!empty($unique_years)) {
+
+                foreach ($unique_years as $year) {
+                    echo "<option value='$year' " . ($year == $currentYear ? 'selected' : '') . ">$year</option>";
+                }
+            } else {
+                echo "<option value='$currentYear' selected>$currentYear</option>";
+            }
+            ?>
+        </select>
+
     </div>
-
-    <div id="form-container" style="display: none;">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 100%; margin: 0;">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">Add Annual Planning Form</h5>
-                    <button type="button" class="close add-button text-white" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <?php if (!empty($planning_entities)): ?>
-                        <form id="add-form" method="post" autocomplete="off">
-                            <div class="row">
-                                <!-- Financial Year Selection -->
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="financial_year" class="font-weight-bold">Financial Year<span class="text-danger">*</span></label>
-                                        <?php
-                                            
-                                            $currentYear = (int)date('Y');
-                                            $currentMonth = (int)date('n');
-                                            $unique_years = $unique_years ?? []; 
-                                            $financialYearStart = ($currentMonth >= 4) ? $currentYear : $currentYear - 1;
-                                            $currentFY = sprintf("%d-%02d", $financialYearStart, ($financialYearStart + 1) % 100);
-                                            ?>
-
-                                            <select class="form-control" id="financial_year" name="year" required>
-                                                <option value="">Select Financial Year</option>
-                                                <?php if (!empty($unique_years)): ?>
-                                                    <?php foreach ($unique_years as $year): ?>
-                                                        <?php
-                                                        
-                                                        $year = (int)$year;
-                                                        if ($year < 2000 || $year > 2100) continue;
-                                                        
-                                                        $startYear = $year;
-                                                        $endYear = $year + 1;
-                                                        $fyValue = sprintf("%d-%02d", $startYear, $endYear % 100);
-                                                        $fyDisplay = sprintf("April %d - March %d", $startYear, $endYear);
-                                                        $selected = ($fyValue === $currentFY) ? 'selected' : '';
-                                                        ?>
-                                                        <option value="<?= htmlspecialchars($fyValue) ?>" <?= $selected ?>>
-                                                            <?= htmlspecialchars("$fyValue ($fyDisplay)") ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                <?php else: ?>
-                                                    <?php  ?>
-                                                    <?php for ($i = 2; $i >= -5; $i--): ?>
-                                                        <?php
-                                                        $startYear = $financialYearStart + $i;
-                                                        $endYear = $startYear + 1;
-                                                        $fyValue = sprintf("%d-%02d", $startYear, $endYear % 100);
-                                                        $fyDisplay = sprintf("April %d - March %d", $startYear, $endYear);
-                                                        $selected = ($fyValue === $currentFY) ? 'selected' : '';
-                                                        ?>
-                                                        <option value="<?= htmlspecialchars($fyValue) ?>" <?= $selected ?>>
-                                                            <?= htmlspecialchars("$fyValue ($fyDisplay)") ?>
-                                                        </option>
-                                                    <?php endfor; ?>
-                                                <?php endif; ?>
-                                            </select>
-                                    </div>
-                                </div>
-                                <!-- Month Selection -->
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="month" class="font-weight-bold">Month<span class="text-danger">*</span></label>
-                                        <select class="form-control" id="month" name="month" required>
-                                            <?php
-                                            $months = [
-                                                ['name' => 'April', 'year_offset' => 0],
-                                                ['name' => 'May', 'year_offset' => 0],
-                                                ['name' => 'June', 'year_offset' => 0],
-                                                ['name' => 'July', 'year_offset' => 0],
-                                                ['name' => 'August', 'year_offset' => 0],
-                                                ['name' => 'September', 'year_offset' => 0],
-                                                ['name' => 'October', 'year_offset' => 0],
-                                                ['name' => 'November', 'year_offset' => 0],
-                                                ['name' => 'December', 'year_offset' => 0],
-                                                ['name' => 'January', 'year_offset' => 1],
-                                                ['name' => 'February', 'year_offset' => 1],
-                                                ['name' => 'March', 'year_offset' => 1]
-                                            ];
-                                            
-                                            foreach ($months as $month) {
-                                                $year = $currentYear + $month['year_offset'];
-                                                if ($currentMonth >= 4 && $month['year_offset'] == 1) {
-                                                    $year = $currentYear + 1;
-                                                } elseif ($currentMonth < 4 && $month['year_offset'] == 0) {
-                                                    $year = $currentYear;
-                                                }
-                                                echo "<option value='{$month['name']}-$year'>{$month['name']} $year</option>";
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            </div>
-
-                            <br>
-                            <?php $columns = array_keys($planning_entities[0]); ?>
-
-                            <div class="row" style="padding: 10px;">
-                                <?php foreach ($planning_entities as $index => $entity): ?>
-                                    <div class="col-md-6">
-                                        <fieldset style="margin-bottom: 15px; padding:10px;">
-                                            <input type="hidden" name="entities[<?= $entity['id']; ?>][entities_id]"
-                                                value="<?= $entity['id']; ?>">
-                                            <?php foreach ($columns as $column): ?>
-                                                <?php if ($column === 'entity'): ?>
-                                                    <div>
-                                                        <label for="entities_<?= $entity['id']; ?>" class="font-weight-bold">
-                                                            <?= htmlspecialchars($entity[$column]); ?><span class="text-danger">*</span>
-                                                        </label>
-                                                        <input type="<?= htmlspecialchars($entity['type']); ?>"
-                                                            id="entities_<?= $entity['id']; ?>"
-                                                            name="entities[<?= $entity['id']; ?>][entity_value]"
-                                                            placeholder="<?= htmlspecialchars($entity[$column]); ?>"
-                                                            style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"
-                                                            required>
-                                                    </div>
-                                                <?php endif; ?>
-                                            <?php endforeach; ?>
-                                        </fieldset>
-                                    </div>
-                                    <?php if (($index + 1) % 2 == 0): ?>
-                                    </div>
-                                    <div class="row">
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
-                            </div>
-
-                            <div class="text-right">
-                                <button type="submit" id="submit-btn" class="btn btn-primary text-right"
-                                    style="padding: 12px 24px; background-color: #28a745; border: none; color: white; cursor: pointer; font-size: 16px; border-radius: 5px;margin-right: 10px;margin-bottom:10px;">Submit</button>
-                            </div>
-                        </form>
-
-                    <?php else: ?>
-                        <p class="text-center">No planning entities found for the specified company.Please Click
-                            On
-                            <a href="<?php echo site_url('erp/planning_configuration'); ?>">Create New
-                                Entity</a>
-                        </p>
-                    <?php endif; ?>
-                </div>
-            </div>
+    <div class="row pb-2">
+        <div class="col-auto" style="line-height:0.5">
+            <h6>Planned:</h6>
+            <p id="totalRevenue">0.00</p>
+        </div>
+        <div class="col-auto" style="line-height:0.5">
+            <h6>Achieved:</h6>
+            <p id="achievedRevenue">0.00</p>
         </div>
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/toastr@latest/build/toastr.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            // Initialize Toastr options for extended duration
-            toastr.options = {
-                "closeButton": true,
-                "progressBar": true,
-                "timeOut": 30000, // Display for 30 seconds (30000 ms)
-                "extendedTimeOut": 30000 // Extended timeout if the user hovers
-            };
-
-            $('.add-button').click(function () {
-                $('#form-container').toggle();
-            });
-
-            $('#add-form').submit(function (event) {
-                event.preventDefault();
-                $('#submit-btn').prop('disabled', true);
-
-                var formData = $(this).serialize();
-                console.log("Form Data:", formData);
-
-                $.ajax({
-                    type: 'POST',
-                    url: '<?php echo base_url('erp/monthly_achive_submit'); ?>',
-                    data: formData,
-                    dataType: 'json',
-                    encode: true,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': '<?php echo csrf_hash(); ?>'
-                    }
-                })
-                    .done(function (response) {
-                        console.log("Response:", response);
-                        if (response.message === 'Form submitted successfully!') {
-                            toastr.success(response.message);
-                            setTimeout(() => location.reload(), 5000);
-                        } else {
-                            toastr.error('Error: ' + response.message);
-                            setTimeout(() => location.reload(), 5000);
-                        }
-                    })
-                    .fail(function (response) {
-                        console.log("AJAX Error:", response);
-                        toastr.error('Error occurred while submitting the form.');
-                        setTimeout(() => location.reload(), 5000);
-                    })
-                    .always(function () {
-                        $('#submit-btn').prop('disabled', false);
-                    });
-            });
-        });
-    </script>
+    <div id="chart-container">
+        <canvas id="performanceChart"></canvas>
+    </div>
+</div>
 
 
-    <div class="analytics-section">
-        <div class="analytics-header">
-            <h6>Performance Analytics</h6>
-            <select id="yearSelectPerformance" class="year-selector">
+<style>
+    .month-heading {
+        color: #4e73df;
+        border-bottom: 2px solid #4e73df;
+        padding-bottom: 8px;
+        margin-top: 20px;
+        margin-bottom: 15px;
+    }
+
+    .month-entities-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .status-item {
+        background: #f8f9fa;
+        border-radius: 5px;
+        padding: 15px;
+        transition: all 0.3s ease;
+        border-left: 4px solid #4e73df;
+    }
+
+    .status-item:hover {
+        background: #e9ecef;
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-text {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .bold {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #343a40;
+    }
+</style>
+
+<!-- Your existing month selector (unchanged) -->
+<div class="card-header-right d-flex align-items-center justify-content-between mt-5">
+    <div class="monthly-planning-text">
+        <h5 class="mb-0 font-weight-bold">Monthly Planning</h5>
+    </div>
+
+    <div class="form-group row align-items-center month-adjust mb-0">
+        <div class="col-md-4 p-0">
+            <select class="form-control month-select" id="month-select" name="month" required>
+                <option value="" disabled selected>Select Month</option>
                 <?php
-                $currentYear = date('Y');
-                $startYear = $currentYear - 15;
-                if (!empty($unique_years)) {
+                $months = [
+                    ['name' => 'April', 'value' => '04'],
+                    ['name' => 'May', 'value' => '05'],
+                    ['name' => 'June', 'value' => '06'],
+                    ['name' => 'July', 'value' => '07'],
+                    ['name' => 'August', 'value' => '08'],
+                    ['name' => 'September', 'value' => '09'],
+                    ['name' => 'October', 'value' => '10'],
+                    ['name' => 'November', 'value' => '11'],
+                    ['name' => 'December', 'value' => '12'],
+                    ['name' => 'January', 'value' => '01'],
+                    ['name' => 'February', 'value' => '02'],
+                    ['name' => 'March', 'value' => '03']
+                ];
 
-                    foreach ($unique_years as $year) {
-                        echo "<option value='$year' " . ($year == $currentYear ? 'selected' : '') . ">$year</option>";
-                    }
-                } else {
-                    echo "<option value='$currentYear' selected>$currentYear</option>";
+                $currentYear = date('Y');
+                $currentMonth = date('m');
+
+                $financialYearStart = ($currentMonth >= '04') ? $currentYear : $currentYear - 1;
+                $financialYearEnd = $financialYearStart + 1;
+
+                foreach ($months as $month) {
+                    $year = ($month['value'] >= '04') ? $financialYearStart : $financialYearEnd;
+                    $displayText = $month['name'] . ' ' . $year;
+                    $value = $month['value'] . '-' . $year;
+                    $selected = ($month['value'] == $currentMonth && $year == $currentYear) ? 'selected' : '';
+                    echo "<option value='{$value}' {$selected}>{$displayText}</option>";
                 }
                 ?>
             </select>
-
-        </div>
-        <div class="row pb-2">
-            <div class="col-auto" style="line-height:0.5">
-                <h6>Planned:</h6>
-                <p id="totalRevenue">0.00</p>
-            </div>
-            <div class="col-auto" style="line-height:0.5">
-                <h6>Achieved:</h6>
-                <p id="achievedRevenue">0.00</p>
-            </div>
-        </div>
-        <div id="chart-container">
-            <canvas id="performanceChart"></canvas>
         </div>
     </div>
+</div>
 
-
-    <div class="row justify-content-between align-items-center mt-5 mr-1">
-        <h5 class="col-auto">Monthly Planning</h5>
-    </div>
-
-    <div class="monthly-summary" id="monthlyPlanningEntitiesContainers">
-        <!-- Dynamic entity list will be added here -->
-    </div>
+<!-- Entities container -->
+<div class="monthly-summary" id="monthlyPlanningEntitiesContainers">
+    <!-- Will be populated by JavaScript -->
 </div>
 <!--  -->
 
 
-
-
+<?php $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('project_id', 'ASC')->findAll(); ?>
 <div class="main-border">
     <div class="card-header d-flex justify-content-between align-items-center pt-1 pb-1">
         <h6>List All Project</h6>
-        <div class="card-header-right d-flex align-items-center">
-            <div class="form-group row align-items-center month-adjust mb-0">
-                <label for="month-select" class="col-form-label font-weight-bold mr-2">Month<span class="text-danger">*</span></label>
-                <div class="col-md-4 p-0">
-                    <select class="form-control month-select" id="month-select" name="month" required>
-                        <option value="" disabled selected>Select Month</option>
-                        <?php
-                        $months = [
-                            ['name' => 'April', 'year_offset' => 0],
-                            ['name' => 'May', 'year_offset' => 0],
-                            ['name' => 'June', 'year_offset' => 0],
-                            ['name' => 'July', 'year_offset' => 0],
-                            ['name' => 'August', 'year_offset' => 0],
-                            ['name' => 'September', 'year_offset' => 0],
-                            ['name' => 'October', 'year_offset' => 0],
-                            ['name' => 'November', 'year_offset' => 0],
-                            ['name' => 'December', 'year_offset' => 0],
-                            ['name' => 'January', 'year_offset' => 1],
-                            ['name' => 'February', 'year_offset' => 1],
-                            ['name' => 'March', 'year_offset' => 1]
-                        ];
-                        
-                        $currentYear = date('Y');
-                        $currentMonth = date('n'); // Current month as numeric value (1-12)
-                        
-                        foreach ($months as $month) {
-                            $year = $currentYear + $month['year_offset'];
-                            if ($currentMonth >= 4 && $month['year_offset'] == 1) {
-                                $year = $currentYear + 1;
-                            } elseif ($currentMonth < 4 && $month['year_offset'] == 0) {
-                                $year = $currentYear;
-                            }
-                            echo "<option value='{$month['name']}-$year'>{$month['name']} $year</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="card-body pt-0">
@@ -630,8 +471,9 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
 
                         $counter = 1;
                         foreach ($all_projects as $r) {
+
                             // Check user role and project status to display delete button
-                            if (in_array('project4', staff_role_resource()) || $user_info['user_type'] == 'company' || $user_info['user_type'] == 'super_user') {
+                            if (in_array('project4', staff_role_resource()) || $user_info['user_type'] == 'company') {
                                 $delete = '<span data-toggle="tooltip" data-placement="top" data-state="danger" title="' . lang('Main.xin_delete') . '"><button type="button" class="btn icon-btn btn-sm btn-light-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . uencode($r['project_id']) . '"><i class="feather icon-trash-2"></i></button></span>';
                             } else {
                                 $delete = '';
@@ -684,10 +526,14 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
                                 $priority = '<span class="badge badge-light-success">' . lang('Projects.xin_low') . '</span>';
                             }
 
-                            // Project revenue formatting
-                            $project_revenue = $r['revenue'] ?? 0;
-
-                        
+                            // $project_revenue = $r['revenue'] ?? 0;
+                            // // $project_revenue = number_to_currency($project_revenue, $xin_system['default_currency'], null, 2);
+                            // if (!empty($r['revenue']) && is_numeric($r['revenue'])) {
+                            //     $project_revenue = number_to_currency((float)$r['revenue'], 'INR', null, 2);
+                            // } else {
+                            //     $project_revenue = 'N/A';
+                            // }
+                    
                             $project_summary = $r['title'];
 
                             // Created by (User info)
@@ -730,127 +576,55 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-   document.addEventListener("DOMContentLoaded", function() {
-    const performanceTable = $('#DataTables_Table_0').DataTable();
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth(); // 0-11
-    
-    // Financial year months (April to March)
-    const financialYearMonths = [
-        {name: "April", value: 3, yearOffset: 0},
-        {name: "May", value: 4, yearOffset: 0},
-        {name: "June", value: 5, yearOffset: 0},
-        {name: "July", value: 6, yearOffset: 0},
-        {name: "August", value: 7, yearOffset: 0},
-        {name: "September", value: 8, yearOffset: 0},
-        {name: "October", value: 9, yearOffset: 0},
-        {name: "November", value: 10, yearOffset: 0},
-        {name: "December", value: 11, yearOffset: 0},
-        {name: "January", value: 0, yearOffset: 1},
-        {name: "February", value: 1, yearOffset: 1},
-        {name: "March", value: 2, yearOffset: 1}
-    ];
-
-    function applyFilters() {
-        const selectedFinancialYear = document.getElementById('yearSelectPerformance').value;
-        const selectedMonth = document.getElementById('month-select').value;
-
-        const [startYear, endYearShort] = selectedFinancialYear.split('-');
-        const endYear = startYear.slice(0, 2) + endYearShort; 
-
-        $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(
-            filterFn => filterFn.source !== 'yearMonthFilter'
-        );
-
-        const yearMonthFilter = function(settings, data, dataIndex) {
-            const row = performanceTable.row(dataIndex).node();
-            const startDate = new Date($(row).data('start-date'));
-            const endDate = new Date($(row).data('end-date'));
-
-            function getFinancialMonth(date) {
-                const month = date.getMonth();
-                return month >= 3 ? month - 3 : month + 9;
-            }
-
-            function isInFinancialYear(date) {
-                const dateYear = date.getFullYear();
-                const dateMonth = date.getMonth();
-                
-                if (dateYear == startYear && dateMonth >= 3) return true;
-                
-                if (dateYear == endYear && dateMonth <= 2) return true;
-                
-                return false;
-            }
-
-            const monthMatch = selectedMonth === '' || 
-                             getFinancialMonth(startDate) == selectedMonth || 
-                             getFinancialMonth(endDate) == selectedMonth;
-
-            const yearMatch = selectedFinancialYear === '' || 
-                             isInFinancialYear(startDate) || 
-                             isInFinancialYear(endDate);
-
-            return monthMatch && yearMatch;
-        };
-
-        yearMonthFilter.source = 'yearMonthFilter';
-        $.fn.dataTable.ext.search.push(yearMonthFilter);
-        performanceTable.draw();
-    }
-
-    const currentFinancialMonth = currentMonth >= 3 ? 
-        financialYearMonths[currentMonth - 3] : 
-        financialYearMonths[currentMonth + 9];
-    document.getElementById("month-select").value = currentFinancialMonth.value;
-
-    applyFilters();
-
-    document.getElementById('yearSelectPerformance').addEventListener('change', applyFilters);
-    document.getElementById('month-select').addEventListener('change', applyFilters);
-});
-</script>
-
-<script>
-
-
     document.addEventListener("DOMContentLoaded", function () {
         let chart;
-        const currencyFormatter = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' });
+        const currencyFormatter = new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR'
+        });
+
+        let responseData;
 
         document.getElementById('yearSelectPerformance').addEventListener('change', loadChartData);
-        setTimeout(loadChartData, 700); // Load data after 700ms delay
+        document.getElementById('month-select').addEventListener('change', filterMonthlyEntities);
+        setTimeout(loadChartData, 700);
 
         function loadChartData() {
             const selectedYear = document.getElementById('yearSelectPerformance').value;
-            console.log("Selected Year:", selectedYear);
-
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
             const company_id = <?php echo json_encode($company_id); ?>;
-            // AJAX request to fetch data
             $.ajax({
-                url: main_url + 'invoices/company_month_plan_chart',
+                url: main_url + 'company-month-plan-chart',
                 type: 'GET',
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                data: {companyId:company_id,year: selectedYear },
+                dataType: 'json',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                data: {
+                    year : selectedYear,
+                    company_id : company_id
+                },
                 success: function (response) {
-                    console.log("AJAX Response:", response);
+                    responseData = response;
+
                     if (response && response.invoice_month && response.paid_invoice && response.unpaid_invoice) {
-                        // Update sales target information with currency formatting
                         document.getElementById('salesTargetRevenue').textContent = currencyFormatter.format(response.total_revenue || 0);
                         document.getElementById('salesTargetPlanned').textContent = currencyFormatter.format(response.achieved || 0);
                         document.getElementById('totalRevenue').textContent = currencyFormatter.format(response.total_revenue || 0);
                         document.getElementById('achievedRevenue').textContent = currencyFormatter.format(response.achieved || 0);
                         document.getElementById('salesTargetUnplanned').textContent = currencyFormatter.format((parseFloat(response.total_revenue) - parseFloat(response.achieved)) || 0);
 
-                        // Ensure year_planning_entities exists and is an array
                         if (Array.isArray(response.year_planning_entities)) {
-                            // Dynamic generation of planning entities
-                            const planningEntitiesContainer = document.getElementById('planningEntitiesContainer');
-                            planningEntitiesContainer.innerHTML = '';  // Clear any previous content
+                            const yearPlanningEntitiesContainers = document.getElementById('yearPlanningEntitiesContainers');
+                            yearPlanningEntitiesContainers.innerHTML = '';
                             response.year_planning_entities.forEach(entity => {
                                 const entityDiv = document.createElement('div');
                                 entityDiv.classList.add('status-item');
+                                entityDiv.style.cursor = 'pointer';
+                                entityDiv.addEventListener('click', function () {
+                                    storeEntityAndRedirect(entity.id, entity.entity_name);
+                                });
 
                                 const entityName = document.createElement('h5');
                                 entityName.id = "saleTargetStatus";
@@ -866,81 +640,30 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
 
                                 entityDiv.appendChild(entityName);
                                 entityDiv.appendChild(entityValue);
-                                planningEntitiesContainer.appendChild(entityDiv);
+                                yearPlanningEntitiesContainers.appendChild(entityDiv);
                             });
-                        } else {
-                            console.error("year_planning_entities is not an array or is missing from the response.");
-                        }
-                        if (response.monthly_planning_entities && typeof response.monthly_planning_entities === 'object') {
-                            // Dynamic generation of planning entities by month
-                            const monthlyPlanningEntitiesContainers = document.getElementById('monthlyPlanningEntitiesContainers');
-                            monthlyPlanningEntitiesContainers.innerHTML = '';  // Clear any previous content
-                            
-                            // Create a month order array to display months in financial year order
-                            const monthOrder = ['april', 'may', 'june', 'july', 'august', 'september', 
-                                            'october', 'november', 'december', 'january', 'february', 'march'];
-                            
-                            monthOrder.forEach(month => {
-                                if (response.monthly_planning_entities[month]) {
-                                    // Create month heading
-                                    const monthHeading = document.createElement('h4');
-                                    monthHeading.classList.add('month-heading');
-                                    monthHeading.textContent = capitalizeFirstLetter(month);
-                                    monthlyPlanningEntitiesContainers.appendChild(monthHeading);
-                                    
-                                    // Create container for this month's entities
-                                    const monthContainer = document.createElement('div');
-                                    monthContainer.classList.add('month-entities-container');
-                                    
-                                    // Add entities for this month
-                                    response.monthly_planning_entities[month].forEach(entity => {
-                                        const entityDiv = document.createElement('div');
-                                        entityDiv.classList.add('status-item');
-
-                                        const entityName = document.createElement('h5');
-                                        entityName.id = "saleTargetStatus";
-                                        entityName.classList.add('bold');
-                                        entityName.textContent = `${capitalizeFirstLetter(entity.entity_name)}`;
-
-                                        const entityValue = document.createElement('span');
-                                        entityValue.classList.add('status-text');
-                                        entityValue.innerHTML = `
-                                            <input type="hidden" name="entities[${entity.id}][entities_id]" value="${entity.id}">
-                                            ${entity.entity_value || 'N/A'}
-                                        `;
-
-                                        entityDiv.appendChild(entityName);
-                                        entityDiv.appendChild(entityValue);
-                                        monthContainer.appendChild(entityDiv);
-                                    });
-                                    
-                                    monthlyPlanningEntitiesContainers.appendChild(monthContainer);
-                                }
-                            });
-                        } else {
-                            console.error("monthly_planning_entities is missing or not in expected format.");
                         }
 
-                        // Chart generation
+                        displayMonthlyEntities(response.monthly_planning_entities, getCurrentFinancialMonth());
+
                         const options = {
                             type: 'line',
                             data: {
                                 labels: response.invoice_month,
-                                datasets: [
-                                    {
-                                        label: response.paid_inv_label,
-                                        data: response.paid_invoice,
-                                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                        borderColor: 'rgba(54, 162, 235, 1)',
-                                        borderWidth: 2
-                                    },
-                                    {
-                                        label: response.unpaid_inv_label,
-                                        data: response.unpaid_invoice,
-                                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                        borderColor: 'rgba(255, 99, 132, 1)',
-                                        borderWidth: 2
-                                    }
+                                datasets: [{
+                                    label: response.paid_inv_label,
+                                    data: response.paid_invoice,
+                                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 2
+                                },
+                                {
+                                    label: response.unpaid_inv_label,
+                                    data: response.unpaid_invoice,
+                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    borderWidth: 2
+                                }
                                 ]
                             },
                             options: {
@@ -964,7 +687,6 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
                             }
                         };
 
-                        // Updating the chart or creating a new one
                         if (chart) {
                             chart.data = options.data;
                             chart.options = options.options;
@@ -984,9 +706,132 @@ $all_projects = $ProjectsModel->where('company_id', $company_id)->orderBy('proje
             });
         }
 
-        // Function to capitalize the first letter of a string
+        function displayMonthlyEntities(monthlyEntities, currentMonth = null) {
+            const monthlyPlanningEntitiesContainers = document.getElementById('monthlyPlanningEntitiesContainers');
+            monthlyPlanningEntitiesContainers.innerHTML = '';
+
+            const monthOrder = ['april', 'may', 'june', 'july', 'august', 'september',
+                'october', 'november', 'december', 'january', 'february', 'march'
+            ];
+
+            let found = false;
+
+            monthOrder.forEach(month => {
+                if (currentMonth && month !== currentMonth) return;
+
+                if (monthlyEntities && monthlyEntities[month] && monthlyEntities[month].length > 0) {
+                    found = true;
+                    const monthHeading = document.createElement('h4');
+                    monthHeading.classList.add('month-heading');
+                    monthHeading.textContent = capitalizeFirstLetter(month);
+                    monthlyPlanningEntitiesContainers.appendChild(monthHeading);
+
+                    const monthContainer = document.createElement('div');
+                    monthContainer.classList.add('month-entities-container');
+
+                    monthlyEntities[month].forEach(entity => {
+                        const entityDiv = document.createElement('div');
+                        entityDiv.classList.add('status-item');
+                        entityDiv.style.cursor = 'pointer';
+                        entityDiv.addEventListener('click', function () {
+                            storeEntityAndRedirect(entity.id, entity.entity_name);
+                        });
+
+                        const entityName = document.createElement('h5');
+                        entityName.id = "saleTargetStatus";
+                        entityName.classList.add('bold');
+                        entityName.textContent = `${capitalizeFirstLetter(entity.entity_name)}`;
+
+                        const entityValue = document.createElement('span');
+                        entityValue.classList.add('status-text');
+                        entityValue.innerHTML = `
+                            <input type="hidden" name="entities[${entity.id}][entities_id]" value="${entity.id}">
+                            ${entity.entity_value || 'N/A'}
+                        `;
+
+                        entityDiv.appendChild(entityName);
+                        entityDiv.appendChild(entityValue);
+                        monthContainer.appendChild(entityDiv);
+                    });
+
+                    monthlyPlanningEntitiesContainers.appendChild(monthContainer);
+                }
+            });
+
+            if (!found) {
+                monthlyPlanningEntitiesContainers.innerHTML = `<p style="text-align:center;font-weight:bold;">No data found for the selected month.</p>`;
+            }
+        }
+
+        function filterMonthlyEntities() {
+            const selectedValue = document.getElementById('month-select').value;
+            if (!selectedValue || !responseData || !responseData.monthly_planning_entities) return;
+
+            const [monthNum, year] = selectedValue.split('-');
+            const monthNames = {
+                '01': 'january',
+                '02': 'february',
+                '03': 'march',
+                '04': 'april',
+                '05': 'may',
+                '06': 'june',
+                '07': 'july',
+                '08': 'august',
+                '09': 'september',
+                '10': 'october',
+                '11': 'november',
+                '12': 'december'
+            };
+
+            const monthKey = monthNames[monthNum];
+            const monthlyEntities = {};
+
+            if (responseData.monthly_planning_entities[monthKey]) {
+                monthlyEntities[monthKey] = responseData.monthly_planning_entities[monthKey];
+            }
+
+            displayMonthlyEntities(monthlyEntities, monthKey);
+        }
+
+        function getCurrentFinancialMonth() {
+            const monthIndex = new Date().getMonth(); // 0 to 11
+            const monthMap = ['january', 'february', 'march', 'april', 'may', 'june',
+                'july', 'august', 'september', 'october', 'november', 'december'
+            ];
+            const currentMonth = monthMap[monthIndex];
+
+            // Reorder month to financial year format (April to March)
+            const fyOrder = ['april', 'may', 'june', 'july', 'august', 'september',
+                'october', 'november', 'december', 'january', 'february', 'march'
+            ];
+            return fyOrder.includes(currentMonth) ? currentMonth : 'april';
+        }
+
         function capitalizeFirstLetter(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        function storeEntityAndRedirect(entityId) {
+            const csrfToken = $('meta[name="csrf-token"]').attr('content');
+            $.ajax({
+                url: main_url + 'set-entityid-session',
+                type: 'POST',
+                dataType: 'json',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                data: {
+                    entityId: entityId
+                },
+                success: function () {
+                    window.location.href = '<?= base_url('erp/projects-list'); ?>';
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    alert('Failed to set entity. Please try again.');
+                }
+            });
         }
     });
 </script>

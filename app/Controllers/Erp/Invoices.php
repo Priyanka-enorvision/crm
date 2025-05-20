@@ -389,7 +389,7 @@ class Invoices extends BaseController
 
 			$invoice_date = set_date_format($r['invoice_date']);
 			$invoice_due_date = set_date_format($r['invoice_due_date']);
-			$invoice_id = '<a href="' . site_url('erp/invoice-detail') . '/' . uencode($r['invoice_id']) . '"><span>#' . $r['invoice_number'] . '</span></a>';
+			$invoice_id = '<a href="' . site_url('erp/invoice-detail') . '/' . $r['invoice_id'] . '"><span>#' . $r['invoice_number'] . '</span></a>';
 			if ($r['status'] == 0) {
 				$status = '<span class="badge badge-light-danger">' . lang('Invoices.xin_unpaid') . '</span>';
 			} else if ($r['status'] == 1) {
@@ -397,9 +397,9 @@ class Invoices extends BaseController
 			} else {
 				$status = '<span class="badge badge-light-info">' . lang('Projects.xin_project_cancelled') . '</span>';
 			}
-			$view = '<a href="' . site_url('erp/invoice-detail/') . uencode($r['invoice_id']) . '"><button type="button" class="btn btn-sm btn-icon btn-light-success"><i class="feather icon-eye"></i></button></a>';
+			$view = '<a href="' . site_url('erp/invoice-detail/') . $r['invoice_id'] . '"><button type="button" class="btn btn-sm btn-icon btn-light-success"><i class="feather icon-eye"></i></button></a>';
 			if ($r['status'] == 1) {
-				$download = '<a href="' . site_url('erp/print-invoice/') . uencode($r['invoice_id']) . '"><button type="button" class="btn btn-sm btn-icon btn-light-primary"><i class="feather icon-download"></i></button></a>';
+				$download = '<a href="' . site_url('erp/print-invoice/') . $r['invoice_id'] . '"><button type="button" class="btn btn-sm btn-icon btn-light-primary"><i class="feather icon-download"></i></button></a>';
 			} else {
 				$download = '';
 			}
@@ -1339,8 +1339,185 @@ class Invoices extends BaseController
 	}
 
 
+	// public function company_month_plan_chart()
+	// {
+	// 	$session = \Config\Services::session();
+	// 	if (!$session->has('sup_username')) {
+	// 		return redirect()->to(site_url('/'));
+	// 	}
+
+	// 	$UsersModel = new UsersModel();
+	// 	$YearPlanningModel = new YearPlanningModel();
+	// 	$MonthlyPlanningModel = new MonthlyPlanningModel();
+	// 	$MonthlyAchivedModel = new MonthlyAchivedModel();
+	// 	$PlanningEntityModel = new PlanningEntityModel();
+	// 	$PlanningConfigurationSettingModel = new PlanningConfigurationSettingModel();
+
+	// 	$selectedFinancialYear = $this->request->getVar('year') ?? date('Y') . '-' . substr(date('Y') + 1, 2);
+	// 	$company_id = $this->request->getVar('companyId');
+
+	// 	$startYear = (int)substr($selectedFinancialYear, 0, 4);
+	// 	$endYear = $startYear + 1;
+
+	// 	$user_info = $UsersModel->find($company_id);
+	// 	$user_type = $user_info['user_type'] ?? 'company';
+
+	// 	$monthly_earning_percentage = array_fill(0, 12, 0);
+	// 	$achieved_revenue = array_fill_keys(array_map('strtolower', [
+	// 		'april',
+	// 		'may',
+	// 		'june',
+	// 		'july',
+	// 		'august',
+	// 		'september',
+	// 		'october',
+	// 		'november',
+	// 		'december',
+	// 		'january',
+	// 		'february',
+	// 		'march'
+	// 	]), 0);
+	// 	$planned_revenue = $achieved_revenue;
+
+	// 	try {
+	// 		// Fetch Monthly Configuration
+	// 		$monthly_config = $PlanningConfigurationSettingModel
+	// 			->where(['company_id' => $company_id, 'user_type' => $user_type, 'year' => $selectedFinancialYear])
+	// 			->findAll();
+
+	// 		foreach ($monthly_config as $config) {
+	// 			$month = strtolower(explode('-', $config['month'])[0]);
+	// 			$month_index = array_search($month, array_keys($achieved_revenue));
+	// 			if ($month_index !== false) {
+	// 				$monthly_earning_percentage[$month_index] = (float)$config['percentage'];
+	// 			}
+	// 		}
+
+	// 		$monthly_achieved = $MonthlyAchivedModel
+	// 			->where([
+	// 				'company_id' => $company_id,
+	// 				'user_type' => $user_type,
+	// 				'year' => $selectedFinancialYear,
+	// 				'entities_id' => 1
+	// 			])
+	// 			->findAll();
+
+	// 		foreach ($monthly_achieved as $record) {
+	// 			$month = strtolower(explode('-', $record['month'])[0]);
+	// 			if (isset($achieved_revenue[$month])) {
+	// 				$achieved_revenue[$month] += (float)$record['entity_value'];
+	// 			}
+	// 		}
+
+	// 		$monthly_planned = $MonthlyPlanningModel
+	// 			->where([
+	// 				'company_id' => $company_id,
+	// 				'user_type' => $user_type,
+	// 				'year' => $selectedFinancialYear,
+	// 				'entities_id' => 1
+	// 			])
+	// 			->findAll();
+
+	// 		foreach ($monthly_planned as $record) {
+	// 			$month = strtolower(explode('-', $record['month'])[0]);
+	// 			if (isset($planned_revenue[$month])) {
+	// 				$planned_revenue[$month] += (float)$record['entity_value'];
+	// 			}
+	// 		}
+
+	// 		// Prepare Chart Data
+	// 		$invoice_month = [];
+	// 		$paid_invoice = [];
+	// 		$unpaid_invoice = [];
+	// 		$financialYearMonths = [
+	// 			['name' => 'April', 'year' => $startYear],
+	// 			['name' => 'May', 'year' => $startYear],
+	// 			['name' => 'June', 'year' => $startYear],
+	// 			['name' => 'July', 'year' => $startYear],
+	// 			['name' => 'August', 'year' => $startYear],
+	// 			['name' => 'September', 'year' => $startYear],
+	// 			['name' => 'October', 'year' => $startYear],
+	// 			['name' => 'November', 'year' => $startYear],
+	// 			['name' => 'December', 'year' => $startYear],
+	// 			['name' => 'January', 'year' => $endYear],
+	// 			['name' => 'February', 'year' => $endYear],
+	// 			['name' => 'March', 'year' => $endYear]
+	// 		];
+
+	// 		foreach ($financialYearMonths as $month) {
+	// 			$month_lower = strtolower($month['name']);
+	// 			$invoice_month[] = substr($month['name'], 0, 3) . ' ' . $month['year'];
+	// 			$paid_invoice[] = (float)($planned_revenue[$month_lower] ?? 0);
+	// 			$unpaid_invoice[] = (float)($achieved_revenue[$month_lower] ?? 0);
+	// 		}
+
+	// 		// Fetch Year Planning Entities
+	// 		$year_planning_entities = [];
+	// 		$year_entities = $YearPlanningModel
+	// 			->where(['company_id' => $company_id, 'user_type' => $user_type, 'year' => $selectedFinancialYear])
+	// 			->findAll();
+
+	// 		foreach ($year_entities as $entity) {
+	// 			$planning_entity = $PlanningEntityModel->find($entity['entities_id']);
+	// 			if ($planning_entity) {
+	// 				$year_planning_entities[] = [
+	// 					'id' => $entity['entities_id'],
+	// 					'entity_name' => $planning_entity['entity'],
+	// 					'entity_value' => $entity['entity_value'],
+	// 				];
+	// 			}
+	// 		}
+
+	// 		// Fetch Monthly Planning Entities
+	// 		$monthly_planning_entities = [];
+	// 		$monthly_entities = $MonthlyPlanningModel
+	// 			->where(['company_id' => $company_id, 'user_type' => $user_type, 'year' => $selectedFinancialYear])
+	// 			->findAll();
+
+	// 		foreach ($monthly_entities as $entity) {
+	// 			$planning_entity = $PlanningEntityModel->find($entity['entities_id']);
+	// 			if ($planning_entity) {
+	// 				$month = strtolower(explode('-', $entity['month'])[0]);
+	// 				if (!isset($monthly_planning_entities[$month])) {
+	// 					$monthly_planning_entities[$month] = [];
+	// 				}
+	// 				$monthly_planning_entities[$month][] = [
+	// 					'id' => $entity['entities_id'],
+	// 					'entity_name' => $planning_entity['entity'],
+	// 					'entity_value' => $entity['entity_value'],
+	// 					'month' => $month
+	// 				];
+	// 			}
+	// 		}
+
+	// 		// Prepare Final Response
+	// 		$response = [
+	// 			'status' => 'success',
+	// 			'invoice_month' => $invoice_month,
+	// 			'paid_invoice' => $paid_invoice,
+	// 			'unpaid_invoice' => $unpaid_invoice,
+	// 			'paid_inv_label' => lang('Invoices.xin_planned_revenue'),
+	// 			'unpaid_inv_label' => lang('Invoices.xin_achieved_revenue'),
+	// 			'total_revenue' => array_sum($planned_revenue),
+	// 			'achieved' => array_sum($achieved_revenue),
+	// 			'year_planning_entities' => $year_planning_entities,
+	// 			'monthly_planning_entities' => $monthly_planning_entities,
+	// 			'monthly_percentages' => $monthly_earning_percentage
+	// 		];
+
+	// 		return $this->response->setJSON($response);
+	// 	} catch (\Exception $e) {
+	// 		log_message('error', 'Error in company_month_plan_chart: ' . $e->getMessage());
+
+	// 		return $this->response->setJSON([
+	// 			'status' => 'error',
+	// 			'message' => 'An error occurred while processing the data'
+	// 		])->setStatusCode(500);
+	// 	}
+	// }
 	public function company_month_plan_chart()
 	{
+
 		$session = \Config\Services::session();
 		if (!$session->has('sup_username')) {
 			return redirect()->to(site_url('/'));
@@ -1354,13 +1531,14 @@ class Invoices extends BaseController
 		$PlanningConfigurationSettingModel = new PlanningConfigurationSettingModel();
 
 		$selectedFinancialYear = $this->request->getVar('year') ?? date('Y') . '-' . substr(date('Y') + 1, 2);
-		$company_id = $this->request->getVar('companyId');
 
 		$startYear = (int)substr($selectedFinancialYear, 0, 4);
 		$endYear = $startYear + 1;
 
-		$user_info = $UsersModel->find($company_id);
-		$user_type = $user_info['user_type'] ?? 'company';
+		$company_id = $this->request->getVar('company_id');
+
+		$user_info = $UsersModel->where('company_id',$company_id)->first();
+		$user_type = $user_info['user_type'];
 
 		$monthly_earning_percentage = array_fill(0, 12, 0);
 		$achieved_revenue = array_fill_keys(array_map('strtolower', [
@@ -1380,9 +1558,12 @@ class Invoices extends BaseController
 		$planned_revenue = $achieved_revenue;
 
 		try {
-			// Fetch Monthly Configuration
 			$monthly_config = $PlanningConfigurationSettingModel
-				->where(['company_id' => $company_id, 'user_type' => $user_type, 'year' => $selectedFinancialYear])
+				->where([
+					'company_id' => $company_id,
+					'user_type' => $user_type,
+					'year' => $selectedFinancialYear
+				])
 				->findAll();
 
 			foreach ($monthly_config as $config) {
@@ -1393,12 +1574,13 @@ class Invoices extends BaseController
 				}
 			}
 
+			// Get achieved revenue data (entity_id = 1 is assumed to be revenue)
 			$monthly_achieved = $MonthlyAchivedModel
 				->where([
 					'company_id' => $company_id,
 					'user_type' => $user_type,
 					'year' => $selectedFinancialYear,
-					'entities_id' => 1
+					'entities_id' => 1 // Assuming 1 is the revenue entity
 				])
 				->findAll();
 
@@ -1409,12 +1591,13 @@ class Invoices extends BaseController
 				}
 			}
 
+			// Get planned revenue data
 			$monthly_planned = $MonthlyPlanningModel
 				->where([
 					'company_id' => $company_id,
 					'user_type' => $user_type,
 					'year' => $selectedFinancialYear,
-					'entities_id' => 1
+					'entities_id' => 1 // Assuming 1 is the revenue entity
 				])
 				->findAll();
 
@@ -1425,10 +1608,12 @@ class Invoices extends BaseController
 				}
 			}
 
-			// Prepare Chart Data
+			// Prepare chart data in financial year order (April-March)
 			$invoice_month = [];
 			$paid_invoice = [];
 			$unpaid_invoice = [];
+
+			// Financial year months in order (April to March)
 			$financialYearMonths = [
 				['name' => 'April', 'year' => $startYear],
 				['name' => 'May', 'year' => $startYear],
@@ -1451,10 +1636,14 @@ class Invoices extends BaseController
 				$unpaid_invoice[] = (float)($achieved_revenue[$month_lower] ?? 0);
 			}
 
-			// Fetch Year Planning Entities
+			// Get year planning entities
 			$year_planning_entities = [];
 			$year_entities = $YearPlanningModel
-				->where(['company_id' => $company_id, 'user_type' => $user_type, 'year' => $selectedFinancialYear])
+				->where([
+					'company_id' => $company_id,
+					'user_type' => $user_type,
+					'year' => $selectedFinancialYear
+				])
 				->findAll();
 
 			foreach ($year_entities as $entity) {
@@ -1468,10 +1657,14 @@ class Invoices extends BaseController
 				}
 			}
 
-			// Fetch Monthly Planning Entities
+			// Get monthly planning entities
 			$monthly_planning_entities = [];
 			$monthly_entities = $MonthlyPlanningModel
-				->where(['company_id' => $company_id, 'user_type' => $user_type, 'year' => $selectedFinancialYear])
+				->where([
+					'company_id' => $company_id,
+					'user_type' => $user_type,
+					'year' => $selectedFinancialYear
+				])
 				->findAll();
 
 			foreach ($monthly_entities as $entity) {
@@ -1490,13 +1683,12 @@ class Invoices extends BaseController
 				}
 			}
 
-
-			// Prepare Final Response
+			// Prepare final response
 			$response = [
 				'status' => 'success',
-				'invoice_month' => $invoice_month,
-				'paid_invoice' => $paid_invoice,
-				'unpaid_invoice' => $unpaid_invoice,
+				'invoice_month' => $invoice_month, // Format: ["Apr 2025", "May 2025", ..., "Mar 2026"]
+				'paid_invoice' => $paid_invoice,   // Planned revenue data
+				'unpaid_invoice' => $unpaid_invoice, // Achieved revenue data
 				'paid_inv_label' => lang('Invoices.xin_planned_revenue'),
 				'unpaid_inv_label' => lang('Invoices.xin_achieved_revenue'),
 				'total_revenue' => array_sum($planned_revenue),
@@ -1508,7 +1700,7 @@ class Invoices extends BaseController
 
 			return $this->response->setJSON($response);
 		} catch (\Exception $e) {
-			log_message('error', 'Error in company_month_plan_chart: ' . $e->getMessage());
+			log_message('error', 'Error in month_plan_chart: ' . $e->getMessage());
 
 			return $this->response->setJSON([
 				'status' => 'error',
@@ -1559,8 +1751,8 @@ class Invoices extends BaseController
 		$Return['paid_invoice'] = $paid_invoice;
 		$Return['unpaid_invoice'] = $unpaid_invoice;
 
-		$this->output($Return);
-		exit;
+		return $this->response->setJSON($Return);
+		
 	}
 	// read record
 	public function read_invoice_data()

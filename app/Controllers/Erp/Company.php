@@ -44,7 +44,7 @@ class Company extends BaseController
 
 		$usession = $session->get('sup_username');
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
-		$segment_id = $request->uri->getSegment(3);
+		$segment_id = $request->getUri()->getSegment(3);
 		$isegment_val = $UsersModel->where('user_id', $segment_id)->first();
 
 		if (!$isegment_val) {
@@ -57,7 +57,7 @@ class Company extends BaseController
 		$data['breadcrumbs'] = 'Company Annual Planning';
 		$data['isegment_val'] = $isegment_val;
 		$data['subview'] = view('erp/planning/company_annual_planning', $data);
-		return view('erp/layout/layout_main', $data); //page load
+		return view('erp/layout/layout_main', $data); 
 	}
 
 	public function updateStatus($enc_id, $status)
@@ -416,7 +416,7 @@ class Company extends BaseController
 			return redirect()->to(site_url('erp/companies-list'));
 		}
 
-		$updated = $UsersModel->delete($id);
+		$updated = $UsersModel->delete($id);	
 
 		if ($updated) {
 			$session->setFlashdata('success', 'Company Deleted Successfully!');

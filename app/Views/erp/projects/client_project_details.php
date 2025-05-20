@@ -27,7 +27,7 @@ $xin_system = $SystemModel->where('setting_id', 1)->first();
 $locale = service('request')->getLocale();
 $request = \Config\Services::request();
 
-$segment_id = $request->uri->getSegment(3);
+$segment_id = $request->getUri()->getSegment(3);
 $project_id = udecode($segment_id);
 
 $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
@@ -165,6 +165,7 @@ $progress_bar = '<div class="progress" style="height: 10px;"><div class="progres
           <div class="card-body task-comment">
             <ul class="media-list p-0">
               <?php $tn=0; foreach($project_discussion as $_discussion){ ?>
+                
               <?php $time = Time::parse($_discussion['created_at']); ?>
               <?php $disc_user = $UsersModel->where('user_id', $_discussion['employee_id'])->first();?>
               <li class="media">
@@ -178,9 +179,15 @@ $progress_bar = '<div class="progress" style="height: 10px;"><div class="progres
                   <p>
                     <?= $_discussion['discussion_text'];?>
                   </p>
-                  <div class="m-t-10"> <span><a href="#!" class="m-r-10 text-secondary"><i class="fas fa-trash-alt text-danger mr-2"></i>
-                    <?= lang('Main.xin_delete');?>
-                    </a></span><span></span> </div>
+                  <div class="m-t-10"> 
+                    <span>
+                        <a href="#!" class="m-r-10 text-secondary">
+                            <i class="fas fa-trash-alt text-danger mr-2 delete_discussion" data-field="<?= $_discussion['project_discussion_id']; ?>"></i>
+                            <?= lang('Main.xin_delete'); ?>
+                        </a>
+                    </span>
+                  </div>
+
                 </div>
               </li>
               <hr>
@@ -188,7 +195,7 @@ $progress_bar = '<div class="progress" style="height: 10px;"><div class="progres
             </ul>
             <?php $attributes = array('name' => 'add_discussion', 'id' => 'add_discussion', 'autocomplete' => 'off');?>
             <?php $hidden = array('token' => $segment_id);?>
-            <?= form_open('erp/projects/add_discussion', $attributes, $hidden);?>
+            <?= form_open('erp/add-project-client-discussion', $attributes, $hidden);?>
             <div class="input-group mb-3">
               <input type="text" name="description" class="form-control" placeholder="<?= lang('Projects.xin_enter_discussion_msg');?>...">
               <div class="input-group-append">
@@ -215,9 +222,9 @@ $progress_bar = '<div class="progress" style="height: 10px;"><div class="progres
                   <p>
                     <?= $_bug['bug_note'];?>
                   </p>
-                  <div class="m-t-10"> <span><a href="#!" class="m-r-10 text-secondary"><i class="fas fa-trash-alt text-danger mr-2"></i>
+                  <div class="m-t-10"> <span><a href="#!" class="m-r-10 text-secondary"><i class="fas fa-trash-alt text-danger mr-2 delete_bug " data-field="<?= $_bug['project_bug_id']; ?>"></i>
                     <?= lang('Main.xin_delete');?>
-                    </a></span><span></span> </div>
+                    </a></span></div>
                 </div>
               </li>
               <hr>
@@ -225,9 +232,9 @@ $progress_bar = '<div class="progress" style="height: 10px;"><div class="progres
             </ul>
             <?php $attributes = array('name' => 'add_bug', 'id' => 'add_bug', 'autocomplete' => 'off');?>
             <?php $hidden = array('token' => $segment_id);?>
-            <?= form_open('erp/projects/add_bug', $attributes, $hidden);?>
+            <?= form_open('erp/add-client-project-bug', $attributes, $hidden);?>
             <div class="input-group mb-3">
-              <input type="text" name="description" class="form-control" placeholder="<?= lang('Projects.xin_post_a_bug');?>...">
+              <input type="text" name="bug_description" class="form-control" placeholder="<?= lang('Projects.xin_post_a_bug');?>...">
               <div class="input-group-append">
                 <button class="btn waves-effect waves-light btn-primary btn-icon" type="submit"><i class="fa fa-plus"></i></button>
               </div>
@@ -238,7 +245,7 @@ $progress_bar = '<div class="progress" style="height: 10px;"><div class="progres
         <div class="tab-pane fade" id="pills-tasks" role="tabpanel" aria-labelledby="pills-tasks-tab">
           <div class="row m-b-1 animated fadeInRight">
             <div class="col-md-12">
-              <div id="add_form" class="collapse add-form <?= $get_animate;?>" data-parent="#accordion" style="">
+              <div id="add_form" class="collapse add-form " data-parent="#accordion" style="">
                 <div class="card">
                   <div id="accordion">
                     <div class="card-header">
@@ -252,7 +259,7 @@ $progress_bar = '<div class="progress" style="height: 10px;"><div class="progres
                     </div>
                     <?php $attributes = array('name' => 'add_task', 'id' => 'add_task', 'autocomplete' => 'off');?>
                     <?php $hidden = array('token' => $segment_id);?>
-                    <?php echo form_open('erp/tasks/add_task', $attributes, $hidden);?>
+                    <?php echo form_open('erp/add-client-tasks', $attributes, $hidden);?>
                     <div class="card-body">
                       <div class="row">
                         <div class="col-md-4">
@@ -371,10 +378,10 @@ $progress_bar = '<div class="progress" style="height: 10px;"><div class="progres
                     <?= $file_user['first_name'].' '.$file_user['last_name'];?>
                     </a> </small>
                     <div class="row justify-content-between">
-                      <div class="col-auto mt-2"> <a href="<?php echo site_url('download')?>?type=project_files&filename=<?php echo uencode($_files['attachment_file']);?>" class="text-secondary"><i class="fas fa-download m-r-5"></i> <?php echo lang('Main.xin_download');?></a> </div>
+                      <div class="col-auto mt-2"> <a href="<?php echo site_url('download')?>?type=project_files&filename=<?php echo $_files['attachment_file'];?>" class="text-secondary"><i class="fas fa-download m-r-5"></i> <?php echo lang('Main.xin_download');?></a> </div>
                       <div class="col-auto mt-2">
                         <ul class="list-inline mb-0">
-                          <li class="list-inline-item"><a href="#!" class="text-body text-h-primary"><i class="fas fa-trash-alt text-danger mr-2"></i><span><?php echo lang('Main.xin_delete');?></span></a></li>
+                          <li class="list-inline-item"><a href="#!" class="text-body text-h-primary"><i class="fas fa-trash-alt text-danger mr-2 delete_file" data-feather="<?= $_files['project_file_id']; ?>"></i><span><?php echo lang('Main.xin_delete');?></span></a></li>
                         </ul>
                       </div>
                     </div>

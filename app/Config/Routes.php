@@ -125,7 +125,11 @@ $routes->get('erp/delete-project-bug/(:any)', 'projects::delete_project_bug/$1',
 
 // discussion and Notes
 $routes->post('erp/add-discussion', 'projects::add_discussion', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-project-client-discussion', 'projects::add_project_client_discussion', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-client-project-bug', 'projects::add_client_project_bug', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/add-note', 'projects::add_note', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/projects/add_attachment', 'projects::add_client_project_attachment', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/projects/add_note', 'projects::add_client_project_note', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 // Add Bug
 $routes->post('erp/add-bug', 'projects::add_bug', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -152,7 +156,9 @@ $routes->get('erp/projects-grid/', 'Projects::projects_grid', ['namespace' => 'A
 
 // projects||Clients
 $routes->get('erp/my-projects-list/', 'Projects::projects_client', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/client-projects-list/', 'Projects::client_projects_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/project-details/(:segment)', 'Projects::client_project_details', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/project-tasks-list/(:segment)', 'Projects::project_tasks_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 //not use route end
 
@@ -161,6 +167,7 @@ $routes->get('erp/project-details/(:segment)', 'Projects::client_project_details
 $routes->get('erp/tasks-list/', 'Tasks::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/tasks-data-Lists', 'Tasks::tasks_data_lists', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/add-tasks', 'Tasks::add_tasks', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/add-client-tasks', 'Tasks::add_task', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->delete('erp/delete-tasks', 'Tasks::delete_tasks', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/task-detail/(:segment)', 'Tasks::task_details', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/update-task-progress', 'Tasks::update_task_progress', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -182,6 +189,7 @@ $routes->get('erp/tasks-calendar/', 'Tasks::tasks_calendar', ['namespace' => 'Ap
 $routes->get('erp/tasks-scrum-board/', 'Tasks::tasks_scrum_board', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/edit-task/(:segment)', 'Tasks::edit_task', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/update-projectTask/(:num)', 'Tasks::taskUpdate/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/client-task-status-chart/', 'Tasks::client_task_status_chart', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 
 // Documention
@@ -342,7 +350,8 @@ $routes->get('erp/companies-grid', 'Company::companies_grid', ['namespace' => 'A
 $routes->get('erp/company-detail/(:segment)', 'Company::company_details', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/update-company', 'Company::update_company', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->delete('erp/delete-company', 'Company::delete_company', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->get('erp/monthly-planning/(:segment)', 'Company::monthly_planning', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/company-monthly-planning/(:segment)', 'Company::monthly_planning', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->match(['get', 'post'], 'erp/company-month-plan-chart', 'Invoices::company_month_plan_chart', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->match(['get', 'post'], 'company/update-status/(:any)/(:any)', 'company::updateStatus/$1/$2', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 //Subscriptions
@@ -715,6 +724,7 @@ $routes->post('erp/user/add-mom', 'Moms::add_mom', ['namespace' => 'App\Controll
 
 // tasks||Clients
 $routes->get('erp/my-tasks-list/', 'Tasks::task_client', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/client-tasks-list/', 'Tasks::client_tasks_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/task-details/(:segment)', 'Tasks::client_task_details', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // clients
 $routes->get('erp/clients-list/', 'Clients::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -726,9 +736,11 @@ $routes->get('erp/clients-overview', 'Clients::overview', ['namespace' => 'App\C
 $routes->post('erp/update-client', 'Clients::update_client', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/update-profile-photo', 'Clients::update_profile_photo', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
+$routes->get('erp/client-project-status-chart', 'Projects::client_project_status_chart', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/client-profile-projects-list/(:num)', 'Projects::client_profile_projects_list/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/client-profile-tasks-list/(:num)', 'Tasks::client_profile_tasks_list/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/client-profile-invoices-list/(:num)', 'Invoices::client_profile_invoices_list/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/client-invoice-amount-chart', 'Invoices::client_invoice_amount_chart', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // performance
 $routes->get('erp/performance-indicator-list', 'Talent::performance_indicator', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/add-indicator', 'Talent::add_indicator', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
@@ -825,7 +837,9 @@ $routes->get('erp/print-estimate/(:segment)', 'Estimates::view_project_estimate'
 $routes->get('erp/estimate-to-invoice', 'Estimates::read_estimate_data', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // invoices || Clients
 $routes->get('erp/my-invoices-list/', 'Invoices::invoices_client', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/client-invoices-list/', 'Invoices::client_invoices_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/my-invoice-payments-list/', 'Invoices::client_invoice_payment', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/client-project-billing-list/', 'Invoices::client_project_billing_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->get('erp/my-invoices-calendar/', 'Invoices::client_invoice_calendar', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 // staff attendance
 $routes->get('erp/timesheet-dashboard/', 'Timesheet::timesheet_dashboard', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);

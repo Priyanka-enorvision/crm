@@ -2,7 +2,7 @@ $(document).ready(function() {
 	var xin_table = $('#xin_table').dataTable({
 		"bDestroy": true,
 		"ajax": {
-			url : main_url+"projects/client_projects_list",
+			url : main_url+"client-projects-list",
 			type : 'GET'
 		},
 		"language": {
