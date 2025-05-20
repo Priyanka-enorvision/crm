@@ -25,7 +25,7 @@ $tagifyValue = implode(',', $optionValues);
         <span aria-hidden="true">&times;</span>
     </button>
 </div>
-<form id="addLeadForm" action="<?= base_url('Erp/Lead_config/updatelead/' . base64_encode($result['id'])); ?>" method="POST">
+<form id="addLeadForm" action="<?= base_url('erp/Lead-config-updatelead/' . $result['id']); ?>" method="POST">
     <div class="modal-body">
 
         <?= csrf_field() ?>

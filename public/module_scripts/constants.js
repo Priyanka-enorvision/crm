@@ -38,7 +38,7 @@ $(document).ready(function () {
 		"iDisplayLength": 10,
 		"aLengthMenu": [[10, 30, 50, 100, -1], [10, 30, 50, 100, "All"]],
 		"ajax": {
-			url: main_url + "settings/religion_list",
+			url: main_url + "religion-data-list",
 			type: 'GET'
 		},
 		"language": {
@@ -67,7 +67,7 @@ $(document).ready(function () {
 		"iDisplayLength": 10,
 		"aLengthMenu": [[10, 30, 50, 100, -1], [10, 30, 50, 100, "All"]],
 		"ajax": {
-			url: main_url + "settings/currency_type_list",
+			url: main_url + "currency-type-list",
 			type: 'GET'
 		},
 		"language": {
@@ -96,7 +96,7 @@ $(document).ready(function () {
 		"iDisplayLength": 10,
 		"aLengthMenu": [[10, 30, 50, 100, -1], [10, 30, 50, 100, "All"]],
 		"ajax": {
-			url: main_url + "settings/company_type_list",
+			url: main_url + "company-type-datalist",
 			type: 'GET'
 		},
 		"language": {
@@ -188,17 +188,19 @@ $(document).ready(function () {
 			cache: false,
 			success: function (JSON) {
 				if (JSON.error != '') {
-					toastr.error(JSON.error, 'Error');
+					toastr.error(JSON.error);
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
 					Ladda.stopAll();
 				} else {
-					xin_table_company_type.api().ajax.reload(function () {
-						toastr.success(JSON.result);
-					}, true);
+					toastr.success(JSON.result);
+					window.location.href = main_url + 'system-constants';
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
-					jQuery('#company_type_info')[0].reset(); // To reset form fields
+
 					Ladda.stopAll();
 				}
+			},
+			error: function (xhr, error, thrown) {
+				console.log("AJAX Error: ", xhr.responseText);
 			}
 		});
 	});
@@ -213,17 +215,19 @@ $(document).ready(function () {
 			cache: false,
 			success: function (JSON) {
 				if (JSON.error != '') {
-					toastr.error(JSON.error, 'Error');
+					toastr.error(JSON.error);
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
 					Ladda.stopAll();
 				} else {
-					xin_table_religion.api().ajax.reload(function () {
-						toastr.success(JSON.result);
-					}, true);
+					toastr.success(JSON.result);
+					window.location.href = main_url + 'system-constants';
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
-					jQuery('#religion_info')[0].reset(); // To reset form fields
+
 					Ladda.stopAll();
 				}
+			},
+			error: function (xhr, error, thrown) {
+				console.log("AJAX Error: ", xhr.responseText);
 			}
 		});
 	});
@@ -256,16 +260,18 @@ $(document).ready(function () {
 				if (JSON.error != '') {
 					toastr.error(JSON.error);
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
-					$('.icon-spinner3').hide();
 					Ladda.stopAll();
 				} else {
 					$('.delete-modal').modal('toggle');
-					$('#' + tb_name).dataTable().api().ajax.reload(function () {
-						toastr.success(JSON.result);
-					}, true);
+					toastr.success(JSON.result);
+					window.location.href = main_url + 'system-constants';
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
+
 					Ladda.stopAll();
 				}
+			},
+			error: function (xhr, error, thrown) {
+				console.log("AJAX Error: ", xhr.responseText);
 			}
 		});
 	});
@@ -285,7 +291,7 @@ $(document).ready(function () {
 		}
 		var modal = $(this);
 		$.ajax({
-			url: main_url + 'settings/constants_read',
+			url: main_url + 'constants-read',
 			type: "GET",
 			data: 'jd=1' + field_add + 'field_id=' + field_id,
 			success: function (response) {

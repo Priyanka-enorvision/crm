@@ -249,9 +249,12 @@ $routes->group('erp', ['filter' => 'checklogin', 'namespace' => 'App\Controllers
 //client management
 //custom lead config
 $routes->get('erp/customization-lead', 'Lead_config::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+$routes->post('erp/save-lead', 'Lead_config::saveLead', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+$routes->post('erp/create-dynamic-table', 'Lead_config::create_dynamic_table', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
 $routes->get('lead/getDetails/(:any)', 'Lead_config::getDetails/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
-$routes->match(['get', 'post'], 'lead/delete-field/(:any)', 'Lead_config::delete_field/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
-$routes->match(['get', 'post'], 'lead/update-status/(:any)/(:any)', 'Lead_config::updateStatus/$1/$2', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('lead/delete-field/(:num)', 'Lead_config::delete_field/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+$routes->get('erp/lead-update-status/(:any)/(:any)', 'Lead_config::updateStatus/$1/$2', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->post('erp/Lead-config-updatelead/(:num)', 'Lead_config::updateLead/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 $routes->get('api/erp/customization-lead-field/(:segment)', 'Lead_config::fetchGlobalLeadFields/$1', ['namespace' => 'App\Controllers\Erp']);
 $routes->get('api/erp/customization-lead-field', 'Lead_config::fetchGlobalLeadFields', ['namespace' => 'App\Controllers\Erp']);
@@ -351,9 +354,10 @@ $routes->get('erp/subscription-detail/(:segment)', 'SubscriptionController::subs
 
 //4: Languages
 $routes->get('erp/all-languages/', 'Languages::index', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+$routes->get('erp/languages-datalist', 'Languages::languages_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
 $routes->match(['get', 'post'], 'erp/languages/add_language/', 'Languages::add_language', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
-$routes->match(['get', 'post'], 'erp/languages/delete_language/', 'Languages::delete_language', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
-$routes->match(['get', 'post'], 'erp/languages/language_status/', 'Languages::language_status', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+$routes->delete('erp/delete-language/(:any)', 'Languages::delete_language/$1', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+$routes->get('erp/language-status/(:any)/(:any)', 'Languages::language_status/$1/$2', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
 //7: System||Settings|| STD
 $routes->get('erp/currency-converter/', 'Settings::currency_converter', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 //STD
@@ -375,13 +379,23 @@ $routes->match(['get', 'post'], 'erp/settings/notification_position_info/', 'Set
 $routes->match(['get', 'post'], 'erp/settings/email_info/', 'Settings::email_info', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
 //8: System||Constants
 $routes->get('erp/system-constants/', 'Settings::constants', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/religion-data-list', 'Settings::religion_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/currency-type-list', 'Settings::currency_type_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/company-type-datalist', 'Settings::company_type_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+
 $routes->get('erp/payment-method-list', 'Settings::payment_method_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->match(['get', 'post'], 'erp/settings/company_type_info/', 'Settings::company_type_info', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
-$routes->match(['get', 'post'], 'erp/settings/update_company_type/', 'Settings::update_company_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
-$routes->match(['get', 'post'], 'erp/settings/delete_company_type/', 'Settings::delete_company_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+$routes->match(['get', 'post'], 'erp/settings/update_company_type', 'Settings::update_company_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+$routes->delete('erp/settings/delete_company_type/', 'Settings::delete_company_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
 $routes->match(['get', 'post'], 'erp/settings/currency_type_info/', 'Settings::currency_type_info', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
 $routes->match(['get', 'post'], 'erp/settings/update_currency_type/', 'Settings::update_currency_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
 $routes->match(['get', 'post'], 'erp/settings/delete_currency_type/', 'Settings::delete_currency_type', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+$routes->get('erp/constants-read', 'Settings::constants_read', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+$routes->post('erp/add-religion-info', 'Settings::add_religion_info', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+$routes->post('erp/update-religion', 'Settings::update_religion', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+$routes->delete('erp/settings/delete_religion', 'Settings::delete_religion', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+
+
 //9: System||Database Backup
 $routes->get('erp/system-backup/', 'Settings::database_backup', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
 $routes->match(['get', 'post'], 'erp/settings/create_database_backup/', 'Settings::create_database_backup', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
@@ -389,6 +403,9 @@ $routes->match(['get', 'post'], 'erp/settings/delete_db_backup/', 'Settings::del
 $routes->match(['get', 'post'], 'erp/settings/delete_dbsingle_backup/', 'Settings::delete_dbsingle_backup', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
 //10: System||Email Templates
 $routes->get('erp/email-templates/', 'Settings::email_templates', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+$routes->get('erp/email-template-list', 'Settings::email_template_list', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+$routes->get('erp/read-emailTempalte', 'Settings::read_tempalte', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
+
 $routes->match(['get', 'post'], 'erp/settings/update_template/', 'Settings::update_template', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin',]);
 
 

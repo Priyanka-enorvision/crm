@@ -16,8 +16,8 @@ class Lead_config extends BaseController
     {
         // Load language
         helper('Language');
-        $this->lang = \Config\Services::language();
-        $this->db = \Config\Database::connect();
+        // $this->lang = \Config\Services::language();
+        // $this->db = \Config\Database::connect();
     }
 
 
@@ -134,7 +134,6 @@ class Lead_config extends BaseController
                     'opportunities' => $opportunityList,
                 ])
                 ->setHeader('Cache-Control', 'public, max-age=3600');
-
         } catch (\Exception $e) {
             log_message('error', 'Lead Config API Error: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
 
@@ -164,7 +163,7 @@ class Lead_config extends BaseController
             'options' => 'permit_empty', // Options are not mandatory
         ]);
 
-        if ($this->request->getMethod() === 'post' && $validation->withRequest($this->request)->run()) {
+        if ($this->request->getMethod()) {
 
             $fieldName = $this->request->getPost('field_name');
             $fieldExists = $LeadConfigModel->where(['column_name' => $fieldName, 'company_id' => $user_info['company_id']])->first();
@@ -220,10 +219,10 @@ class Lead_config extends BaseController
         return redirect()->back()->withInput(); // Keep form input values
     }
 
-    
-    public function delete_field($enc_id)
+
+    public function delete_field($id)
     {
-        $id = base64_decode($enc_id);
+        // $id = base64_decode($enc_id);
         $session = \Config\Services::session();
         $request = \Config\Services::request();
 
@@ -244,21 +243,19 @@ class Lead_config extends BaseController
 
 
     // Validate and update info in database
-    public function updateStatus($enc_id, $status)
+    public function updateStatus($lead_id, $status)
     {
-        $lead_id = base64_decode($enc_id);
-        $request = \Config\Services::request();
         $session = \Config\Services::session();
-
-        $data = array('status' => $status);
-        $msg = lang('Language.xin_success_update_status'); // Success message
         $LeadConfig = new LeadConfigModel();
-        $result = $LeadConfig->update($lead_id, $data);
-        if ($result) {
-            session()->setFlashdata('message', lang('Language.xin_success_update_status'));
+
+        $data = ['status' => $status];
+
+        if ($LeadConfig->update($lead_id, $data)) {
+            $session->setFlashdata('message', lang('Language.xin_success_update_status'));
         } else {
-            $session->setFlashdata('error', lang('Main.xin_error_msg')); // Error message
+            $session->setFlashdata('error', lang('Main.xin_error_msg'));
         }
+
         return redirect()->back();
     }
 
@@ -274,9 +271,9 @@ class Lead_config extends BaseController
         }
     }
 
-    public function updateLead($enc_id)
+    public function updateLead($lead_id)
     {
-        $lead_id = base64_decode($enc_id);
+        // $lead_id = base64_decode($enc_id);
         $session = session();
 
         // Validate the lead ID
@@ -329,6 +326,7 @@ class Lead_config extends BaseController
 
     public function create_dynamic_table()
     {
+
         $session = \Config\Services::session();
         $UsersModel = new UsersModel();
         $LeadConfig = new LeadConfigModel();
@@ -347,6 +345,7 @@ class Lead_config extends BaseController
         $company_name = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '_', $user_info['company_name']));
         $company_id = $user_info['company_id'];
         $table_name = 'leads_' . $company_name;
+
 
         $db = \Config\Database::connect();
 
@@ -437,7 +436,7 @@ class Lead_config extends BaseController
             return $this->response->setJSON(['error' => 'Table creation/update failed: ' . $e->getMessage()]);
         }
     }
-    
+
 
     protected function sanitizeColumnName($column_name)
     {
@@ -607,6 +606,4 @@ class Lead_config extends BaseController
             log_message('error', 'Migration execution failed: ' . $e->getMessage());
         }
     }
-
-
 }

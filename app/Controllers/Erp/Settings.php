@@ -818,7 +818,7 @@ class Settings extends BaseController
 		$usession = $session->get('sup_username');
 		$ConstantsModel = new ConstantsModel();
 
-		if ($this->request->getPost('type') === 'edit_record') {
+		if ($this->request->getPost()) {
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$Return['csrf_hash'] = csrf_hash();
 			// set rules
@@ -896,20 +896,13 @@ class Settings extends BaseController
 			];
 			if (!$this->validate($rules)) {
 
-				/*$ruleErrors = \Config\Services::validation()->listErrors();
-																															//foreach($ruleErrors as $err){
-																																$Return['error'] = $ruleErrors;
-																																if($Return['error']!=''){
-																																	$this->output($Return);
-																																}*/
-				//}
 				$ruleErrors = [
 					"company_type" => $validation->getError('company_type')
 				];
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -929,12 +922,12 @@ class Settings extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 				exit;
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 			exit;
 		}
 	}
@@ -962,20 +955,14 @@ class Settings extends BaseController
 			];
 			if (!$this->validate($rules)) {
 
-				/*$ruleErrors = \Config\Services::validation()->listErrors();
-																															//foreach($ruleErrors as $err){
-																																$Return['error'] = $ruleErrors;
-																																if($Return['error']!=''){
-																																	$this->output($Return);
-																																}*/
-				//}
+
 				$ruleErrors = [
 					"religion" => $validation->getError('religion')
 				];
 				foreach ($ruleErrors as $err) {
 					$Return['error'] = $err;
 					if ($Return['error'] != '') {
-						$this->output($Return);
+						return $this->response->setJSON($Return);
 					}
 				}
 			} else {
@@ -995,12 +982,12 @@ class Settings extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 				exit;
 			}
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
+			return $this->response->setJSON($Return);
 			exit;
 		}
 	}
@@ -1014,7 +1001,7 @@ class Settings extends BaseController
 		$usession = $session->get('sup_username');
 		$ConstantsModel = new ConstantsModel();
 
-		if ($this->request->getPost('type') === 'edit_record') {
+		if ($this->request->getPost()) {
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$Return['csrf_hash'] = csrf_hash();
 			// set rules
@@ -1029,7 +1016,7 @@ class Settings extends BaseController
 			if (!$this->validate($rules)) {
 				$Return['error'] = $validation->getError('name');
 				if ($Return['error'] != '') {
-					$this->output($Return);
+					return $this->response->setJSON($Return);
 				}
 			} else {
 				$name = $this->request->getPost('name', FILTER_SANITIZE_STRING);
@@ -1045,7 +1032,7 @@ class Settings extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 				exit;
 			}
 		}
@@ -1075,7 +1062,7 @@ class Settings extends BaseController
 			if (!$this->validate($rules)) {
 				$Return['error'] = $validation->getError('religion');
 				if ($Return['error'] != '') {
-					$this->output($Return);
+					return $this->response->setJSON($Return);
 				}
 			} else {
 				$religion = $this->request->getPost('religion', FILTER_SANITIZE_STRING);
@@ -1091,7 +1078,7 @@ class Settings extends BaseController
 				} else {
 					$Return['error'] = lang('Main.xin_error_msg');
 				}
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 				exit;
 			}
 		}
@@ -1137,43 +1124,37 @@ class Settings extends BaseController
 	public function delete_company_type()
 	{
 
-		if ($this->request->getPost('type') == 'delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-			$session = \Config\Services::session();
-			$request = \Config\Services::request();
-			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
-			$Return['csrf_hash'] = csrf_hash();
-			$ConstantsModel = new ConstantsModel();
-			$result = $ConstantsModel->where('constants_id', $id)->delete($id);
-			if ($result == TRUE) {
-				$Return['result'] = lang('Main.xin_company_type_deleted');
-			} else {
-				$Return['error'] = lang('Main.xin_error_msg');
-			}
-			$this->output($Return);
+		$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+		$session = \Config\Services::session();
+		$request = \Config\Services::request();
+		$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
+		$Return['csrf_hash'] = csrf_hash();
+		$ConstantsModel = new ConstantsModel();
+		$result = $ConstantsModel->where('constants_id', $id)->delete($id);
+		if ($result == TRUE) {
+			$Return['result'] = lang('Main.xin_company_type_deleted');
+		} else {
+			$Return['error'] = lang('Main.xin_error_msg');
 		}
+		return $this->response->setJSON($Return);
 	}
 	// delete record
 	public function delete_religion()
 	{
 
-		if ($this->request->getPost('type') == 'delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-			$session = \Config\Services::session();
-			$request = \Config\Services::request();
-			$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
-			$Return['csrf_hash'] = csrf_hash();
-			$ConstantsModel = new ConstantsModel();
-			$result = $ConstantsModel->where('constants_id', $id)->delete($id);
-			if ($result == TRUE) {
-				$Return['result'] = lang('Employees.xin_ethnicity_type_success_deleted');
-			} else {
-				$Return['error'] = lang('Main.xin_error_msg');
-			}
-			$this->output($Return);
+		$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+		$session = \Config\Services::session();
+		$request = \Config\Services::request();
+		$id = udecode($this->request->getPost('_token', FILTER_SANITIZE_STRING));
+		$Return['csrf_hash'] = csrf_hash();
+		$ConstantsModel = new ConstantsModel();
+		$result = $ConstantsModel->where('constants_id', $id)->delete($id);
+		if ($result == TRUE) {
+			$Return['result'] = lang('Employees.xin_ethnicity_type_success_deleted');
+		} else {
+			$Return['error'] = lang('Main.xin_error_msg');
 		}
+		return $this->response->setJSON($Return);
 	}
 
 	// list
@@ -1361,7 +1342,7 @@ class Settings extends BaseController
 		$usession = $session->get('sup_username');
 		$EmailtemplatesModel = new EmailtemplatesModel();
 
-		if ($this->request->getPost('type') === 'edit_template') {
+		if ($this->request->getPost()) {
 			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$Return['csrf_hash'] = csrf_hash();
 			// set rules
@@ -1399,7 +1380,7 @@ class Settings extends BaseController
 				$Return['error'] = $validation->getError('message');
 			}
 			if ($Return['error'] != '') {
-				$this->output($Return);
+				return $this->response->setJSON($Return);
 			}
 		}
 		$name = $this->request->getPost('name', FILTER_SANITIZE_STRING);
@@ -1420,8 +1401,7 @@ class Settings extends BaseController
 		} else {
 			$Return['error'] = lang('Main.xin_error_msg');
 		}
-		$this->output($Return);
-		exit;
+		return $this->response->setJSON($Return);
 	}
 
 	public function planning_configuration()

@@ -84,11 +84,9 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
                             <td><?= $value['is_required'] ? 'True' : 'False'; ?></td>
                             <td>
                                 <?php if ($value['status']): ?>
-                                    <a href="<?= base_url('lead/update-status/' . base64_encode($value['id']) . '/0') ?>"
-                                        class="btn btn-success">Active</a>
+                                    <a href="<?= base_url('erp/lead-update-status/' . $value['id'] . '/0') ?>" class="btn btn-success">Active</a>
                                 <?php else: ?>
-                                    <a href="<?= base_url('lead/update-status/' . base64_encode($value['id']) . '/1') ?>"
-                                        class="btn btn-danger">Inactive</a>
+                                    <a href="<?= base_url('erp/lead-update-status/' . $value['id'] . '/1') ?>" class="btn btn-danger">Inactive</a>
                                 <?php endif; ?>
                             </td>
                             <td>
@@ -97,7 +95,7 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
                                         title="View Details" onclick="openModal(<?= $value['id'] ?>);">
                                         <i class="feather icon-edit-2 text-white"></i>
                                     </a>
-                                    <a href="<?= base_url('lead/delete-field/' . base64_encode($value['id'])); ?>"
+                                    <a href="<?= base_url('lead/delete-field/' . $value['id']); ?>"
                                         class="btn btn-danger"
                                         onclick="return confirm('Are you sure you want to delete this item?');"
                                         data-toggle="tooltip" title="Delete Item">
@@ -135,7 +133,7 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form id="addLeadForm" action="<?= base_url('Erp/Lead_config/saveLead'); ?>" method="POST">
+            <form id="addLeadForm" action="<?= base_url('erp/save-lead'); ?>" method="POST">
                 <div class="modal-body">
 
                     <?= csrf_field() ?>
@@ -212,31 +210,31 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
 <script>
-    $(document).ready(function () {
-        $('#commitButton').click(function (e) {
+    $(document).ready(function() {
+        $('#commitButton').click(function(e) {
             e.preventDefault();
             $(this).prop('disabled', true).text('Loading...');
 
             $.ajax({
-                url: '<?php echo base_url('Erp/Lead_config/create_dynamic_table'); ?>',
+                url: '<?php echo base_url('erp/create-dynamic-table'); ?>',
                 type: 'POST',
                 dataType: 'json', // Expect JSON response
-                success: function (response) {
+                success: function(response) {
                     if (response.error) {
                         toastr.error(response.error, 'Error');
                     } else if (response.success) {
                         // alert(response.success); 
                         toastr.success(response.success, 'Success');
-                        setTimeout(function () {
+                        setTimeout(function() {
                             location.reload(true);
                         }, 7000);
                     }
                 },
-                error: function (xhr, status, error) {
+                error: function(xhr, status, error) {
                     console.error(xhr.responseText);
                     alert('An error occurred: ' + error);
                 },
-                complete: function () {
+                complete: function() {
                     $('#commitButton').prop('disabled', false).text('Commit');
                 }
             });
@@ -265,7 +263,7 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 </script>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         $('#xin_table').DataTable({
             paging: true, // Enable pagination
             searching: true, // Enable search
@@ -279,7 +277,7 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
     });
 </script>
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         <?php if (session()->getFlashdata('error')): ?>
             toastr.error("<?= esc(session()->getFlashdata('error')); ?>", 'Error', {
                 timeOut: 5000
@@ -310,7 +308,7 @@ $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
     var input = document.querySelector('input[name=options]');
     var tagify = new Tagify(input);
 
-    document.getElementById('inputType').addEventListener('change', function () {
+    document.getElementById('inputType').addEventListener('change', function() {
         var inputType = this.value;
         var optionsField = document.getElementById('optionsInputField');
 
