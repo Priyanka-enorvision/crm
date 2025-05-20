@@ -1504,7 +1504,7 @@ function floatchart() {
 	// [ client-task-status-chart ] start
 	$(function () {
 		$.ajax({
-			url: main_url + 'tasks/client_task_status_chart',
+			url: main_url + 'client-task-status-chart',
 			contentType: "application/json; charset=utf-8",
 			dataType: "json",
 			success: function (response) {
@@ -1557,7 +1557,7 @@ function floatchart() {
 	// [ client-project-status-chart ] start
 	$(function () {
 		$.ajax({
-			url: main_url + 'projects/client_project_status_chart',
+			url: main_url + 'client-project-status-chart',
 			contentType: "application/json; charset=utf-8",
 			dataType: "json",
 			success: function (response) {
@@ -1804,7 +1804,7 @@ function floatchart() {
 	$(function () {
 		$(function () {
 			$.ajax({
-				url: main_url + 'invoices/client_invoice_amount_chart',
+				url: main_url + 'client-invoice-amount-chart',
 				contentType: "application/json; charset=utf-8",
 				dataType: "json",
 				success: function (response) {

@@ -27,7 +27,7 @@ $user = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
 $locale = service('request')->getLocale();
 $request = \Config\Services::request();
 
-$segment_id = $request->uri->getSegment(3);
+$segment_id = $request->getUri()->getSegment(3);
 $task_id = udecode($segment_id);
 
 $user_info = $UsersModel->where('user_id', $usession['sup_user_id'])->first();
@@ -191,7 +191,7 @@ $progress_bar = '<div class="progress" style="height: 10px;"><div class="progres
         <div class="tab-pane fade <?php if($get_type=='edit'):?>show active<?php endif;?>" id="pills-edit" role="tabpanel" aria-labelledby="pills-edit-tab">
           <?php $attributes = array('name' => 'update_task', 'id' => 'update_task', 'autocomplete' => 'off');?>
           <?php $hidden = array('token' => $segment_id);?>
-          <?php echo form_open('erp/tasks/update_task', $attributes, $hidden);?>
+          <?php echo form_open('erp/update-task', $attributes, $hidden);?>
           <div class="card-body">
             <div class="row">
               <div class="col-md-4">
@@ -302,7 +302,7 @@ $progress_bar = '<div class="progress" style="height: 10px;"><div class="progres
             </ul>
             <?php $attributes = array('name' => 'add_discussion', 'id' => 'add_discussion', 'autocomplete' => 'off');?>
             <?php $hidden = array('token' => $segment_id);?>
-            <?= form_open('erp/tasks/add_discussion', $attributes, $hidden);?>
+            <?= form_open('erp/add-task-discussion', $attributes, $hidden);?>
             <div class="input-group mb-3">
               <textarea class="form-control editor" name="description"><?= lang('Projects.xin_enter_discussion_msg');?>...</textarea>
             </div>
@@ -341,7 +341,7 @@ $progress_bar = '<div class="progress" style="height: 10px;"><div class="progres
             </ul>
             <?php $attributes = array('name' => 'add_note', 'id' => 'add_note', 'autocomplete' => 'off');?>
             <?php $hidden = array('token' => $segment_id);?>
-            <?= form_open('erp/tasks/add_note', $attributes, $hidden);?>
+            <?= form_open('erp/add-task-note', $attributes, $hidden);?>
             <div class="input-group mb-3">
               <input type="text" name="description" class="form-control" placeholder="<?= lang('Projects.xin_post_a_note');?>...">
               <div class="input-group-append">
@@ -383,7 +383,7 @@ $progress_bar = '<div class="progress" style="height: 10px;"><div class="progres
             </div>
             <?php $attributes = array('name' => 'add_attachment', 'id' => 'add_attachment', 'autocomplete' => 'off');?>
             <?php $hidden = array('token' => $segment_id);?>
-            <?= form_open('erp/tasks/add_attachment', $attributes, $hidden);?>
+            <?= form_open('erp/add-attachment', $attributes, $hidden);?>
             <div class="bg-white">
               <div class="row mt-4">
                 <div class="col-md-6">

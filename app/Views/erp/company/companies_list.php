@@ -223,7 +223,7 @@ $get_animate="";
             <tr>
               <td>
                 <?php if (isset($company['company_id']) && isset($company['company_name'])): ?>
-                  <a href="<?= site_url('erp/monthly-planning/' . urlencode($company['company_id'])); ?>"
+                  <a href="<?= site_url('erp/company-monthly-planning/' . urlencode($company['company_id'])); ?>"
                     title="View Monthly Planning for <?= htmlspecialchars($company['company_name']); ?>">
                     <?= htmlspecialchars($company['company_name']); ?>
                   </a>
@@ -232,7 +232,6 @@ $get_animate="";
                 <?php endif; ?>
               </td>
 
-              <!-- <td><?= htmlspecialchars($company['company_name']); ?></td> -->
               <td><?= htmlspecialchars($company['username']); ?></td>
               <td><?= htmlspecialchars($company['contact_number']); ?></td>
               <td><?= htmlspecialchars($company['country']); ?></td>

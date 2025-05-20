@@ -119,7 +119,6 @@ class Tasks extends BaseController
 		$data['title'] = lang('Dashboard.left_tasks') . ' | ' . $xin_system['application_name'];
 		$data['path_url'] = 'task_client';
 		$data['breadcrumbs'] = lang('Dashboard.left_tasks');
-
 		$data['subview'] = view('erp/projects/projects_task_client', $data);
 		return view('erp/layout/layout_main', $data); //page load
 	}
@@ -181,7 +180,7 @@ class Tasks extends BaseController
 		}
 		$usession = $session->get('sup_username');
 		$xin_system = $SystemModel->where('setting_id', 1)->first();
-		$segment_id = $request->uri->getSegment(3);
+		$segment_id = $request->getUri()->getSegment(3);
 		$ifield_id = udecode($segment_id);
 		$isegment_val = $TasksModel->where('task_id', $ifield_id)->first();
 		if (!$isegment_val) {
@@ -838,12 +837,12 @@ class Tasks extends BaseController
 						$assigned_name = $assigned_to['first_name'] . ' ' . $assigned_to['last_name'];
 
 						if ($assigned_to['profile_photo'] != '' && $assigned_to['profile_photo'] != 'no file') {
-							$ol .= '<a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" data-state="primary" title="' . $assigned_name . '"><span class="mb-1"><img src="' . base_url() . '/public/uploads/users/thumb/' . $assigned_to['profile_photo'] . '" class="img-fluid img-radius wid-30" alt=""></span></a>';
+							$ol .= '<a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" data-state="primary" title="' . $assigned_name . '"><span class="mb-1"><img src="' . base_url() . 'uploads/users/thumb/' . $assigned_to['profile_photo'] . '" class="img-fluid img-radius wid-30" alt=""></span></a>';
 						} else {
 							if ($assigned_to['gender'] == 'Male') {
-								$de_file = base_url() . '/public/uploads/profile/default_male.jpg';
+								$de_file = base_url() . 'uploads/profile/default_male.jpg';
 							} else {
-								$de_file = base_url() . '/public/uploads/profile/default_female.jpg';
+								$de_file = base_url() . 'uploads/profile/default_female.jpg';
 							}
 							$ol .= '<a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" data-state="primary" title="' . $assigned_name . '"><span class="mb-1"><img src="' . $de_file . '" class="img-fluid img-radius wid-30" alt=""></span></a>';
 						}
@@ -954,12 +953,12 @@ class Tasks extends BaseController
 						$assigned_name = $assigned_to['first_name'] . ' ' . $assigned_to['last_name'];
 
 						if ($assigned_to['profile_photo'] != '' && $assigned_to['profile_photo'] != 'no file') {
-							$ol .= '<a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" data-state="primary" title="' . $assigned_name . '"><span class="mb-1"><img src="' . base_url() . '/public/uploads/users/thumb/' . $assigned_to['profile_photo'] . '" class="img-fluid img-radius wid-30" alt=""></span></a>';
+							$ol .= '<a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" data-state="primary" title="' . $assigned_name . '"><span class="mb-1"><img src="' . base_url() . 'uploads/users/thumb/' . $assigned_to['profile_photo'] . '" class="img-fluid img-radius wid-30" alt=""></span></a>';
 						} else {
 							if ($assigned_to['gender'] == 'Male') {
-								$de_file = base_url() . '/public/uploads/profile/default_male.jpg';
+								$de_file = base_url() . 'uploads/profile/default_male.jpg';
 							} else {
-								$de_file = base_url() . '/public/uploads/profile/default_female.jpg';
+								$de_file = base_url() . 'uploads/profile/default_female.jpg';
 							}
 							$ol .= '<a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" data-state="primary" title="' . $assigned_name . '"><span class="mb-1"><img src="' . $de_file . '" class="img-fluid img-radius wid-30" alt=""></span></a>';
 						}
@@ -1245,8 +1244,7 @@ class Tasks extends BaseController
 			foreach ($ruleErrors as $err) {
 				if (!empty($err)) {
 					$Return['error'] = $err;
-					$this->output($Return);
-					return;
+					return $this->response->setJSON($Return);
 				}
 			}
 		}
@@ -1301,8 +1299,7 @@ class Tasks extends BaseController
 
 		if ($result === false) {
 			$Return['error'] = lang('Main.xin_error_msg');
-			$this->output($Return);
-			return;
+			return $this->response->setJSON($Return);
 		}
 
 		// Handle email notifications
@@ -2191,8 +2188,7 @@ class Tasks extends BaseController
 		$Return['hold_lb'] = lang('Projects.xin_project_hold');
 		$Return['hold'] = $hold;
 		//$Return['total'] = $total;
-		$this->output($Return);
-		exit;
+		return $this->response->setJSON($Return);
 	}
 	public function tasks_by_projects_chart()
 	{

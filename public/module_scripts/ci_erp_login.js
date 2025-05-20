@@ -16,6 +16,7 @@ $(document).ready(function () {
 				if (JSON.error != '') {
 					toastr.error(JSON.error);
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
+					location.reload();
 					Ladda.stopAll();
 				} else {
 					toastr.clear();
@@ -29,6 +30,7 @@ $(document).ready(function () {
 			},
 			error: function (xhr, status, error) {
 				toastr.error('An error occurred during login');
+				location.reload();
 				Ladda.stopAll();
 			}
 		});

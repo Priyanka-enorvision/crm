@@ -23,7 +23,7 @@ $projects = $ProjectsModel->where('company_id',$user_info['company_id'])->where(
 ?>
 <div class="row m-b-1 animated fadeInRight">
   <div class="col-md-12">
-    <div id="add_form" class="collapse add-form <?= $get_animate;?>" data-parent="#accordion" style="">
+    <div id="add_form" class="collapse add-form" data-parent="#accordion" style="">
       <div class="card mb-2">
         <div id="accordion">
           <div class="card-header">
@@ -36,7 +36,7 @@ $projects = $ProjectsModel->where('company_id',$user_info['company_id'])->where(
               </a> </div>
           </div>
           <?php $attributes = array('name' => 'add_task', 'id' => 'xin-form', 'autocomplete' => 'off');?>
-          <?php $hidden = array('user_id' => 0);?>
+          <?php $hidden = array('user_id' => '0');?>
           <?php echo form_open('erp/tasks/add_task', $attributes, $hidden);?>
           <div class="card-body">
             <div class="row">

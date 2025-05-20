@@ -2,7 +2,7 @@ $(document).ready(function () {
 	var xin_table = $('#xin_table').dataTable({
 		"bDestroy": true,
 		"ajax": {
-			url: main_url + "projects/project_tasks_list?project_val=" + $('#project_id').val(),
+			url: main_url + "project-tasks-list/" + $('#project_id').val(),
 			type: 'GET'
 		},
 		"fnDrawCallback": function (settings) {
@@ -279,8 +279,8 @@ $(document).ready(function () {
 				if (JSON.error != '') {
 					toastr.error(JSON.error);
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
-					Ladda.stopAll();
-					location.reload();
+					// Ladda.stopAll();
+					// location.reload();
 				} else {
 					xin_table.api().ajax.reload(function () {
 						toastr.success(JSON.result);
@@ -288,14 +288,14 @@ $(document).ready(function () {
 					$('input[name="csrf_token"]').val(JSON.csrf_hash);
 					$('#add_task')[0].reset(); // To reset form fields
 					$('.add-form').removeClass('show');
-					Ladda.stopAll();
+					// Ladda.stopAll();
 				}
 			},
 			error: function () {
 				toastr.error(JSON.error);
 				$('input[name="csrf_token"]').val(JSON.csrf_hash);
-				Ladda.stopAll();
-				location.reload();
+				// Ladda.stopAll();
+				// location.reload();
 			}
 		});
 	});
@@ -378,7 +378,7 @@ $(document).ready(function () {
 		});
 	});
 	$(".delete_file").on("click", function () {
-		const field_id = $(this).data('field'); // <--- Fix 1: define field_id
+		const field_id = $(this).data('field'); 
 		
 		$.ajax({
 			url: main_url + "delete-project-file/" + field_id,
