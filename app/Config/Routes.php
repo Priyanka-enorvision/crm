@@ -146,6 +146,7 @@ $routes->get('erp/invoice-detail/(:any)', 'Invoices::invoice_details/$1', ['name
 $routes->get('erp/read-invoice-data', 'Invoices::read_invoice_data', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/pay-invoice-record', 'Invoices::pay_invoice_record', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 $routes->post('erp/update-invoice', 'Invoices::update_invoice', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
+$routes->get('erp/delete-invoice-items', 'Invoices::delete_invoice_items', ['namespace' => 'App\Controllers\Erp', 'filter' => 'checklogin']);
 
 
 //not use route start

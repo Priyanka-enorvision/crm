@@ -172,12 +172,34 @@ $(document).ready(function() {
 	});	
 	
 });
-jQuery(document).on('click','.remove-invoice-item-ol', function () {
-	var record_id = $(this).data('record-id');
-	$(this).closest('.item-row').fadeOut(300, function() {
-	jQuery.get(main_url+"/invoices/delete_invoice_items?record_id="+record_id, function(data, status){
-	});
-	$(this).remove();
-		update_total();
-	});
+jQuery(document).on('click', '.remove-invoice-item-ol', function () {
+    var $button = jQuery(this);
+    var record_id = $button.data('record-id');
+
+    if (!confirm("Are you sure you want to delete this item?")) {
+        return;
+    }
+
+    $button.prop('disabled', true);
+
+    jQuery.get(main_url + "delete-invoice-items", { record_id: record_id }, function (response, status) {
+        if (status === "success") {
+            if (response.result) {
+                $button.closest('.item-row').fadeOut(300, function () {
+                    jQuery(this).remove();
+                    update_total();
+                });
+            } else {
+                alert("Error: " + response.error);
+                $button.prop('disabled', false);
+            }
+        } else {
+            alert("Request failed. Please try again.");
+            $button.prop('disabled', false);
+        }
+    }).fail(function () {
+        alert("Server error. Try again later.");
+        $button.prop('disabled', false);
+    });
 });
+

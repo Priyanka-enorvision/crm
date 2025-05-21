@@ -2751,7 +2751,7 @@ class Projects extends BaseController
 
 		$invoice_data = $InvoicesModel->where('invoice_id', $invoice_id)->first();
 		$data['title'] = 'Edit Project Invoice';
-		$data['path_url'] = '';
+		$data['path_url'] = 'create_invoice';
 
 		$data['breadcrumbs'] = 'Edit Project Invoice';
 		$data['invoice'] = $invoice_data;

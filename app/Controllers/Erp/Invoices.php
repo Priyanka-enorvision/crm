@@ -970,23 +970,26 @@ class Invoices extends BaseController
 	public function delete_invoice_items()
 	{
 
-		if ($this->request->getVar('record_id')) {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-			$session = \Config\Services::session();
-			$request = \Config\Services::request();
-			$usession = $session->get('sup_username');
-			$record_id = udecode($this->request->getVar('record_id', FILTER_SANITIZE_STRING));
-			$Return['csrf_hash'] = csrf_hash();
+		$Return = ['result' => '', 'error' => '', 'csrf_hash' => csrf_hash()];
+		
+		$record_id = $this->request->getVar('record_id');
+		$record_id = udecode($record_id);
+		
+		if ($record_id) {
+			
 			$InvoiceitemsModel = new InvoiceitemsModel();
-			$result = $InvoiceitemsModel->where('invoice_item_id', $record_id)->delete($record_id);
-			if ($result == TRUE) {
+			$result = $InvoiceitemsModel->where('invoice_item_id', $record_id)->delete();
+			
+			if ($result) {
 				$Return['result'] = lang('Success.ci_invoice_deleted_msg');
 			} else {
 				$Return['error'] = lang('Main.xin_error_msg');
 			}
-			$this->output($Return);
+		} else {
+			$Return['error'] = 'Invalid record ID';
 		}
+		
+		return $this->response->setJSON($Return);
 	}
 	public function invoice_status_chart()
 	{
