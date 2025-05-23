@@ -113,7 +113,7 @@ class Moms extends BaseController {
 				$project_ids = $this->request->getPost('project_id');
 				if (is_array($project_ids)) {
 					$filtered_project_ids = array_filter($project_ids, function($id) {
-						return $id !== '0' && $id !== ''; 
+						return  $id !== ''; 
 					});
 					$project_id = implode(',', $filtered_project_ids);
 				} else {
@@ -123,7 +123,7 @@ class Moms extends BaseController {
 				$assigned_ids = $this->request->getPost('assigned_to');
 				if (is_array($assigned_ids)) {
 					$filtered_assigned_ids = array_filter($assigned_ids, function($id) {
-						return $id !== '0' && $id !== ''; 
+						return  $id !== ''; 
 					});
 					$employee_ids = implode(',', $filtered_assigned_ids);
 				} else {
@@ -207,14 +207,14 @@ class Moms extends BaseController {
 	
 				$project_ids = $this->request->getPost('project_id') ?? [];
 				$filtered_project_ids = array_filter($project_ids, function($id) {
-					return $id !== '0' && $id !== '';
+					return  $id !== '';
 				});
 				$project_id = implode(',', $filtered_project_ids);
 	
 				
 				$assigned_ids = $this->request->getPost('assigned_to') ?? [];
 				$filtered_assigned_ids = array_filter($assigned_ids, function($id) {
-					return $id !== '0' && $id !== '';
+					return  $id !== '';
 				});
 				$employee_ids = implode(',', $filtered_assigned_ids);
 				

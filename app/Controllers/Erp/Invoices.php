@@ -976,7 +976,7 @@ class Invoices extends BaseController
 		$record_id = udecode($record_id);
 		
 		if ($record_id) {
-			
+
 			$InvoiceitemsModel = new InvoiceitemsModel();
 			$result = $InvoiceitemsModel->where('invoice_item_id', $record_id)->delete();
 			
